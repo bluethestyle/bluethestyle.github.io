@@ -109,9 +109,13 @@ architecture decisions, and what three months of human-AI
 collaboration actually looked like.
 Also available in [한국어](/series/three-months-ko/).
 
-*The MRM Thread* — a shorter parallel series on the regulatory
-and model-risk-management angle — will follow the first half
-of the main series.
+### [The MRM Thread](/series/mrm-thread/)
+
+A parallel series on model risk management for AI recommendation
+systems, written from a GARP FRM practitioner perspective. Aimed
+at financial practitioners, risk managers, regulatory staff, and
+MRM teams.
+Also available in [한국어](/series/mrm-thread-ko/).
 
 ## All posts
 
