@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 title: "시리즈: 3개월간의 금융 AI 개발기"
 permalink: /series/three-months-ko/
 ---

@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 title: "Series: Building a Financial AI in Three Months"
 permalink: /series/three-months/
 ---

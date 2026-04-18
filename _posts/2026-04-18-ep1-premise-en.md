@@ -1,13 +1,14 @@
 ---
-layout: default
+layout: post
 title: "[FinAI Build] Ep 1 — The Premise"
-date: 2026-04-18
+date: 2026-04-18 12:00:00 +0900
+categories: [FinAI Build]
+tags: [finai-build, architecture, claude-code, financial-ai, ple]
 lang: en
 series: three-months
 part: 1
+toc: true
 ---
-
-# Episode 1 — The Premise
 
 *Part 1 of "Building a Financial AI in Three Months" — a series on
 building a financial recommendation system with Claude Code, on

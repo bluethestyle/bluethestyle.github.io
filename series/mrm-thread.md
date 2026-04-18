@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 title: "Series: The MRM Thread"
 permalink: /series/mrm-thread/
 ---

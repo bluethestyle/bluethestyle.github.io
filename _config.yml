@@ -1,41 +1,121 @@
-title: Seonkyu Jeong
-description: >
-  Independent researcher — financial AI, model risk management,
-  agentic systems. GARP FRM. Seoul, Republic of Korea.
+theme: jekyll-theme-chirpy
 
-# GitHub Pages built-in theme (no Gemfile needed for this theme)
-theme: jekyll-theme-minimal
-
-# Author info
-author: Seonkyu Jeong
-github_username: bluethestyle
-
-# SEO
-url: "https://bluethestyle.github.io"
-twitter_username:
-linkedin_username:
-
-# Build settings
-markdown: kramdown
-highlighter: rouge
-permalink: /:year/:month/:day/:title/
+lang: en  # site default; individual posts specify lang
 timezone: Asia/Seoul
 
-# Display
-show_downloads: false
-google_analytics:
+# Site info
+title: Seonkyu Jeong
+tagline: Independent researcher — financial AI, MRM, agentic systems. GARP FRM. Seoul.
+description: >-
+  Independent research on financial AI, model risk management, and
+  agentic systems. GARP FRM. Based in Seoul, Republic of Korea.
+url: "https://bluethestyle.github.io"
 
-# Files to exclude from build
+github:
+  username: bluethestyle
+
+social:
+  name: Seonkyu Jeong
+  email: jsk320098@gmail.com
+  links:
+    - https://github.com/bluethestyle
+    - https://orcid.org/0009-0005-3291-9112
+
+# Theme mode: null allows user to toggle
+theme_mode: # light | dark | null
+
+# CDN endpoint for assets — leave empty for GitHub Pages default
+cdn: ""
+
+# Path configuration
+avatar: ""  # no avatar for now; can add later at /assets/img/avatar.png
+
+# Note preview on home page
+post_excerpts: true
+
+# Image lazy-load
+lazy_load_img: true
+
+# Default permalink pattern — keep existing pattern
+permalink: /:year/:month/:day/:title/
+
+# Markdown + highlighter
+markdown: kramdown
+highlighter: rouge
+
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: highlight
+    block:
+      line_numbers: true
+      start_line: 1
+
+collections:
+  tabs:
+    output: true
+    sort_by: order
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+      comments: false
+      toc: true
+      permalink: /:year/:month/:day/:title/
+  - scope:
+      path: _tabs
+      type: tabs
+    values:
+      layout: page
+      permalink: /:title/
+  - scope:
+      path: assets/img/favicons
+    values:
+      swcache: true
+  - scope:
+      path: assets/js/dist
+    values:
+      swcache: true
+
+sass:
+  style: compressed
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  profile: false
+  blanklines: false
+  ignore:
+    envs: [development]
+
 exclude:
+  - "*.gem"
+  - "*.gemspec"
+  - docs
+  - tools
   - README.md
+  - LICENSE
+  - "*.config.js"
+  - package*.json
   - Gemfile
   - Gemfile.lock
-  - vendor/
+  - vendor
   - .gitignore
-  - .github/
 
-# Plugins (GitHub Pages supports these)
+jekyll-archives:
+  enabled: [categories, tags]
+  layouts:
+    category: category
+    tag: tag
+  permalinks:
+    tag: /tags/:name/
+    category: /categories/:name/
+
 plugins:
+  - jekyll-paginate
+  - jekyll-redirect-from
   - jekyll-seo-tag
-  - jekyll-sitemap
-  - jekyll-feed

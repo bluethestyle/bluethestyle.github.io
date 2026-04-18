@@ -1,13 +1,14 @@
 ---
-layout: default
+layout: post
 title: "[MRM 스레드] 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다"
-date: 2026-04-18
+date: 2026-04-18 12:00:00 +0900
+categories: [MRM 스레드]
+tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: ko
 series: mrm-thread
 part: 1
+toc: true
 ---
-
-# MRM 에피소드 1 — Model Risk Management 는 검증이 아니라 아키텍처에 속한다
 
 *시리즈 "MRM 스레드" 1편. AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.*
 

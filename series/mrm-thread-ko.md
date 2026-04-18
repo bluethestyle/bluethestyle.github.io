@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 title: "시리즈: MRM 스레드"
 permalink: /series/mrm-thread-ko/
 ---

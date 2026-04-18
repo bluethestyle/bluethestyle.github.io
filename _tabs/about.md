@@ -1,10 +1,8 @@
 ---
-layout: default
 title: About
-permalink: /about/
+icon: fas fa-info-circle
+order: 4
 ---
-
-# About
 
 ## Who I am
 
@@ -97,6 +95,3 @@ please use the email above.
 - **Blog posts**: CC BY 4.0 unless noted otherwise
 - **Research papers** (on Zenodo): CC BY 4.0
 - **Source code** (on GitHub): MIT License
-
-Attribution is always appreciated but not strictly required for
-short quotations within fair-use / fair-dealing doctrine.
