@@ -26,8 +26,13 @@ GCN, PersLay-TDA, LightGCN, Causal, Optimal Transport), distilled
 to LightGBM for AWS Lambda serving, with regulatory-grade audit
 infrastructure built into the architecture — not bolted on.
 
-Built by three people on personal time, starting early 2026, with
-Claude Code (Anthropic) as the primary development partner.
+**Team** — three people on personal time, starting early 2026:
+
+- **Seonkyu Jeong** — architecture, regulatory framing, paper writing
+- **Euncheol Sim** — engineering, experimentation
+- **Youngchan Kim** — engineering, evaluation
+
+Claude Code (Anthropic) served as the primary development partner.
 Roughly 90% of the codebase and both preprints went through
 Opus + Sonnet collaboration.
 
