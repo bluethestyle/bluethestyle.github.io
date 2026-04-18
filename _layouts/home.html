@@ -5,14 +5,10 @@ refactor: true
 
 {% comment %}
   Homepage layout — ported from Claude Design handoff.
-  Wraps main content + right-panel in a 2-col flex container so
-  the prototype's right-hand INDEX/Recent/Trending/ORCID/Colophon
-  panel sits beside the main column on large screens, and stacks
-  below on small screens.
+  Right panel is rendered by the parent default.html wrapper into
+  #panel-wrapper, so this layout only produces the main column
+  content.
 {% endcomment %}
-
-<div class="layout-with-panel" style="display: flex; gap: 2.5rem; align-items: flex-start;">
-  <div class="layout-main" style="flex: 1; min-width: 0;">
 
 
 <!-- ============================================================
@@ -291,9 +287,3 @@ refactor: true
   <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">License</span> content CC BY-NC 4.0 · code MIT</div>
 </section>
 
-  </div>{%- comment -%} end .layout-main {%- endcomment -%}
-
-  <aside class="layout-panel d-none d-xl-block" style="width: 300px; flex-shrink: 0; position: sticky; top: 80px;">
-    {% include right-panel.html %}
-  </aside>
-</div>{%- comment -%} end .layout-with-panel {%- endcomment -%}
