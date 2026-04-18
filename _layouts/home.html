@@ -4,16 +4,15 @@ refactor: true
 ---
 
 {% comment %}
-  Homepage layout — ported from Claude Design handoff
-  (tech_blog_extracted/handoff/Homepage.standalone.html)
-
-  Sections (top to bottom):
-    1. Hero / intro         — WORKING NOTES + Fraunces H1 + lead + FRM badge
-    2. Current work card    — 2-col: text + PLE diagram placeholder
-    3. Co-authors grid      — 3 cards driven by _data/coauthors.yml
-    4. Series grid          — 2 cards driven by _data/series.yml
-    5. Latest posts         — rendered from paginator.posts
+  Homepage layout — ported from Claude Design handoff.
+  Wraps main content + right-panel in a 2-col flex container so
+  the prototype's right-hand INDEX/Recent/Trending/ORCID/Colophon
+  panel sits beside the main column on large screens, and stacks
+  below on small screens.
 {% endcomment %}
+
+<div class="layout-with-panel" style="display: flex; gap: 2.5rem; align-items: flex-start;">
+  <div class="layout-main" style="flex: 1; min-width: 0;">
 
 
 <!-- ============================================================
@@ -288,6 +287,13 @@ refactor: true
 <section id="contact-strip" style="margin-top: 5rem; padding-top: 1.5rem; border-top: 1px solid var(--dash-color); font-family: JetBrains Mono, monospace; font-size: 11px; letter-spacing: 0.04em; color: var(--text-muted-color); display: flex; flex-wrap: wrap; gap: 2rem;">
   <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">Contact</span> jsk320098 [at] gmail [dot] com</div>
   <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">ORCID</span> <a href="https://orcid.org/0009-0005-3291-9112" style="color: var(--link-color);">0009-0005-3291-9112 ↗</a></div>
-  <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">GitHub</span> <a href="https://github.com/bluethestyle" style="color: var(--link-color);">@bluethestyle ↗</a></div>
+  <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">GitHub</span> <a href="https://github.com/bluethestyle">@bluethestyle ↗</a></div>
   <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">License</span> content CC BY-NC 4.0 · code MIT</div>
 </section>
+
+  </div>{%- comment -%} end .layout-main {%- endcomment -%}
+
+  <aside class="layout-panel d-none d-xl-block" style="width: 300px; flex-shrink: 0; position: sticky; top: 80px;">
+    {% include right-panel.html %}
+  </aside>
+</div>{%- comment -%} end .layout-with-panel {%- endcomment -%}

@@ -3,6 +3,9 @@ layout: default
 refactor: true
 ---
 
+<div class="layout-with-panel" style="display: flex; gap: 2.5rem; align-items: flex-start;">
+  <div class="layout-main" style="flex: 1; min-width: 0;">
+
 {% comment %}
   Tags layout — overrides Chirpy's default tags page
   Ported from Claude Design handoff (05-tags.png)
@@ -272,3 +275,11 @@ refactor: true
   });
 })();
 </script>
+
+
+  </div>{%- comment -%} end .layout-main {%- endcomment -%}
+
+  <aside class="layout-panel d-none d-xl-block" style="width: 300px; flex-shrink: 0; position: sticky; top: 80px;">
+    {% include right-panel.html %}
+  </aside>
+</div>{%- comment -%} end .layout-with-panel {%- endcomment -%}
