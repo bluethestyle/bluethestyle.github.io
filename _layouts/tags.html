@@ -21,8 +21,17 @@ refactor: true
   {% if tag[1].size > max_count %}{% assign max_count = tag[1].size %}{% endif %}
 {% endfor %}
 
-{% comment %} --- sort tags by count desc, then name asc --- {% endcomment %}
-{% assign sorted_tags = site.tags | sort: 'size' | reverse %}
+{% comment %}
+  NOTE on sorting:
+  site.tags in Jekyll iterates as [name, posts_array] tuples.
+  `site.tags | sort: 'size' | reverse` fails in Jekyll 4.4+
+  because each item is a 2-element Array, not an object with
+  a .size property.
+  Solution: the two loops below use a bucket-sort pattern —
+  outer loop counts from max_count down to 1; inner loop emits
+  tags whose post count matches the current rank. No
+  pre-sorted array needed, no plugin, no `push` dependency.
+{% endcomment %}
 {% assign tag_total = site.tags | size %}
 
 {% comment %} --- total posts tagged (sum of sizes) for SHARE denominator: use max_count so top tag = 100% --- {% endcomment %}
@@ -83,23 +92,34 @@ refactor: true
   </div>
 
   <div id="tag-cloud-box" style="border: 1px solid var(--card-border-color); border-radius: 10px; padding: 2rem 1.8rem; background: var(--card-bg); line-height: 2.2;">
-    {% for tag in sorted_tags %}
-      {% assign tname = tag[0] %}
-      {% assign tcount = tag[1].size %}
-      {% assign size_ratio = tcount | times: 100 | divided_by: max_count %}
-      {% assign font_add = size_ratio | divided_by: 50.0 %}
-      {% comment %} font-size ranges approximately 1rem (small) to 3rem (largest) {% endcomment %}
-      {% if forloop.index <= 3 %}
-        {% assign is_hot = true %}
-      {% else %}
-        {% assign is_hot = false %}
-      {% endif %}
+    {%- comment -%}
+      Bucket sort: walk count levels from max_count down to 1
+      and emit tags whose size matches each level. Rank counter
+      tracked manually since we cannot use forloop.index here.
+    {%- endcomment -%}
+    {% assign cloud_rank = 0 %}
+    {% for i in (1..max_count) %}
+      {% assign current_rank = max_count | plus: 1 | minus: i %}
+      {% for tag in site.tags %}
+        {% if tag[1].size == current_rank %}
+          {% assign cloud_rank = cloud_rank | plus: 1 %}
+          {% assign tname = tag[0] %}
+          {% assign tcount = tag[1].size %}
+          {% assign size_ratio = tcount | times: 100 | divided_by: max_count %}
+          {% assign font_add = size_ratio | divided_by: 50.0 %}
+          {% if cloud_rank <= 3 %}
+            {% assign is_hot = true %}
+          {% else %}
+            {% assign is_hot = false %}
+          {% endif %}
 
-      <a href="{{ '/tags/' | append: tname | slugify | append: '/' | relative_url }}"
-         class="tag-cloud-item"
-         style="font-family: Fraunces, serif; font-style: italic; font-size: calc(1rem + {{ font_add }}rem); margin-right: 0.9rem; color: var(--text-color); text-decoration: none; white-space: nowrap;{% if is_hot %} position: relative;{% endif %}">
-        {% if is_hot %}<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #E8465C; margin-right: 0.25rem; vertical-align: middle;"></span>{% endif %}#{{ tname }}<sub style="font-family: 'JetBrains Mono', monospace; font-style: normal; font-size: 0.42em; color: var(--text-muted-color); letter-spacing: 0.04em; margin-left: 0.1em;">{{ tcount }}</sub>
-      </a>
+          <a href="{{ '/tags/' | append: tname | slugify | append: '/' | relative_url }}"
+             class="tag-cloud-item"
+             style="font-family: Fraunces, serif; font-style: italic; font-size: calc(1rem + {{ font_add }}rem); margin-right: 0.9rem; color: var(--text-color); text-decoration: none; white-space: nowrap;{% if is_hot %} position: relative;{% endif %}">
+            {% if is_hot %}<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #E8465C; margin-right: 0.25rem; vertical-align: middle;"></span>{% endif %}#{{ tname }}<sub style="font-family: 'JetBrains Mono', monospace; font-style: normal; font-size: 0.42em; color: var(--text-muted-color); letter-spacing: 0.04em; margin-left: 0.1em;">{{ tcount }}</sub>
+          </a>
+        {% endif %}
+      {% endfor %}
     {% endfor %}
   </div>
 </section>
@@ -126,53 +146,70 @@ refactor: true
       <span></span>
     </div>
 
-    {% for tag in sorted_tags %}
-      {% assign tname = tag[0] %}
-      {% assign tcount = tag[1].size %}
-      {% assign share_pct = tcount | times: 100 | divided_by: max_count %}
-      {% assign rank_num = forloop.index %}
-      {% if rank_num < 10 %}
-        {% assign rank_str = rank_num | prepend: '0' %}
-      {% else %}
-        {% assign rank_str = rank_num | append: '' %}
-      {% endif %}
-      {% if forloop.index <= 3 %}
-        {% assign is_hot = true %}
-      {% else %}
-        {% assign is_hot = false %}
-      {% endif %}
-
-      <a href="{{ '/tags/' | append: tname | slugify | append: '/' | relative_url }}"
-         class="tags-table-row"
-         style="display: grid; grid-template-columns: 48px 1fr 80px 1.4fr 32px; gap: 1rem; padding: 0.95rem 1.2rem; align-items: center; text-decoration: none; color: var(--text-color); border-bottom: 1px solid var(--dash-color); transition: background 0.12s ease;{% if forloop.last %} border-bottom: none;{% endif %}">
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.04em;">
-          {{ rank_str }}
-        </span>
-
-        <span style="display: flex; align-items: center; gap: 0.6rem; font-family: Fraunces, serif; font-size: 1.05rem;">
-          #{{ tname }}
-          {% if is_hot %}
-            <span style="background: #E8465C; color: white; border-radius: 2px; padding: 1px 5px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.1em; font-weight: 500;">HOT</span>
+    {%- comment -%}
+      Ranked rows: same bucket-sort pattern. `table_rank` is the
+      running position counter (used for HOT badges + leading 0s).
+      `rows_emitted` is the 1-based index within the table to
+      compare against `tag_total` for `forloop.last`-style border
+      suppression on the final row.
+    {%- endcomment -%}
+    {% assign table_rank = 0 %}
+    {% for i in (1..max_count) %}
+      {% assign current_rank = max_count | plus: 1 | minus: i %}
+      {% for tag in site.tags %}
+        {% if tag[1].size == current_rank %}
+          {% assign table_rank = table_rank | plus: 1 %}
+          {% assign tname = tag[0] %}
+          {% assign tcount = tag[1].size %}
+          {% assign share_pct = tcount | times: 100 | divided_by: max_count %}
+          {% if table_rank < 10 %}
+            {% assign rank_str = table_rank | prepend: '0' %}
+          {% else %}
+            {% assign rank_str = table_rank | append: '' %}
           {% endif %}
-        </span>
+          {% if table_rank <= 3 %}
+            {% assign is_hot = true %}
+          {% else %}
+            {% assign is_hot = false %}
+          {% endif %}
+          {% assign is_last = false %}
+          {% if table_rank == tag_total %}
+            {% assign is_last = true %}
+          {% endif %}
 
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-color); letter-spacing: 0.02em;">
-          {{ tcount }}
-        </span>
+          <a href="{{ '/tags/' | append: tname | slugify | append: '/' | relative_url }}"
+             class="tags-table-row"
+             style="display: grid; grid-template-columns: 48px 1fr 80px 1.4fr 32px; gap: 1rem; padding: 0.95rem 1.2rem; align-items: center; text-decoration: none; color: var(--text-color); border-bottom: 1px solid var(--dash-color); transition: background 0.12s ease;{% if is_last %} border-bottom: none;{% endif %}">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.04em;">
+              {{ rank_str }}
+            </span>
 
-        <span style="display: flex; align-items: center; gap: 0.8rem;">
-          <span style="flex: 1; height: 4px; background: var(--mask-bg); border-radius: 2px; overflow: hidden; min-width: 80px;">
-            <span style="display: block; width: {{ share_pct }}%; height: 100%; background: var(--accent-color);"></span>
-          </span>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.02em; min-width: 36px; text-align: right;">
-            {{ share_pct }}%
-          </span>
-        </span>
+            <span style="display: flex; align-items: center; gap: 0.6rem; font-family: Fraunces, serif; font-size: 1.05rem;">
+              #{{ tname }}
+              {% if is_hot %}
+                <span style="background: #E8465C; color: white; border-radius: 2px; padding: 1px 5px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.1em; font-weight: 500;">HOT</span>
+              {% endif %}
+            </span>
 
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent-color); text-align: right;">
-          &#8599;
-        </span>
-      </a>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-color); letter-spacing: 0.02em;">
+              {{ tcount }}
+            </span>
+
+            <span style="display: flex; align-items: center; gap: 0.8rem;">
+              <span style="flex: 1; height: 4px; background: var(--mask-bg); border-radius: 2px; overflow: hidden; min-width: 80px;">
+                <span style="display: block; width: {{ share_pct }}%; height: 100%; background: var(--accent-color);"></span>
+              </span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.02em; min-width: 36px; text-align: right;">
+                {{ share_pct }}%
+              </span>
+            </span>
+
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent-color); text-align: right;">
+              &#8599;
+            </span>
+          </a>
+        {% endif %}
+      {% endfor %}
     {% endfor %}
   </div>
 </section>
