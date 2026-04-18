@@ -100,7 +100,20 @@ Topics I expect to write about:
 
 ---
 
-## Posts
+## Series
+
+### [Three Months, Three People](/series/three-months/)
+
+A narrative series on building the system — team, constraints,
+architecture decisions, and what three months of human-AI
+collaboration actually looked like.
+Also available in [한국어](/series/three-months-ko/).
+
+*The MRM Thread* — a shorter parallel series on the regulatory
+and model-risk-management angle — will follow the first half
+of the main series.
+
+## All posts
 
 <ul>
 {% for post in site.posts %}
