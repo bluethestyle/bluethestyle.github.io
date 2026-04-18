@@ -7,16 +7,27 @@ timezone: Asia/Seoul
 title: Seonkyu Jeong
 tagline: Independent researcher — financial AI, MRM, agentic systems. GARP FRM. Seoul.
 description: >-
-  Independent research on financial AI, model risk management, and
-  agentic systems. GARP FRM. Based in Seoul, Republic of Korea.
+  Notes, working papers, and long-form thinking on financial AI,
+  model risk management, and agentic systems.
 url: "https://bluethestyle.github.io"
+since: 2026
 
 github:
   username: bluethestyle
 
+# Author block (read by the Claude Design v2 hero/sidebar/topbar)
+author:
+  name: Seonkyu Jeong
+  role: Independent researcher
+  location: Seoul
+  frm: true
+
 social:
   name: Seonkyu Jeong
   email: jsk320098@gmail.com
+  github: bluethestyle
+  orcid: 0009-0005-3291-9112
+  zenodo: https://zenodo.org/communities/bluethestyle
   links:
     - https://github.com/bluethestyle
     - https://orcid.org/0009-0005-3291-9112

@@ -12,33 +12,24 @@ refactor: true
 
 
 <!-- ============================================================
-     1. Hero / intro
+     1. Hero — .bts-hero per handoff/chirpy/README.md §4
      ============================================================ -->
-<section id="home-intro">
+<section class="bts-hero">
+  <div class="label"><span class="pulse"></span>Working notes · est. {{ site.since | default: 2026 }}</div>
   <h1>
-    Seonkyu <em>Jeong</em> —
-    notes on <span class="hl">financial AI</span>,
-    model risk, and the slow integration of
-    <em>agents</em> into <span class="hl">regulated workflows</span>.
+    {{ site.author.name | default: "Seonkyu Jeong" }} <em>—</em> notes on
+    <span class="hl">financial&nbsp;AI</span>, model&nbsp;risk, and the slow integration of
+    <em>agents</em> into regulated workflows.
   </h1>
-
-  <p class="lead">
-    <strong>Independent researcher · Seoul.</strong>
-    Notes, working papers, and long-form thinking on financial AI,
-    model risk management, and agentic systems.
-    <strong>GARP Financial Risk Manager (FRM).</strong>
-  </p>
-
   <p>
-    This site collects what does not fit into a journal paper or a
-    GitHub README — decisions and their reasons, failed experiments,
-    what collaborating with an AI system for three months actually
-    looked like.
+    <b>{{ site.author.role | default: "Independent researcher" }} · {{ site.author.location | default: "Seoul" }}.</b>
+    {{ site.description | default: "Notes, working papers, and long-form thinking on financial AI, model risk management, and agentic systems." }}
   </p>
-
-  <p style="margin-top: 1.5rem;">
-    <code>◆ GARP FRM · Financial Risk Manager</code>
-  </p>
+  {% if site.author.frm %}
+    <span class="frm">◆ GARP FRM · Financial Risk Manager</span>
+  {% else %}
+    <span class="frm">◆ GARP FRM · Financial Risk Manager</span>
+  {% endif %}
 </section>
 
 

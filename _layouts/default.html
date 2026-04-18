@@ -16,72 +16,53 @@ layout: compress
 
   <body>
     {%- comment -%}
-      Custom default layout — overrides Chirpy's to match Claude
-      Design handoff structure:
+      Claude Design handoff v2 layout structure:
 
         [topbar, full width, sticky top]
-        [sidebar fixed left] [main content] [right panel]
+        .bts-frame (grid)
+          [sidebar]  [main]  [right-panel]
 
-      Chirpy's own structure puts topbar INSIDE the centered
-      container, which constrains it to ~60% width. We instead
-      render topbar as a direct child of body with 100vw sticky
-      positioning so it spans edge to edge.
+      Chirpy's original default placed sidebar OUTSIDE main-wrapper
+      and topbar INSIDE the centered container. We replace that
+      with the prototype's 3-column grid at body level so topbar
+      spans edge to edge and columns align properly.
+
+      site.css provides all .bts-* styles. Chirpy's own theme.css
+      still loads for baseline typography + dark mode toggle JS,
+      but our site.css is loaded after and overrides where needed.
     {%- endcomment -%}
 
-    {% include topbar.html lang=lang %}
+    {%- include topbar.html -%}
 
-    {% include sidebar.html lang=lang %}
+    <div class="bts-frame">
+      {%- include sidebar.html -%}
 
-    <div id="main-wrapper" class="d-flex justify-content-center">
-      <div class="container d-flex flex-column px-xxl-5">
+      <main class="bts-main" aria-label="Main Content">
+        {% if layout.layout == 'default' %}
+          {% include refactor-content.html content=content lang=lang %}
+        {% else %}
+          {{ content }}
+        {% endif %}
 
-        <div class="row flex-grow-1">
-          <main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4">
-            {% if layout.layout == 'default' %}
-              {% include refactor-content.html content=content lang=lang %}
-            {% else %}
-              {{ content }}
-            {% endif %}
-          </main>
+        {% for _include in layout.tail_includes %}
+          {% assign _include_path = _include | append: '.html' %}
+          {% include {{ _include_path }} lang=lang %}
+        {% endfor %}
+      </main>
 
-          {%- comment -%}
-            Right panel: Chirpy's access block (update-list +
-            trending-tags) is REPLACED by our right-panel.html
-            which includes INDEX stats + Recently + Trending +
-            ORCID + Colophon in the handoff style.
-          {%- endcomment -%}
-          <aside aria-label="Panel" id="panel-wrapper" class="col-xl-3 ps-2 text-muted">
-            {% include right-panel.html lang=lang %}
-
-            {% for _include in layout.panel_includes %}
-              {% assign _include_path = _include | append: '.html' %}
-              {% include {{ _include_path }} lang=lang %}
-            {% endfor %}
-          </aside>
-        </div>
-
-        <div class="row">
-          <div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-md-4">
-            {% for _include in layout.tail_includes %}
-              {% assign _include_path = _include | append: '.html' %}
-              {% include {{ _include_path }} lang=lang %}
-            {% endfor %}
-
-            {% include_cached footer.html lang=lang %}
-          </div>
-        </div>
-
-        {% include_cached search-results.html lang=lang %}
-      </div>
-
-      <aside aria-label="Scroll to Top">
-        <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow">
-          <i class="fas fa-angle-up"></i>
-        </button>
-      </aside>
+      {%- include right-panel.html -%}
     </div>
 
     <div id="mask" class="d-none position-fixed w-100 h-100 z-1"></div>
+
+    {%- comment -%} Search UI (Chirpy-managed) {%- endcomment -%}
+    {% include_cached search-results.html lang=lang %}
+
+    <aside aria-label="Scroll to Top">
+      <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow">
+        <i class="fas fa-angle-up"></i>
+      </button>
+    </aside>
 
     {% if site.pwa.enabled %}
       {% include_cached notification.html lang=lang %}
