@@ -595,7 +595,7 @@ html[data-mode="dark"] {
   grid-template-columns: 240px 1fr 280px;
   column-gap: 56px;
   row-gap: 40px;
-  padding: 0 64px 96px;
+  padding: 48px 64px 96px;
 }
 .bts-frame > .bts-sidebar-l { grid-column: 1; }
 .bts-frame > .bts-main      { grid-column: 2; min-width: 0; }
