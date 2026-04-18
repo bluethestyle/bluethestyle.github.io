@@ -1,0 +1,377 @@
+---
+layout: default
+refactor: true
+---
+
+{% comment %}
+  Categories layout — ported from Claude Design handoff
+  (tech_blog_extracted/handoff/screens/04-categories.png)
+
+  Sections (top to bottom):
+    1. Mono caption       — ● NAVIGATION · N CATEGORIES
+    2. Hero block         — Fraunces H1 w/ .hl + lead paragraph
+    3. Section divider
+    4. All categories     — filter chips + 2-column grid of cards
+    5. Distribution bar   — horizontal stacked bar + legend
+
+  Korean mappings + descriptions are declared inline via Liquid
+  conditionals so new categories added by Chirpy's site.categories
+  iterator can be extended here without touching any other file.
+{% endcomment %}
+
+
+{%- comment -%}
+  ============================================================
+  Build a unified list of categories:
+    - all categories Chirpy gave us in site.categories
+    - plus any "planned" empty categories we want to preview
+  ============================================================
+{%- endcomment -%}
+
+{% assign active_categories = site.categories %}
+{% assign planned_names = "Field Notes,Commentary" | split: "," %}
+
+{%- comment -%} Count planned categories that are not already active {%- endcomment -%}
+{% assign planned_empty_count = 0 %}
+{% for pn in planned_names %}
+  {% assign is_present = false %}
+  {% for cat in active_categories %}
+    {% if cat[0] == pn %}{% assign is_present = true %}{% endif %}
+  {% endfor %}
+  {% unless is_present %}
+    {% assign planned_empty_count = planned_empty_count | plus: 1 %}
+  {% endunless %}
+{% endfor %}
+
+{% assign total_categories = active_categories.size | plus: planned_empty_count %}
+{% assign active_count = active_categories.size %}
+
+
+<!-- ============================================================
+     1. Mono caption / breadcrumb
+     ============================================================ -->
+<div class="mono-caption" style="margin-bottom: 1.5rem;">
+  <span style="color: var(--accent-color);">●</span>
+  &nbsp;NAVIGATION &middot; {{ total_categories }} CATEGORIES
+</div>
+
+
+<!-- ============================================================
+     2. Hero block
+     ============================================================ -->
+<section id="categories-hero" style="padding-bottom: 2.5rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--dash-color); position: relative;">
+  <h1 style="font-family: Fraunces, serif; font-size: 2.8rem; font-weight: 400; line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 1.5rem; text-wrap: balance;">
+    <em>Categories</em> &mdash; everything here is a
+    <span class="hl">field note</span>,
+    <span class="hl">grouped</span>.
+  </h1>
+
+  <p class="lead" style="font-size: 1.08rem; line-height: 1.55; color: var(--text-color); max-width: 58ch;">
+    Pages here are organized by theme. Every category usually exists as an
+    <strong>English/Korean pair</strong>. Empty categories are listed so you can see
+    what's coming.
+  </p>
+
+  <span style="position: absolute; bottom: -1px; left: 0; width: 60px; height: 2px; background: var(--accent-color);"></span>
+</section>
+
+
+<!-- ============================================================
+     3. All categories — heading row + filter chips
+     ============================================================ -->
+<section id="all-categories" style="margin-top: 2.5rem;">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: baseline; gap: 1rem;">
+      <h2 style="font-family: Fraunces, serif; font-style: italic; font-size: 1.8rem; font-weight: 400; margin: 0; letter-spacing: -0.02em;">
+        All <em>categories</em>
+      </h2>
+      <span class="mono-caption">{{ total_categories }} total &middot; {{ active_count }} active</span>
+    </div>
+
+    <div class="cat-filters" style="display: flex; gap: 0.4rem;">
+      <button type="button" data-filter="all" class="cat-filter-btn active" style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--text-color); background: var(--text-color); color: var(--main-bg); cursor: pointer;">ALL</button>
+      <button type="button" data-filter="active" class="cat-filter-btn" style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--card-border-color); background: var(--card-bg); color: var(--text-muted-color); cursor: pointer;">ACTIVE</button>
+      <button type="button" data-filter="planned" class="cat-filter-btn" style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--card-border-color); background: var(--card-bg); color: var(--text-muted-color); cursor: pointer;">PLANNED</button>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       Category grid
+       ============================================================ -->
+  <div id="categories-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+
+    {%- comment -%} ---------- ACTIVE categories ---------- {%- endcomment -%}
+    {% assign cat_index = 0 %}
+    {% for cat in active_categories %}
+      {% assign cat_index = cat_index | plus: 1 %}
+      {% assign cat_name = cat[0] %}
+      {% assign cat_posts = cat[1] %}
+      {% assign post_count = cat_posts.size %}
+
+      {%- comment -%} Resolve KO title, description and accent per known category {%- endcomment -%}
+      {% assign ko_title = "" %}
+      {% assign desc = "Notes filed under this theme." %}
+      {% assign accent_hex = "#2E5BFF" %}
+
+      {% if cat_name == "FinAI Build" %}
+        {% assign ko_title = "3개월 개발기" %}
+        {% assign desc = "Building a financial AI in three months &mdash; engineering notes." %}
+        {% assign accent_hex = "#2E5BFF" %}
+      {% elsif cat_name == "MRM Thread" %}
+        {% assign ko_title = "MRM 스레드" %}
+        {% assign desc = "Model risk management for AI recommendation systems." %}
+        {% assign accent_hex = "#E8465C" %}
+      {% elsif cat_name == "Field Notes" %}
+        {% assign ko_title = "현장 노트" %}
+        {% assign desc = "Short observations from client work." %}
+        {% assign accent_hex = "#2F7D3A" %}
+      {% elsif cat_name == "Commentary" %}
+        {% assign ko_title = "논평" %}
+        {% assign desc = "Readings of regulatory drafts and papers." %}
+        {% assign accent_hex = "#8B7F6B" %}
+      {% endif %}
+
+      {%- comment -%} Pad CAT index to 2 digits {%- endcomment -%}
+      {% assign cat_label_num = cat_index %}
+      {% if cat_index < 10 %}{% assign cat_label_num = cat_index | prepend: "0" %}{% endif %}
+
+      {%- comment -%} Collect unique languages present in this category {%- endcomment -%}
+      {% assign langs = "" | split: "," %}
+      {% for p in cat_posts %}
+        {% if p.lang %}
+          {% unless langs contains p.lang %}
+            {% assign langs = langs | push: p.lang %}
+          {% endunless %}
+        {% endif %}
+      {% endfor %}
+
+      <div class="cat-card" data-cat-state="active" style="position: relative; border: 1px solid var(--card-border-color); border-radius: 10px; padding: 1.3rem; background: var(--card-bg); display: flex; flex-direction: column; gap: 0.7rem;">
+        <!-- Top row: CAT label + post count -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.55rem;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {{ accent_hex }};"></span>
+            <code style="background: var(--mask-bg); color: var(--text-muted-color); padding: 3px 7px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;">CAT {{ cat_label_num }}</code>
+          </div>
+          <span class="mono-caption" style="font-size: 10px;">{{ post_count }} post{% if post_count != 1 %}s{% endif %}</span>
+        </div>
+
+        <!-- Title -->
+        <h3 style="font-family: Fraunces, serif; font-size: 1.35rem; font-weight: 500; line-height: 1.2; margin: 0.2rem 0 0 0; letter-spacing: -0.015em;">
+          <a href="{{ '/categories/' | append: cat_name | slugify | append: '/' | relative_url }}" style="color: var(--text-color); text-decoration: none; border-bottom: none;">
+            {{ cat_name }}
+          </a>
+        </h3>
+
+        {% if ko_title != "" %}
+          <div lang="ko" style="font-family: 'Pretendard Variable', 'Pretendard', sans-serif; font-size: 13px; color: var(--text-muted-color); margin-top: -0.2rem;">
+            {{ ko_title }}
+          </div>
+        {% endif %}
+
+        <p style="font-size: 13.5px; line-height: 1.55; color: var(--text-muted-color); margin: 0.2rem 0 0.4rem 0;">
+          {{ desc }}
+        </p>
+
+        {% if langs.size > 0 %}
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: auto;">
+            {% for lang in langs %}
+              {%- comment -%} Pick latest post in that language for date stamp {%- endcomment -%}
+              {% assign latest_date = "" %}
+              {% for p in cat_posts %}
+                {% if p.lang == lang %}
+                  {% assign this_date = p.date | date: "%m-%d" %}
+                  {% if latest_date == "" %}
+                    {% assign latest_date = this_date %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; background: {% if lang == 'ko' %}rgba(232, 70, 92, 0.1){% else %}var(--accent-soft){% endif %}; color: {% if lang == 'ko' %}#B2394C{% else %}var(--accent-color-hover){% endif %}; padding: 2px 8px; border-radius: 999px;">
+                {{ lang | upcase }} {{ latest_date }}
+              </span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+
+    {%- comment -%} ---------- PLANNED (empty) categories ---------- {%- endcomment -%}
+    {% for pn in planned_names %}
+      {% assign is_present = false %}
+      {% for cat in active_categories %}
+        {% if cat[0] == pn %}{% assign is_present = true %}{% endif %}
+      {% endfor %}
+
+      {% unless is_present %}
+        {% assign cat_index = cat_index | plus: 1 %}
+        {% assign cat_label_num = cat_index %}
+        {% if cat_index < 10 %}{% assign cat_label_num = cat_index | prepend: "0" %}{% endif %}
+
+        {% assign ko_title = "" %}
+        {% assign desc = "Coming soon." %}
+        {% assign accent_hex = "#8B7F6B" %}
+
+        {% if pn == "Field Notes" %}
+          {% assign ko_title = "현장 노트" %}
+          {% assign desc = "Short observations from client work. (empty)" %}
+          {% assign accent_hex = "#2F7D3A" %}
+        {% elsif pn == "Commentary" %}
+          {% assign ko_title = "논평" %}
+          {% assign desc = "Readings of regulatory drafts and papers. (empty)" %}
+          {% assign accent_hex = "#8B7F6B" %}
+        {% endif %}
+
+        <div class="cat-card cat-card--empty" data-cat-state="planned" style="position: relative; border: 1px dashed var(--card-border-color); border-radius: 10px; padding: 1.3rem; background: var(--card-bg); display: flex; flex-direction: column; gap: 0.7rem; opacity: 0.7;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.55rem;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {{ accent_hex }}; opacity: 0.8;"></span>
+              <code style="background: var(--mask-bg); color: var(--text-muted-color); padding: 3px 7px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;">CAT {{ cat_label_num }}</code>
+            </div>
+            <span class="mono-caption" style="font-size: 10px; background: var(--mask-bg); padding: 2px 8px; border-radius: 999px;">empty</span>
+          </div>
+
+          <h3 style="font-family: Fraunces, serif; font-size: 1.35rem; font-weight: 500; line-height: 1.2; margin: 0.2rem 0 0 0; letter-spacing: -0.015em; color: var(--text-muted-color);">
+            {{ pn }}
+          </h3>
+
+          {% if ko_title != "" %}
+            <div lang="ko" style="font-family: 'Pretendard Variable', 'Pretendard', sans-serif; font-size: 13px; color: var(--text-muted-color); margin-top: -0.2rem;">
+              {{ ko_title }}
+            </div>
+          {% endif %}
+
+          <p style="font-size: 13.5px; line-height: 1.55; color: var(--text-muted-color); margin: 0.2rem 0 0.4rem 0;">
+            {{ desc }}
+          </p>
+        </div>
+      {% endunless %}
+    {% endfor %}
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     4. Distribution bar
+     ============================================================ -->
+<section id="categories-distribution" style="margin-top: 3.5rem;">
+  <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.2rem;">
+    <h3 style="font-family: Fraunces, serif; font-style: italic; font-size: 1.5rem; font-weight: 400; margin: 0; letter-spacing: -0.02em;">
+      <em>Distribution</em>
+    </h3>
+    <span class="mono-caption">by category</span>
+  </div>
+
+  {% assign total_posts = 0 %}
+  {% for cat in active_categories %}
+    {% assign total_posts = total_posts | plus: cat[1].size %}
+  {% endfor %}
+
+  <div style="border: 1px solid var(--card-border-color); border-radius: 10px; padding: 1.2rem; background: var(--card-bg);">
+
+    <!-- Stacked bar -->
+    <div style="display: flex; height: 28px; border-radius: 6px; overflow: hidden; background: var(--mask-bg);">
+      {% if total_posts > 0 %}
+        {% assign dist_index = 0 %}
+        {% for cat in active_categories %}
+          {% assign dist_index = dist_index | plus: 1 %}
+          {% assign cat_name = cat[0] %}
+          {% assign pc = cat[1].size %}
+          {% assign pct = pc | times: 100 | divided_by: total_posts %}
+
+          {% assign dist_hex = "#2E5BFF" %}
+          {% if cat_name == "FinAI Build" %}{% assign dist_hex = "#2E5BFF" %}
+          {% elsif cat_name == "MRM Thread" %}{% assign dist_hex = "#E8465C" %}
+          {% elsif cat_name == "Field Notes" %}{% assign dist_hex = "#2F7D3A" %}
+          {% elsif cat_name == "Commentary" %}{% assign dist_hex = "#8B7F6B" %}
+          {% endif %}
+
+          <div title="{{ cat_name }} · {{ pc }}" style="width: {{ pct }}%; background: {{ dist_hex }}; display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em;">
+            {% if pct >= 10 %}{{ pc }}{% endif %}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Legend -->
+    <div style="display: flex; flex-wrap: wrap; gap: 1.2rem; margin-top: 0.9rem; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.04em;">
+      {% for cat in active_categories %}
+        {% assign cat_name = cat[0] %}
+        {% assign pc = cat[1].size %}
+        {% assign dist_hex = "#2E5BFF" %}
+        {% if cat_name == "FinAI Build" %}{% assign dist_hex = "#2E5BFF" %}
+        {% elsif cat_name == "MRM Thread" %}{% assign dist_hex = "#E8465C" %}
+        {% elsif cat_name == "Field Notes" %}{% assign dist_hex = "#2F7D3A" %}
+        {% elsif cat_name == "Commentary" %}{% assign dist_hex = "#8B7F6B" %}
+        {% endif %}
+        <span style="display: inline-flex; align-items: center; gap: 0.5rem;">
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: {{ dist_hex }};"></span>
+          {{ cat_name }} &middot; {{ pc }}
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     5. Pagination (Chirpy safety net; categories index is not
+         normally paginated, but keep the guard for portability)
+     ============================================================ -->
+{% if paginator.total_pages > 1 %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if paginator.previous_page %}
+        <li class="page-item">
+          <a class="page-link" href="{{ paginator.previous_page_path | relative_url }}">&laquo; Previous</a>
+        </li>
+      {% endif %}
+      {% if paginator.next_page %}
+        <li class="page-item">
+          <a class="page-link" href="{{ paginator.next_page_path | relative_url }}">Next &raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+
+<!-- ============================================================
+     Client-side filter behaviour (ALL / ACTIVE / PLANNED chips)
+     ============================================================ -->
+<script>
+  (function () {
+    var buttons = document.querySelectorAll('.cat-filter-btn');
+    var cards = document.querySelectorAll('#categories-grid .cat-card');
+    if (!buttons.length || !cards.length) return;
+
+    function setActive(btn) {
+      buttons.forEach(function (b) {
+        b.classList.remove('active');
+        b.style.background = 'var(--card-bg)';
+        b.style.color = 'var(--text-muted-color)';
+        b.style.borderColor = 'var(--card-border-color)';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'var(--text-color)';
+      btn.style.color = 'var(--main-bg)';
+      btn.style.borderColor = 'var(--text-color)';
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var filter = btn.getAttribute('data-filter');
+        setActive(btn);
+        cards.forEach(function (card) {
+          var state = card.getAttribute('data-cat-state');
+          if (filter === 'all' || filter === state) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  })();
+</script>
