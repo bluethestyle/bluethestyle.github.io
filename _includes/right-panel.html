@@ -75,27 +75,27 @@
     </div>
   </div>
 
-  {%- comment -%} ── ORCID ────────────────────────────────── {%- endcomment -%}
+  {%- comment -%} ── ORCID — matches prototype markup ────────── {%- endcomment -%}
   {%- if site.social.orcid -%}
     <div class="bts-widget">
       <div class="w-head"><h3>ORCID</h3></div>
       <div class="bts-orcid">
-        <div class="hdr">Researcher ID</div>
+        <div class="hdr">Verified researcher</div>
         <div class="id">{{ site.social.orcid }}</div>
-        <a class="link" href="https://orcid.org/{{ site.social.orcid }}" rel="me">view on orcid.org ↗</a>
+        <a class="link" href="https://orcid.org/{{ site.social.orcid }}" rel="me">orcid.org ↗</a>
       </div>
     </div>
   {%- endif -%}
 
-  {%- comment -%} ── colophon ─────────────────────────────── {%- endcomment -%}
+  {%- comment -%} ── colophon — matches prototype markup ─────── {%- endcomment -%}
   <div class="bts-widget">
     <div class="w-head"><h3>Colophon</h3></div>
     <div class="bts-colophon">
-      <div class="row"><span class="k">theme</span><b>chirpy + bts</b></div>
-      <div class="row"><span class="k">type</span><b>Fraunces · Inter Tight</b></div>
-      <div class="row"><span class="k">mono</span><b>JetBrains Mono</b></div>
-      <div class="row"><span class="k">hosted</span><b>GitHub Pages</b></div>
-      <div class="row"><span class="k">license</span><b>CC BY-NC · MIT</b></div>
+      <div class="row"><span class="k">theme</span><b>chirpy 7.5.0</b></div>
+      <div class="row"><span class="k">engine</span><b>jekyll · markdown</b></div>
+      <div class="row"><span class="k">diagrams</span><b>mermaid</b></div>
+      <div class="row"><span class="k">host</span><b>github pages</b></div>
+      <div class="row"><span class="k">&nbsp;</span><b>&copy; {{ site.time | date: "%Y" }} {{ site.author.name | default: "Seonkyu Jeong" }}</b></div>
     </div>
   </div>
 </aside>
