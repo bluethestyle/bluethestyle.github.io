@@ -1,0 +1,171 @@
+---
+layout: default
+refactor: true
+---
+
+<!-- ============================================================
+     Intro / Bio block — replaces the dedicated About page
+     ============================================================ -->
+<section id="home-intro" class="mb-5 pb-3 border-bottom">
+  <h1 class="mb-3 d-flex align-items-center">
+    Seonkyu Jeong
+    <small class="ms-3 fw-normal text-muted" style="font-size: 0.6em;">
+      Independent researcher — Seoul
+    </small>
+  </h1>
+
+  <p class="lead mb-3">
+    Notes, working papers, and long-form thinking on
+    <strong>financial AI</strong>, <strong>model risk management</strong>,
+    and <strong>agentic systems</strong>.
+    <strong>GARP Financial Risk Manager (FRM).</strong>
+  </p>
+
+  <p class="mb-3">
+    This site collects what does not fit into a journal paper or a
+    GitHub README — decisions and their reasons, failed experiments,
+    what collaborating with an AI system for three months actually
+    looked like.
+  </p>
+
+  <h3 class="mt-4 mb-2" style="font-size: 1.1rem;">Current work</h3>
+  <p class="mb-2">
+    <strong>Heterogeneous Expert PLE for Financial Product
+    Recommendation</strong> — a 13-task multi-task learning system
+    with seven structurally distinct expert networks, distilled to
+    LightGBM for AWS Lambda serving, with regulatory-grade audit
+    infrastructure. Built by three people on personal time, early 2026,
+    with Claude Code (Anthropic) as the primary development partner.
+  </p>
+
+  <ul class="mb-3" style="font-size: 0.95em;">
+    <li>
+      <strong>Paper 1</strong> — Architecture &amp; Ablation:
+      <a href="https://doi.org/10.5281/zenodo.19621884">
+        doi.org/10.5281/zenodo.19621884
+      </a>
+    </li>
+    <li>
+      <strong>Paper 2</strong> — Agentic Reason Generation &amp; Compliance:
+      <a href="https://doi.org/10.5281/zenodo.19622052">
+        doi.org/10.5281/zenodo.19622052
+      </a>
+    </li>
+    <li>
+      <strong>Source code</strong> (MIT):
+      <a href="https://github.com/bluethestyle/aws_ple_for_financial">
+        github.com/bluethestyle/aws_ple_for_financial
+      </a>
+    </li>
+  </ul>
+
+  <h3 class="mt-4 mb-2" style="font-size: 1.1rem;">Co-authors</h3>
+  <p class="mb-2" style="font-size: 0.95em;">
+    Seonkyu Jeong (architecture, regulatory framing) ·
+    Euncheol Sim (engineering, experimentation) ·
+    Youngchan Kim (engineering, evaluation)
+  </p>
+
+  <h3 class="mt-4 mb-2" style="font-size: 1.1rem;">Series</h3>
+  <ul class="mb-3" style="font-size: 0.95em;">
+    <li>
+      <a href="/series/three-months/">
+        <strong>Building a Financial AI in Three Months</strong>
+      </a>
+      (<code>[FinAI Build]</code>) —
+      <a href="/series/three-months-ko/">한국어</a>
+    </li>
+    <li>
+      <a href="/series/mrm-thread/">
+        <strong>The MRM Thread</strong>
+      </a>
+      (<code>[MRM Thread]</code>) —
+      <a href="/series/mrm-thread-ko/">한국어</a>
+    </li>
+  </ul>
+
+  <p class="mb-0" style="font-size: 0.9em;" class="text-muted">
+    <strong>Contact:</strong>
+    jsk320098 [at] gmail [dot] com
+    &middot;
+    <strong>ORCID:</strong>
+    <a href="https://orcid.org/0009-0005-3291-9112">
+      0009-0005-3291-9112
+    </a>
+  </p>
+</section>
+
+
+<!-- ============================================================
+     Post list — same as Chirpy's default home layout
+     ============================================================ -->
+<h2 class="mb-4" style="font-size: 1.4rem;">Latest posts</h2>
+
+<div id="post-list" class="flex-grow-1 px-xl-1">
+  {% for post in paginator.posts %}
+    <article class="card-wrapper card">
+      <a href="{{ post.url | relative_url }}" class="post-preview row g-0 flex-md-row-reverse">
+        {% assign card_body_col = '12' %}
+
+        {% if post.image %}
+          {% assign src = post.image.path | default: post.image %}
+          {% unless src contains '//' %}
+            {% assign src = post.media_subpath | append: '/' | append: src | replace: '//', '/' %}
+          {% endunless %}
+
+          {% assign alt = post.image.alt | xml_escape | default: 'Preview Image' %}
+
+          {% assign lqip = null %}
+
+          {% if post.image.lqip %}
+            {% capture lqip %}lqip="{{ post.image.lqip }}"{% endcapture %}
+          {% endif %}
+
+          <div class="col-md-5">
+            <img src="{{ src }}" alt="{{ alt }}" {{ lqip }}>
+          </div>
+
+          {% assign card_body_col = '7' %}
+        {% endif %}
+
+        <div class="col-md-{{ card_body_col }}">
+          <div class="card-body">
+            <h1 class="card-title my-2 mt-md-0">{{ post.title }}</h1>
+
+            <div class="card-text content mt-0 mb-3">
+              <p>{% include post-description.html %}</p>
+            </div>
+
+            <div class="post-meta flex-grow-1 d-flex align-items-end">
+              <div class="me-auto">
+                <!-- posted date -->
+                <i class="far fa-calendar fa-fw me-1"></i>
+                {% include datetime.html date=post.date lang=lang %}
+
+                <!-- categories -->
+                {% if post.categories.size > 0 %}
+                  <i class="far fa-folder-open fa-fw me-1"></i>
+                  <span class="categories">
+                    {% for category in post.categories %}
+                      {{ category }}
+                      {%- unless forloop.last -%},{%- endunless -%}
+                    {% endfor %}
+                  </span>
+                {% endif %}
+              </div>
+
+              {% if post.pin %}
+                <div class="pin ms-1">
+                  <i class="fas fa-thumbtack fa-fw"></i>
+                  <span>{{ site.data.locales[lang].post.pin_prompt }}</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </a>
+    </article>
+  {% endfor %}
+</div>
+
+{% include post-paginator.html %}
