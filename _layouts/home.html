@@ -133,18 +133,24 @@ refactor: true
             <h1 class="card-title my-2 mt-md-0">{{ post.title }}</h1>
 
             <div class="card-text content mt-0 mb-3">
-              <p>{% include post-description.html %}</p>
+              <p>
+                {% if post.description %}
+                  {{ post.description }}
+                {% else %}
+                  {{ post.excerpt | strip_html | strip_newlines | truncate: 200 }}
+                {% endif %}
+              </p>
             </div>
 
             <div class="post-meta flex-grow-1 d-flex align-items-end">
               <div class="me-auto">
                 <!-- posted date -->
                 <i class="far fa-calendar fa-fw me-1"></i>
-                {% include datetime.html date=post.date lang=lang %}
+                <time>{{ post.date | date: "%Y-%m-%d" }}</time>
 
                 <!-- categories -->
                 {% if post.categories.size > 0 %}
-                  <i class="far fa-folder-open fa-fw me-1"></i>
+                  <i class="far fa-folder-open fa-fw me-1 ms-2"></i>
                   <span class="categories">
                     {% for category in post.categories %}
                       {{ category }}
@@ -157,7 +163,7 @@ refactor: true
               {% if post.pin %}
                 <div class="pin ms-1">
                   <i class="fas fa-thumbtack fa-fw"></i>
-                  <span>{{ site.data.locales[lang].post.pin_prompt }}</span>
+                  <span>Pinned</span>
                 </div>
               {% endif %}
             </div>
@@ -168,4 +174,24 @@ refactor: true
   {% endfor %}
 </div>
 
-{% include post-paginator.html %}
+{% if paginator.total_pages > 1 %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if paginator.previous_page %}
+        <li class="page-item">
+          <a class="page-link" href="{{ paginator.previous_page_path | relative_url }}">
+            &laquo; Previous
+          </a>
+        </li>
+      {% endif %}
+
+      {% if paginator.next_page %}
+        <li class="page-item">
+          <a class="page-link" href="{{ paginator.next_page_path | relative_url }}">
+            Next &raquo;
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
