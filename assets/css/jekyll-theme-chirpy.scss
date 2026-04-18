@@ -1,0 +1,454 @@
+---
+---
+
+/*
+ * ============================================================
+ * Custom theme override — design by Claude Design (2026-04-18)
+ * ============================================================
+ *
+ * Design tokens extracted from the mockup:
+ *   - Warm cream background (#F4F3EE) — softer than pure white
+ *   - Deep charcoal text (#141414) — not pure black for softness
+ *   - Muted warm gray (#6B6A63) — captions, metadata, secondary
+ *   - Electric blue accent (#2E5BFF) — links, active states, rules
+ *   - Serif-forward display (Georgia / Source Serif 4)
+ *   - Monospace + letter-spacing for tags and technical labels
+ *
+ * Strategy: import Chirpy's main stylesheet first, then override
+ * CSS custom properties and selectors. This keeps the override
+ * upgradeable across Chirpy minor versions.
+ *
+ * ------------------------------------------------------------ */
+
+@import "main";
+
+/* ------------------------------------------------------------
+ * Google Fonts — Source Serif 4 (Georgia-like), Inter (sans),
+ * JetBrains Mono (monospace)
+ * ------------------------------------------------------------ */
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* ------------------------------------------------------------
+ * Light mode — Claude Design palette
+ * ------------------------------------------------------------ */
+
+html[data-mode="light"],
+html:not([data-mode]) {
+  --body-bg:           #F4F3EE;
+  --main-bg:           #F4F3EE;
+  --mask-bg:           #E8E6DD;
+  --main-border-color: #D9D6C9;
+  --sidebar-bg:        #E8E6DD;
+  --sidebar-border-color: #D9D6C9;
+  --sidebar-muted-color:  #6B6A63;
+  --sidebar-active-color: #141414;
+
+  --text-color:        #141414;
+  --text-muted-color:  #6B6A63;
+  --heading-color:     #141414;
+  --blockquote-text-color:   #4A4A44;
+  --blockquote-border-color: #2E5BFF;
+
+  --link-color:              #2E5BFF;
+  --link-underline-color:    #2E5BFF;
+  --button-bg:               #E8E6DD;
+  --btn-border-color:        #D9D6C9;
+  --btn-backtotop-color:     #141414;
+  --btn-backtotop-border-color: #D9D6C9;
+
+  --card-bg:            #FFFFFF;
+  --card-header-bg:     #F4F3EE;
+  --card-border-color:  #D9D6C9;
+  --card-box-shadow:    0 1px 3px rgba(20, 20, 20, 0.05);
+
+  --label-color:        #6B6A63;
+  --search-wrapper-bg:  #FFFFFF;
+  --search-wrapper-border-color: #D9D6C9;
+  --search-tag-bg:      #E8E6DD;
+  --search-icon-color:  #6B6A63;
+
+  --tag-border:         #D9D6C9;
+  --tag-bg:             #FFFFFF;
+  --tag-hover:          #E8E6DD;
+  --tb-odd-bg:          #FAF9F4;
+  --tb-even-bg:         #F4F3EE;
+  --tb-border-color:    #D9D6C9;
+
+  --dash-color:         #D9D6C9;
+  --categories-hover-bg: #E8E6DD;
+  --timeline-color:     #D9D6C9;
+  --timeline-node-bg:   #2E5BFF;
+  --timeline-year-dot-color: #FFFFFF;
+
+  /* Accent block (the Claude-Design signature blue bar) */
+  --accent-color:       #2E5BFF;
+  --accent-color-rgb:   46, 91, 255;
+}
+
+/* ------------------------------------------------------------
+ * Dark mode — preserve Claude Design vibe in dark
+ * ------------------------------------------------------------ */
+
+html[data-mode="dark"] {
+  --body-bg:            #141414;
+  --main-bg:            #141414;
+  --mask-bg:            #1F1F1F;
+  --main-border-color:  #2A2A2A;
+  --sidebar-bg:         #1A1A1A;
+  --sidebar-border-color: #2A2A2A;
+  --sidebar-muted-color:  #8E8E88;
+  --sidebar-active-color: #F4F3EE;
+
+  --text-color:         #E8E6DD;
+  --text-muted-color:   #8E8E88;
+  --heading-color:      #F4F3EE;
+  --blockquote-text-color: #BDBBB0;
+  --blockquote-border-color: #5A7FFF;
+
+  --link-color:         #5A7FFF;
+  --link-underline-color: #5A7FFF;
+
+  --card-bg:            #1F1F1F;
+  --card-header-bg:     #1A1A1A;
+  --card-border-color:  #2A2A2A;
+  --card-box-shadow:    0 1px 3px rgba(0, 0, 0, 0.3);
+
+  --accent-color:       #5A7FFF;
+  --accent-color-rgb:   90, 127, 255;
+}
+
+/* ------------------------------------------------------------
+ * Typography — serif body, sans headings, monospace tags
+ * ------------------------------------------------------------ */
+
+body {
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  letter-spacing: 0.003em;
+}
+
+h1, h2, h3, h4, h5, h6,
+.sidebar .site-title,
+.site-title a {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.1rem; }
+h2 { font-size: 1.6rem; margin-top: 2.5rem; }
+h3 { font-size: 1.25rem; margin-top: 2rem; }
+
+/* Monospace styling for tags, categories, code labels */
+code,
+pre,
+.post-tag,
+.post-meta,
+.tag,
+.timeline time {
+  font-family: "JetBrains Mono", "SF Mono", Consolas, monospace;
+}
+
+.post-tag,
+.tag {
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  font-size: 0.82rem;
+}
+
+/* ------------------------------------------------------------
+ * Sidebar — Claude Design-inspired initial badge
+ * ------------------------------------------------------------ */
+
+#sidebar .profile-wrapper {
+  padding-top: 2rem;
+}
+
+#sidebar .site-title {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+#sidebar .site-subtitle {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted-color);
+  margin-top: 0.5rem;
+}
+
+/* Avatar circle — dark fill with cream initials if image missing */
+#avatar {
+  border: 2px solid var(--dash-color);
+  transition: border-color 0.2s ease;
+}
+
+#avatar:hover {
+  border-color: var(--accent-color);
+}
+
+/* Sidebar nav */
+#sidebar ul.nav-list > li > a {
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.08em;
+  font-size: 0.82rem;
+}
+
+#sidebar ul.nav-list > li.active > a {
+  color: var(--sidebar-active-color);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------
+ * Home intro (from our _layouts/home.html)
+ * ------------------------------------------------------------ */
+
+#home-intro {
+  padding-bottom: 2.5rem;
+  margin-bottom: 3rem;
+  border-bottom: 3px solid var(--accent-color) !important;
+}
+
+#home-intro h1 {
+  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
+}
+
+#home-intro h1 small {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted-color) !important;
+  display: inline-block;
+  padding-top: 0.6rem;
+}
+
+#home-intro .lead {
+  font-size: 1.18rem;
+  line-height: 1.65;
+  color: var(--text-color);
+  font-style: italic;
+}
+
+#home-intro h3 {
+  font-size: 0.85rem !important;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted-color);
+  font-weight: 500;
+  margin-top: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+
+#home-intro ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+#home-intro ul li {
+  padding-left: 1.2rem;
+  position: relative;
+  margin-bottom: 0.6rem;
+}
+
+#home-intro ul li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+#home-intro code {
+  font-size: 0.85em;
+  background: var(--mask-bg);
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  color: var(--accent-color);
+}
+
+#home-intro a {
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+#home-intro a:hover {
+  border-bottom-color: var(--accent-color);
+  text-decoration: none;
+}
+
+/* "Latest posts" heading */
+#post-list-heading,
+.flex-grow-1 > h2 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted-color);
+  margin-bottom: 1.5rem;
+}
+
+/* ------------------------------------------------------------
+ * Post cards — quieter, academic paper preview feel
+ * ------------------------------------------------------------ */
+
+#post-list .card {
+  border: 1px solid var(--card-border-color);
+  border-radius: 4px;
+  box-shadow: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+  margin-bottom: 1.2rem;
+}
+
+#post-list .card:hover {
+  border-color: var(--accent-color);
+  transform: none;
+}
+
+#post-list .card-title {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.35rem !important;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+#post-list .card-text p {
+  color: var(--text-muted-color);
+  line-height: 1.6;
+  font-size: 0.96rem;
+}
+
+#post-list .post-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted-color);
+}
+
+#post-list .post-meta .categories {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--accent-color);
+}
+
+/* ------------------------------------------------------------
+ * Post page — readable long-form
+ * ------------------------------------------------------------ */
+
+.post {
+  font-size: 1.04rem;
+  line-height: 1.75;
+}
+
+.post h1 {
+  font-size: 2.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.post h2 {
+  font-size: 1.55rem;
+  margin-top: 3rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--dash-color);
+}
+
+.post h3 {
+  font-size: 1.2rem;
+  margin-top: 2.2rem;
+}
+
+.post blockquote {
+  border-left: 3px solid var(--accent-color);
+  padding-left: 1rem;
+  color: var(--blockquote-text-color);
+  font-style: italic;
+}
+
+.post a {
+  border-bottom: 1px solid rgba(var(--accent-color-rgb), 0.3);
+  transition: border-color 0.15s ease;
+}
+
+.post a:hover {
+  border-bottom-color: var(--accent-color);
+  text-decoration: none;
+}
+
+.post pre,
+.post code {
+  font-size: 0.9em;
+}
+
+/* Post meta (date, categories, tags under title) */
+.post-meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted-color);
+}
+
+/* ------------------------------------------------------------
+ * Right sidebar panels (Recently Updated, Trending Tags)
+ * ------------------------------------------------------------ */
+
+.access {
+  .panel-heading {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted-color);
+  }
+
+  .post-content {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .post-tag {
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.06em;
+    font-size: 0.78rem;
+  }
+}
+
+/* ------------------------------------------------------------
+ * Footer
+ * ------------------------------------------------------------ */
+
+#core-wrapper footer,
+#contact + footer,
+footer {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted-color);
+}
+
+/* ------------------------------------------------------------
+ * Horizontal rule — thin blue accent
+ * ------------------------------------------------------------ */
+
+hr {
+  border: none;
+  height: 1px;
+  background: var(--dash-color);
+}
+
+/* Special: first hr after h1 in posts acts as accent bar */
+.post h1 + hr,
+.post .post-meta + hr {
+  background: var(--accent-color);
+  height: 2px;
+  width: 60px;
+  margin-left: 0;
+  opacity: 1;
+}
