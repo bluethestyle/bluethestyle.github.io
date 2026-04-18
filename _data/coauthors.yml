@@ -1,0 +1,15 @@
+# Co-authors of the Heterogeneous Expert PLE project
+# Rendered on the home page via _layouts/home.html
+
+- name: Seonkyu Jeong
+  initials: SJ
+  role: "architecture, regulatory framing"
+  lead: true
+
+- name: Euncheol Sim
+  initials: ES
+  role: "engineering, experimentation"
+
+- name: Youngchan Kim
+  initials: YK
+  role: "engineering, evaluation"

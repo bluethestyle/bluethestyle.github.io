@@ -1,0 +1,31 @@
+# Series index — rendered on the home page and in the right panel
+
+- slug: finai-build
+  tag_en: "FinAI Build"
+  tag_ko: "3개월 개발기"
+  title_en: "Building a Financial AI in Three Months"
+  title_ko: "3개월간의 금융 AI 개발기"
+  desc_en: >
+    Building a financial recommendation system with Claude Code,
+    on consumer hardware, as three people on personal time.
+  desc_ko: >
+    Claude Code, 소비자 GPU, 3명의 팀. 3개월간 금융 추천 시스템을
+    만든 이야기.
+  total: 8
+  url_en: "/series/three-months/"
+  url_ko: "/series/three-months-ko/"
+
+- slug: mrm-thread
+  tag_en: "MRM Thread"
+  tag_ko: "MRM 스레드"
+  title_en: "The MRM Thread"
+  title_ko: "MRM 스레드"
+  desc_en: >
+    Regulatory compliance and model risk management for AI
+    recommendation systems, from a GARP FRM practitioner perspective.
+  desc_ko: >
+    AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM
+    실무자 관점에서 다룬다.
+  total: 3
+  url_en: "/series/mrm-thread/"
+  url_ko: "/series/mrm-thread-ko/"
