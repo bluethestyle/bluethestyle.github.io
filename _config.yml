@@ -39,6 +39,10 @@ lazy_load_img: true
 # Default permalink pattern — keep existing pattern
 permalink: /:year/:month/:day/:title/
 
+# Pagination (required for Chirpy's home layout to display post cards)
+paginate: 10
+paginate_path: "/page:num/"
+
 # Markdown + highlighter
 markdown: kramdown
 highlighter: rouge
