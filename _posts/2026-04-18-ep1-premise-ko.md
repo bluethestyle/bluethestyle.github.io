@@ -2,7 +2,7 @@
 layout: post
 title: "[3개월 개발기] 에피소드 1 — 전제 조건"
 date: 2026-04-18 12:00:00 +0900
-categories: [3개월 개발기]
+categories: [FinAI Build]
 tags: [finai-build, architecture, claude-code, financial-ai, ple]
 lang: ko
 series: three-months
