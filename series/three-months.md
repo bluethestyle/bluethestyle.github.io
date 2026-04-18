@@ -1,14 +1,14 @@
 ---
 layout: default
-title: "Series: Three Months, Three People"
+title: "Series: Building a Financial AI in Three Months"
 permalink: /series/three-months/
 ---
 
-# Three Months, Three People
+# Building a Financial AI in Three Months
 
 *A series on building a financial recommendation system with
 Claude Code, on consumer hardware, as three people on personal
-time.*
+time. Tag: `[FinAI Build]`*
 
 🇰🇷 [한국어 목차 →](/series/three-months-ko/)
 
@@ -49,8 +49,8 @@ human-AI collaboration actually feels like.
 
 ## A companion thread
 
-A second, shorter series — *The MRM Thread* — will run in parallel
-once this one completes its first half. That one covers the
+A second, shorter series — [*The MRM Thread*](/series/mrm-thread/) —
+runs in parallel. That one covers the
 regulatory and model-risk-management angle: why MRM belongs in
 architecture rather than validation, how Champion-Challenger works
 as a gate rather than a report, and what SR 11-7, EU AI Act, and

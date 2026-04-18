@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "MRM 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다"
+title: "[MRM 스레드] 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다"
 date: 2026-04-18
 lang: ko
 series: mrm-thread

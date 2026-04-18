@@ -14,7 +14,7 @@ from a GARP FRM practitioner perspective.*
 ---
 
 A short parallel series to
-[*Three Months, Three People*](/series/three-months/),
+[*Building a Financial AI in Three Months*](/series/three-months/),
 aimed at a different audience — financial practitioners, risk
 managers, regulatory staff, and MRM teams.
 

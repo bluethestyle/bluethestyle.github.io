@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "MRM Ep 1 — Why MRM Belongs in the Architecture"
+title: "[MRM Thread] Ep 1 — Why MRM Belongs in the Architecture"
 date: 2026-04-18
 lang: en
 series: mrm-thread

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "에피소드 1 — 전제 조건"
+title: "[3개월 개발기] 에피소드 1 — 전제 조건"
 date: 2026-04-18
 lang: ko
 series: three-months
@@ -9,7 +9,7 @@ part: 1
 
 # 에피소드 1 — 전제 조건
 
-*시리즈 "3개월, 3명" 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.*
+*시리즈 "3개월간의 금융 AI 개발기" 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.*
 
 🇬🇧 [English version →](/2026/04/18/ep1-premise-en/)
 

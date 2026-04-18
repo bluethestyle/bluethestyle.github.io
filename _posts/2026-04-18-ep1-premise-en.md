@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Ep 1 — The Premise"
+title: "[FinAI Build] Ep 1 — The Premise"
 date: 2026-04-18
 lang: en
 series: three-months
@@ -9,9 +9,9 @@ part: 1
 
 # Episode 1 — The Premise
 
-*Part 1 of "Three Months, Three People" — a series on building
-a financial recommendation system with Claude Code, on consumer
-hardware, as three people on personal time.*
+*Part 1 of "Building a Financial AI in Three Months" — a series on
+building a financial recommendation system with Claude Code, on
+consumer hardware, as three people on personal time.*
 
 🇰🇷 [한국어 버전 →](/2026/04/18/ep1-premise-ko/)
 
