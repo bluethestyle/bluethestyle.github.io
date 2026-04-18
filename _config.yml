@@ -1,0 +1,41 @@
+title: Seonkyu Jeong
+description: >
+  Independent researcher — financial AI, model risk management,
+  agentic systems. GARP FRM. Seoul, Republic of Korea.
+
+# GitHub Pages built-in theme (no Gemfile needed for this theme)
+theme: jekyll-theme-minimal
+
+# Author info
+author: Seonkyu Jeong
+github_username: bluethestyle
+
+# SEO
+url: "https://bluethestyle.github.io"
+twitter_username:
+linkedin_username:
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: /:year/:month/:day/:title/
+timezone: Asia/Seoul
+
+# Display
+show_downloads: false
+google_analytics:
+
+# Files to exclude from build
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - .gitignore
+  - .github/
+
+# Plugins (GitHub Pages supports these)
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
