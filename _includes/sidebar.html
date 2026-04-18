@@ -1,11 +1,17 @@
-{%- comment -%} bluethestyle — left sidebar {%- endcomment -%}
+{%- comment -%}
+  bluethestyle — LEFT sidebar
+  Aligned with handoff prototype (screens/01-home-top.png)
+{%- endcomment -%}
+
 <aside class="bts-sidebar-l">
+  {%- comment -%} ── Bio ──────────────────────────────── {%- endcomment -%}
   <div class="bts-bio">
     <div class="bts-avatar" aria-hidden="true"><span class="bts-avatar-initials">SJ</span></div>
     <div class="bts-who">{{ site.author.name }}</div>
     <div class="bts-role">
       <b>{{ site.author.role }}</b><br>
-      {{ site.author.location }} · finance · AI · MRM
+      financial AI · MRM · agents<br>
+      {% if site.author.frm %}GARP FRM · {% endif %}{{ site.author.location }}
     </div>
   </div>
 
@@ -13,42 +19,55 @@
   {%- assign tag_count  = site.tags | size -%}
   {%- assign post_count = site.posts | size -%}
 
+  {%- comment -%} Active-tab detection for left blue bar {%- endcomment -%}
+  {%- assign on_home = false -%}{% if page.url == "/" or page.layout == "home" %}{% assign on_home = true %}{% endif -%}
+  {%- assign on_cats = false -%}{% if page.url contains "/categories" %}{% assign on_cats = true %}{% endif -%}
+  {%- assign on_tags = false -%}{% if page.url contains "/tags" %}{% assign on_tags = true %}{% endif -%}
+  {%- assign on_arch = false -%}{% if page.url contains "/archives" %}{% assign on_arch = true %}{% endif -%}
+
+  {%- comment -%} ── Navigate (numbered, uppercase) ──── {%- endcomment -%}
   <div class="nav-label">Navigate</div>
   <ul class="bts-nav-list">
-    <li><a href="{{ '/' | relative_url }}" class="{% if page.layout == 'home' %}on{% endif %}"><span>01 · home</span><span class="arr">→</span></a></li>
-    <li><a href="{{ '/categories/' | relative_url }}"><span>02 · categories <span class="n">{{ cat_count }}</span></span><span class="arr">→</span></a></li>
-    <li><a href="{{ '/tags/' | relative_url }}"><span>03 · tags <span class="n">{{ tag_count }}</span></span><span class="arr">→</span></a></li>
-    <li><a href="{{ '/archives/' | relative_url }}"><span>04 · archives <span class="n">{{ post_count }}</span></span><span class="arr">→</span></a></li>
+    <li><a href="{{ '/' | relative_url }}" {% if on_home %}class="on"{% endif %}>
+      <span class="bts-nav-inner"><span class="num">01</span><span class="lbl">HOME</span></span></a></li>
+    <li><a href="{{ '/categories/' | relative_url }}" {% if on_cats %}class="on"{% endif %}>
+      <span class="bts-nav-inner"><span class="num">02</span><span class="lbl">CATEGORIES</span></span><span class="n">{{ cat_count }}</span></a></li>
+    <li><a href="{{ '/tags/' | relative_url }}" {% if on_tags %}class="on"{% endif %}>
+      <span class="bts-nav-inner"><span class="num">03</span><span class="lbl">TAGS</span></span><span class="n">{{ tag_count }}</span></a></li>
+    <li><a href="{{ '/archives/' | relative_url }}" {% if on_arch %}class="on"{% endif %}>
+      <span class="bts-nav-inner"><span class="num">04</span><span class="lbl">ARCHIVES</span></span><span class="n">{{ post_count }}</span></a></li>
   </ul>
 
+  {%- comment -%} ── Elsewhere (external) ──────────────── {%- endcomment -%}
   <div class="nav-label">Elsewhere</div>
   <div class="bts-elsewhere">
-    {%- if site.social.email  -%}<a href="mailto:{{ site.social.email }}"><span>email</span><span class="arr">↗</span></a>{%- endif -%}
-    {%- if site.social.github -%}<a href="https://github.com/{{ site.social.github }}" rel="me"><span>github · @{{ site.social.github }}</span><span class="arr">↗</span></a>{%- endif -%}
-    {%- if site.social.orcid  -%}<a href="https://orcid.org/{{ site.social.orcid }}" rel="me"><span>orcid</span><span class="arr">↗</span></a>{%- endif -%}
-    {%- if site.social.zenodo -%}<a href="{{ site.social.zenodo }}" rel="me"><span>zenodo</span><span class="arr">↗</span></a>{%- endif -%}
-    <a href="{{ '/feed.xml' | relative_url }}"><span>rss</span><span class="arr">↗</span></a>
+    <a href="{{ '/feed.xml' | relative_url }}"><span>RSS</span><span class="arr">↗</span></a>
+    {%- if site.social.email  -%}<a href="mailto:{{ site.social.email }}"><span>Email</span><span class="arr">↗</span></a>{%- endif -%}
+    {%- if site.social.github -%}<a href="https://github.com/{{ site.social.github }}" rel="me"><span>GitHub</span><span class="arr">↗</span></a>{%- endif -%}
+    {%- if site.social.orcid  -%}<a href="https://orcid.org/{{ site.social.orcid }}" rel="me"><span>ORCID</span><span class="arr">↗</span></a>{%- endif -%}
+    {%- if site.social.zenodo -%}<a href="{{ site.social.zenodo }}" rel="me"><span>Zenodo</span><span class="arr">↗</span></a>{%- endif -%}
   </div>
 
+  {%- comment -%} ── Series · active (compact) ─────────── {%- endcomment -%}
   {%- if site.data.series -%}
     <div class="nav-label">Series · active</div>
     <div class="bts-series-mini">
       {%- for s in site.data.series -%}
         {%- if s.active == false -%}{%- continue -%}{%- endif -%}
-        <a href="{{ s.en | relative_url }}">
+        <a href="{{ s.en | relative_url }}" class="bts-series-row">
           <span class="cat">[{{ s.tag }}]</span>
-          <h5>{{ s.title }}</h5>
-          <span class="prog">ep {{ s.ep }} of {{ s.total }}</span>
+          <span class="prog">ep {{ s.ep }}/{{ s.total }}</span>
         </a>
       {%- endfor -%}
     </div>
   {%- endif -%}
 
+  {%- comment -%} ── Build stats (prototype format) ─────── {%- endcomment -%}
   <div class="bts-kv">
+    <div><span class="k">build</span> idx.{{ site.time | date: "%Y.%m" }}</div>
+    <div><span class="k">stack</span> jekyll · handcraft</div>
+    <div><span class="k">last</span> {{ site.time | date: "%-d %b %Y" | downcase }}</div>
     <div><span class="k">posts</span> {{ post_count }}</div>
-    <div><span class="k">cats</span> {{ cat_count }}</div>
-    <div><span class="k">tags</span> {{ tag_count }}</div>
-    <div><span class="k">since</span> {{ site.since }}</div>
-    <div><span class="k">build</span> {{ site.time | date: "%Y-%m-%d" }}</div>
+    <div><span class="k">lic</span> cc by-nc 4.0</div>
   </div>
 </aside>
