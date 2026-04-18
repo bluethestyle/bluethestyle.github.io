@@ -1,39 +1,26 @@
-{%- comment -%}
-  bluethestyle — top bar
-  Drop at: _includes/topbar.html
-  Requires site.css (includes .bts-topbar / .bts-logo / .bts-tabs / .bts-tools rules)
-
-  Renders the full-width bar. Your _layouts/default.html should call:
-    {%- include topbar.html -%}
-  ABOVE the main grid wrapper.
-{%- endcomment -%}
-
+{%- comment -%} bluethestyle — top bar {%- endcomment -%}
 <header class="bts-topbar">
-  {%- comment -%} logo cluster — left {%- endcomment -%}
   <a class="bts-logo" href="{{ '/' | relative_url }}">
-    <span class="dot"></span>
-    bluethestyle
+    <span class="dot"></span>bluethestyle
     <span class="sub">— field notes</span>
   </a>
 
-  {%- comment -%} primary tabs — center {%- endcomment -%}
-  {%- assign cat_count = site.categories | size -%}
-  {%- assign tag_count = site.tags | size -%}
+  {%- assign cat_count  = site.categories | size -%}
+  {%- assign tag_count  = site.tags | size -%}
   {%- assign post_count = site.posts | size -%}
+
   <nav class="bts-tabs" aria-label="Primary">
-    {%- assign page_url = page.url -%}
-    <a href="{{ '/' | relative_url }}"            class="{% if page.layout == 'home' %}on{% endif %}">home</a>
-    <a href="{{ '/categories/' | relative_url }}" class="{% if page_url contains '/categories' %}on{% endif %}">categories <span class="n">{{ cat_count }}</span></a>
-    <a href="{{ '/tags/' | relative_url }}"       class="{% if page_url contains '/tags' %}on{% endif %}">tags <span class="n">{{ tag_count }}</span></a>
-    <a href="{{ '/archives/' | relative_url }}"   class="{% if page_url contains '/archives' %}on{% endif %}">archives <span class="n">{{ post_count }}</span></a>
+    {%- assign u = page.url -%}
+    <a href="{{ '/'            | relative_url }}" class="{% if page.layout == 'home' %}on{% endif %}">home</a>
+    <a href="{{ '/categories/' | relative_url }}" class="{% if u contains '/categories' %}on{% endif %}">categories <span class="n">{{ cat_count }}</span></a>
+    <a href="{{ '/tags/'       | relative_url }}" class="{% if u contains '/tags' %}on{% endif %}">tags <span class="n">{{ tag_count }}</span></a>
+    <a href="{{ '/archives/'   | relative_url }}" class="{% if u contains '/archives' %}on{% endif %}">archives <span class="n">{{ post_count }}</span></a>
   </nav>
 
-  {%- comment -%} tools cluster — right {%- endcomment -%}
   <div class="bts-tools">
-    <span class="bts-status" title="site status">
+    <span class="bts-status">
       <span class="live"></span> live · {{ site.time | date: "%Y-%m-%d" }}
     </span>
-
     <label class="bts-search" for="bts-search-input">
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/>
@@ -41,14 +28,13 @@
       <input id="bts-search-input" type="search" placeholder="search posts…" autocomplete="off">
       <span class="bts-kbd">⌘K</span>
     </label>
-
-    {%- comment -%}
-      Language switch — expects EN at `/` and KO at `/ko/`.
-      Adjust the hrefs below if you use jekyll-polyglot or a different URL scheme.
-    {%- endcomment -%}
     <div class="bts-lang-sw" role="group" aria-label="Language">
       <a href="{{ '/' | relative_url }}"   class="{% unless page.lang == 'ko' %}on{% endunless %}">EN</a>
       <a href="{{ '/ko/' | relative_url }}" class="{% if page.lang == 'ko' %}on{% endif %}">한</a>
     </div>
+    <button id="bts-mode-toggle" class="bts-mode-btn" type="button" aria-label="Toggle dark mode">
+      <svg class="i-sun"  width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>
+      <svg class="i-moon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M13 9.5A5 5 0 016.5 3 5 5 0 1013 9.5z"/></svg>
+    </button>
   </div>
 </header>

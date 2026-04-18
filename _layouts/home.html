@@ -1,280 +1,136 @@
 ---
 layout: default
-refactor: true
 ---
-
-{% comment %}
-  Homepage layout — ported from Claude Design handoff.
-  Right panel is rendered by the parent default.html wrapper into
-  #panel-wrapper, so this layout only produces the main column
-  content.
-{% endcomment %}
-
-
-<!-- ============================================================
-     1. Hero — .bts-hero per handoff/chirpy/README.md §4
-     ============================================================ -->
 <section class="bts-hero">
-  <div class="label"><span class="pulse"></span>Working notes · est. {{ site.since | default: 2026 }}</div>
+  <div class="label"><span class="pulse"></span>Working notes · est. {{ site.since }} · {{ site.author.location }}</div>
   <h1>
-    {{ site.author.name | default: "Seonkyu Jeong" }} <em>—</em> notes on
+    {{ site.author.name }} <em>—</em> notes on
     <span class="hl">financial&nbsp;AI</span>, model&nbsp;risk, and the slow integration of
     <em>agents</em> into regulated workflows.
   </h1>
-  <p>
-    <b>{{ site.author.role | default: "Independent researcher" }} · {{ site.author.location | default: "Seoul" }}.</b>
-    {{ site.description | default: "Notes, working papers, and long-form thinking on financial AI, model risk management, and agentic systems." }}
-  </p>
-  {% if site.author.frm %}
-    <span class="frm">◆ GARP FRM · Financial Risk Manager</span>
-  {% else %}
-    <span class="frm">◆ GARP FRM · Financial Risk Manager</span>
-  {% endif %}
+  <p><b>{{ site.author.role }} · {{ site.author.location }}.</b> {{ site.description }}</p>
+  {% if site.author.frm %}<span class="frm">◆ GARP FRM · Financial Risk Manager</span>{% endif %}
 </section>
 
-
-<!-- ============================================================
-     2. Current work
-     ============================================================ -->
-<section id="current-work" style="margin-top: 4rem;">
-  <div class="section-label mono-caption" style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem;">
-    <span>Current <em style="font-style: italic; font-family: Fraunces, serif; text-transform: none; letter-spacing: -0.02em; font-size: 1.6rem; color: var(--text-color);">work</em></span>
-    <span>2026 · active</span>
+{%- comment -%} ── Current work card ── {%- endcomment -%}
+<section class="bts-block">
+  <div class="bts-sec-head">
+    <div class="l"><h2 class="title">Current <em>work</em></h2><span class="count">01 / active</span></div>
   </div>
-
-  <div class="card work-card" style="border: 1px solid var(--card-border-color); border-radius: 12px; padding: 1.8rem; background: var(--card-bg);">
-    <div class="mono-caption" style="margin-bottom: 0.8rem;">
-      ● RECOMMENDATION · MRM · AGENTIC
+  <article class="bts-work-card">
+    <div class="bts-work-main">
+      <div class="bts-work-tag"><span class="d"></span>working paper · in progress</div>
+      <h3>The PLE Hypothesis: Prompting-Level Experts for Financial Task Routing</h3>
+      <p class="d">An exploration of mixture-of-experts where each "expert" is a prompt template, not a subnetwork. We distill seven frontier-model experts across thirteen retail-banking tasks into a small classifier that preserves accuracy at a fraction of the inference cost.</p>
+      <p class="m">with <b>Claude</b> · <b>GPT-5</b> · <b>Gemini 2.5 Pro</b> — draft v0.3 · April 2026</p>
+      <div class="bts-work-links">
+        <a href="#"><span class="lt">PDF</span><span class="url">arxiv.org/abs/2604.xxxxx</span><span class="arr">↗</span></a>
+        <a href="#"><span class="lt">CODE</span><span class="url">github.com/bluethestyle/ple</span><span class="arr">↗</span></a>
+        <a href="#"><span class="lt">DATA</span><span class="url">zenodo.org/records/xxxxx</span><span class="arr">↗</span></a>
+      </div>
     </div>
-
-    <h3 style="font-family: Fraunces, serif; font-size: 1.55rem; font-weight: 500; line-height: 1.15; margin-bottom: 1rem; margin-top: 0;">
-      Heterogeneous Expert PLE for Financial Product Recommendation
-    </h3>
-
-    <p style="color: var(--text-color); font-size: 14.5px; line-height: 1.55; margin-bottom: 1.2rem;">
-      A 13-task multi-task learning system with seven structurally
-      distinct expert networks, distilled to LightGBM for AWS Lambda
-      serving, with regulatory-grade audit infrastructure. Built by
-      three people on personal time, early 2026, with Claude Code
-      (Anthropic) as the primary development partner.
-    </p>
-
-    <div class="work-links" style="display: grid; gap: 0.5rem;">
-      <a href="https://doi.org/10.5281/zenodo.19621884" style="display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border: 1px solid var(--card-border-color); border-radius: 8px; text-decoration: none; transition: border-color 0.15s ease;">
-        <code style="font-size: 10.5px; letter-spacing: 0.08em; background: var(--mask-bg); padding: 3px 7px; border-radius: 3px; color: var(--text-muted-color);">DOI</code>
-        <span style="flex: 1; color: var(--text-color); font-size: 14px;">
-          <strong>Paper 1</strong> · Architecture &amp; Ablation
-          <br>
-          <span style="font-family: JetBrains Mono, monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.02em;">doi.org/10.5281/zenodo.19621884</span>
-        </span>
-      </a>
-      <a href="https://doi.org/10.5281/zenodo.19622052" style="display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border: 1px solid var(--card-border-color); border-radius: 8px; text-decoration: none; transition: border-color 0.15s ease;">
-        <code style="font-size: 10.5px; letter-spacing: 0.08em; background: var(--mask-bg); padding: 3px 7px; border-radius: 3px; color: var(--text-muted-color);">DOI</code>
-        <span style="flex: 1; color: var(--text-color); font-size: 14px;">
-          <strong>Paper 2</strong> · Agentic Reason Generation &amp; Compliance
-          <br>
-          <span style="font-family: JetBrains Mono, monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.02em;">doi.org/10.5281/zenodo.19622052</span>
-        </span>
-      </a>
-      <a href="https://github.com/bluethestyle/aws_ple_for_financial" style="display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border: 1px solid var(--card-border-color); border-radius: 8px; text-decoration: none; transition: border-color 0.15s ease;">
-        <code style="font-size: 10.5px; letter-spacing: 0.08em; background: var(--mask-bg); padding: 3px 7px; border-radius: 3px; color: var(--text-muted-color);">MIT</code>
-        <span style="flex: 1; color: var(--text-color); font-size: 14px;">
-          <strong>Source code</strong>
-          <br>
-          <span style="font-family: JetBrains Mono, monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.02em;">github.com/bluethestyle/aws_ple_for_financial</span>
-        </span>
-      </a>
+    <div class="bts-work-viz">
+      <div class="viz-top"><span>architecture</span><b>ple · v0.3</b></div>
+      {% include ple-diagram.svg %}
+      <div class="viz-nums">
+        <div><div class="n">7</div><div class="l">experts</div></div>
+        <div><div class="n">13</div><div class="l">tasks</div></div>
+        <div><div class="n">0.91</div><div class="l">f1 mean</div></div>
+      </div>
     </div>
-
-    <div class="work-stats" style="display: flex; gap: 2rem; margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--dash-color);">
-      <div><span style="font-family: Fraunces, serif; font-size: 1.6rem; font-weight: 500; color: var(--text-color);">7</span> <span class="mono-caption">EXPERTS</span></div>
-      <div><span style="font-family: Fraunces, serif; font-size: 1.6rem; font-weight: 500; color: var(--text-color);">13</span> <span class="mono-caption">TASKS</span></div>
-      <div><span style="font-family: Fraunces, serif; font-size: 1.6rem; font-weight: 500; color: var(--text-color);">λ</span> <span class="mono-caption">LAMBDA</span></div>
-    </div>
-  </div>
+  </article>
 </section>
 
-
-<!-- ============================================================
-     3. Co-authors
-     ============================================================ -->
-<section id="co-authors" style="margin-top: 4rem;">
-  <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem;">
-    <h2 style="font-family: Fraunces, serif; font-size: 1.8rem; font-weight: 400; font-style: italic; margin: 0; letter-spacing: -0.02em;">
-      Co-<em>authors</em>
-    </h2>
-    <span class="mono-caption">3 · personal time</span>
+{%- comment -%} ── Co-authors ── {%- endcomment -%}
+{%- if site.data.coauthors -%}
+<section class="bts-block">
+  <div class="bts-sec-head">
+    <div class="l"><h2 class="title">Co-<em>authors</em></h2><span class="count">{{ site.data.coauthors | size }} · incl. agents</span></div>
   </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-    {% for author in site.data.coauthors %}
-      <div class="author-card" style="border: 1px solid var(--card-border-color); border-radius: 10px; padding: 1.2rem; background: var(--card-bg); position: relative;">
-        {% if author.lead %}
-          <span style="position: absolute; top: 0.7rem; right: 0.7rem; font-family: JetBrains Mono, monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted-color); background: var(--mask-bg); padding: 2px 6px; border-radius: 3px;">LEAD</span>
-        {% endif %}
-        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--mask-bg); display: flex; align-items: center; justify-content: center; font-family: Fraunces, serif; font-size: 12px; font-weight: 500; color: var(--text-color); margin-bottom: 0.9rem; border: 1px solid var(--card-border-color);">
-          {{ author.initials }}
-        </div>
-        <div style="font-family: 'Inter Tight', sans-serif; font-weight: 500; font-size: 14.5px; margin-bottom: 0.3rem;">
-          {{ author.name }}
-        </div>
-        <div style="font-family: JetBrains Mono, monospace; font-size: 11px; color: var(--text-muted-color); letter-spacing: 0.02em; line-height: 1.45;">
-          {{ author.role }}
-        </div>
+  <div class="bts-authors">
+    {% for a in site.data.coauthors %}
+      <div class="bts-author {% if a.lead %}lead{% endif %}">
+        <div class="init">{{ a.initials }}</div>
+        <div class="nm">{{ a.name }}</div>
+        <div class="rl">{{ a.role }}</div>
       </div>
     {% endfor %}
   </div>
 </section>
+{%- endif -%}
 
-
-<!-- ============================================================
-     4. Series
-     ============================================================ -->
-<section id="series" style="margin-top: 4rem;">
-  <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem;">
-    <h2 style="font-family: Fraunces, serif; font-size: 1.8rem; font-weight: 400; font-style: italic; margin: 0; letter-spacing: -0.02em;">
-      <em>Series</em>
-    </h2>
-    <span class="mono-caption">EN · KO parallel</span>
+{%- comment -%} ── Posts, grouped by year ── {%- endcomment -%}
+<section class="bts-block">
+  <div class="bts-sec-head">
+    <div class="l"><h2 class="title">Field <em>notes</em></h2><span class="count">{{ site.posts | size }} total</span></div>
   </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-    {% for s in site.data.series %}
-      <div class="series-card" style="border: 1px solid var(--card-border-color); border-radius: 10px; padding: 1.3rem; background: var(--card-bg);">
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.9rem;">
-          <code style="background: var(--accent-soft); color: var(--accent-color-hover); padding: 3px 8px; border-radius: 3px; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;">
-            [{{ s.tag_en }}]
-          </code>
-          <span class="mono-caption">ep 1 of {{ s.total }}</span>
-        </div>
-
-        <h3 style="font-family: Fraunces, serif; font-size: 1.3rem; font-weight: 500; line-height: 1.2; margin: 0 0 0.8rem 0; letter-spacing: -0.015em;">
-          {{ s.title_en }}
-        </h3>
-
-        <p style="font-size: 13.5px; line-height: 1.55; color: var(--text-muted-color); margin-bottom: 1.2rem;">
-          {{ s.desc_en }}
-        </p>
-
-        <div style="height: 3px; background: var(--mask-bg); border-radius: 2px; margin-bottom: 1rem; overflow: hidden;">
-          <div style="width: {{ 100 | divided_by: s.total }}%; height: 100%; background: var(--accent-color);"></div>
-        </div>
-
-        <div style="display: flex; gap: 1rem; font-size: 12px; color: var(--text-muted-color);">
-          <span class="mono-caption" style="color: var(--text-muted-color);">read</span>
-          <a href="{{ s.url_en }}" style="color: var(--link-color); border-bottom: 1px solid rgba(46, 91, 255, 0.3); text-decoration: none;">english ↗</a>
-          <a href="{{ s.url_ko }}" style="color: var(--link-color); border-bottom: 1px solid rgba(46, 91, 255, 0.3); text-decoration: none;">한국어로 읽기 ↗</a>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-</section>
-
-
-<!-- ============================================================
-     5. Latest posts — Chirpy post card list
-     ============================================================ -->
-<section id="latest" style="margin-top: 4rem;">
-  <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem;">
-    <h2 style="font-family: Fraunces, serif; font-size: 1.8rem; font-weight: 400; font-style: italic; margin: 0; letter-spacing: -0.02em;">
-      Latest <em>posts</em>
-    </h2>
-    <span class="mono-caption">{{ site.posts.size }}</span>
-  </div>
-
-  <div id="post-list" class="flex-grow-1 px-xl-1">
-    {% for post in paginator.posts %}
-      <article class="card-wrapper card">
-        <a href="{{ post.url | relative_url }}" class="post-preview row g-0 flex-md-row-reverse">
-          {% assign card_body_col = '12' %}
-
-          {% if post.image %}
-            {% assign src = post.image.path | default: post.image %}
-            {% unless src contains '//' %}
-              {% assign src = post.media_subpath | append: '/' | append: src | replace: '//', '/' %}
-            {% endunless %}
-
-            {% assign alt = post.image.alt | xml_escape | default: 'Preview Image' %}
-
-            <div class="col-md-5">
-              <img src="{{ src }}" alt="{{ alt }}">
-            </div>
-
-            {% assign card_body_col = '7' %}
-          {% endif %}
-
-          <div class="col-md-{{ card_body_col }}">
-            <div class="card-body">
-              <h1 class="card-title my-2 mt-md-0">{{ post.title }}</h1>
-
-              <div class="card-text content mt-0 mb-3">
-                <p>
-                  {% if post.description %}
-                    {{ post.description }}
-                  {% else %}
-                    {{ post.excerpt | strip_html | strip_newlines | truncate: 200 }}
-                  {% endif %}
-                </p>
-              </div>
-
-              <div class="post-meta flex-grow-1 d-flex align-items-end">
-                <div class="me-auto">
-                  <i class="far fa-calendar fa-fw me-1"></i>
-                  <time>{{ post.date | date: "%Y-%m-%d" }}</time>
-
-                  {% if post.categories.size > 0 %}
-                    <i class="far fa-folder-open fa-fw me-1 ms-2"></i>
-                    <span class="categories">
-                      {% for category in post.categories %}
-                        {{ category }}{%- unless forloop.last -%}, {%- endunless -%}
-                      {% endfor %}
-                    </span>
-                  {% endif %}
-
-                  {% if post.lang %}
-                    <span style="margin-left: 0.8rem; font-family: JetBrains Mono, monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 1px 6px; border-radius: 3px;">
-                      {{ post.lang }}
-                    </span>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
+  {%- assign cur_year = "" -%}
+  <div class="bts-post-index">
+    {%- for p in site.posts -%}
+      {%- assign y = p.date | date: "%Y" -%}
+      {%- if y != cur_year -%}
+        {%- unless forloop.first -%}</div>{%- endunless -%}
+        <div class="bts-year">— {{ y }}</div>
+        <div>
+        {%- assign cur_year = y -%}
+      {%- endif -%}
+      <a class="bts-post-row" href="{{ p.url | relative_url }}">
+        <div>
+          <div class="meta-line">
+            <span>{{ p.date | date: "%b %d" }}</span>
+            <span class="d"></span>
+            {%- if p.categories.size > 0 -%}<span class="cat">{{ p.categories | first }}</span><span class="d"></span>{%- endif -%}
+            <span class="lang">{{ p.lang | default: "en" | upcase }}</span>
           </div>
-        </a>
-      </article>
+          <h3 class="title {% if p.lang == 'ko' %}kr{% endif %}">{{ p.title }}</h3>
+          {%- if p.excerpt -%}<p class="ex {% if p.lang == 'ko' %}kr{% endif %}">{{ p.excerpt | strip_html | truncate: 200 }}</p>{%- endif -%}
+          {%- if p.tags.size > 0 -%}
+            <div class="tags-row">
+              {%- for t in p.tags limit: 6 -%}<span class="tg">#{{ t }}</span>{%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+        <div class="right"><span>read</span><span class="arr">→</span></div>
+      </a>
+    {%- endfor -%}
+    {%- unless site.posts.size == 0 -%}</div>{%- endunless -%}
+  </div>
+</section>
+
+{%- comment -%} ── Series ── {%- endcomment -%}
+{%- if site.data.series -%}
+<section class="bts-block">
+  <div class="bts-sec-head">
+    <div class="l"><h2 class="title">Long-form <em>series</em></h2><span class="count">{{ site.data.series | size }}</span></div>
+  </div>
+  <div class="bts-series-grid">
+    {% for s in site.data.series %}
+      <a class="bts-series" href="{{ s.en | relative_url }}">
+        <div class="top">
+          <span class="cat">{{ s.tag }}</span>
+          <span class="prog">ep {{ s.ep }} / {{ s.total }}</span>
+        </div>
+        <h4>{{ s.title }}</h4>
+        <p>{{ s.desc }}</p>
+        <div class="bar"><span style="width: {{ s.ep | times: 100 | divided_by: s.total }}%"></span></div>
+        <div class="lang">
+          <a href="{{ s.en | relative_url }}">english</a>
+          <span class="sep">·</span>
+          <a href="{{ s.ko | relative_url }}">한국어</a>
+        </div>
+      </a>
     {% endfor %}
   </div>
-
-  {% if paginator.total_pages > 1 %}
-    <nav class="mt-4">
-      <ul class="pagination justify-content-center">
-        {% if paginator.previous_page %}
-          <li class="page-item">
-            <a class="page-link" href="{{ paginator.previous_page_path | relative_url }}">
-              &laquo; Previous
-            </a>
-          </li>
-        {% endif %}
-        {% if paginator.next_page %}
-          <li class="page-item">
-            <a class="page-link" href="{{ paginator.next_page_path | relative_url }}">
-              Next &raquo;
-            </a>
-          </li>
-        {% endif %}
-      </ul>
-    </nav>
-  {% endif %}
 </section>
+{%- endif -%}
 
-
-<!-- ============================================================
-     Contact strip (footer-ish)
-     ============================================================ -->
-<section id="contact-strip" style="margin-top: 5rem; padding-top: 1.5rem; border-top: 1px solid var(--dash-color); font-family: JetBrains Mono, monospace; font-size: 11px; letter-spacing: 0.04em; color: var(--text-muted-color); display: flex; flex-wrap: wrap; gap: 2rem;">
-  <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">Contact</span> jsk320098 [at] gmail [dot] com</div>
-  <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">ORCID</span> <a href="https://orcid.org/0009-0005-3291-9112" style="color: var(--link-color);">0009-0005-3291-9112 ↗</a></div>
-  <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">GitHub</span> <a href="https://github.com/bluethestyle">@bluethestyle ↗</a></div>
-  <div><span style="text-transform: uppercase; letter-spacing: 0.12em; margin-right: 0.6rem;">License</span> content CC BY-NC 4.0 · code MIT</div>
-</section>
-
+<div class="bts-contact-bar">
+  <span class="k">contact</span>
+  <span class="v">{{ site.author.name }}, {{ site.author.location }}</span>
+  <span class="sep">·</span>
+  <a href="mailto:{{ site.social.email }}">{{ site.social.email }}</a>
+  <span class="sep">·</span>
+  <a href="https://github.com/{{ site.social.github }}">@{{ site.social.github }}</a>
+  <span class="sep">·</span>
+  <a href="https://orcid.org/{{ site.social.orcid }}">orcid</a>
+</div>

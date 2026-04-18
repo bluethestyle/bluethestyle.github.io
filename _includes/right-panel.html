@@ -1,20 +1,6 @@
-{%- comment -%}
-  bluethestyle — right panel (widgets)
-  Drop at: _includes/right-panel.html
-  Wrap in <aside class="bts-sidebar-r"> when you include it.
-
-  Data sources:
-    • site.posts, site.categories, site.tags, site.data.series — Jekyll built-ins / collections
-    • site.social.orcid  — _config.yml   (bare ID like "0009-0005-3291-9112")
-    • page.last_modified_at — optional per-post front matter
-{%- endcomment -%}
-
+{%- comment -%} bluethestyle — right panel {%- endcomment -%}
 <aside class="bts-sidebar-r">
 
-  {%- comment -%} ── index stats ────────────────────────────── {%- endcomment -%}
-  {%- assign years = site.posts | map: 'date' | map_to_year | uniq -%}
-  {%- assign year_count = 1 -%}
-  {%- if years -%}{% assign year_count = years | size %}{%- endif -%}
   <div class="bts-widget">
     <div class="w-head"><h3>Index</h3><span class="n">updated · {{ site.time | date: "%Y-%m-%d" }}</span></div>
     <div class="bts-stats">
@@ -25,19 +11,15 @@
     </div>
   </div>
 
-  {%- comment -%} ── recently updated ──────────────────────────
-    Sort by last_modified_at if set; fall back to date.
-  {%- endcomment -%}
-  {%- assign recent = site.posts | sort: 'last_modified_at' | reverse | slice: 0, 4 -%}
-  {%- if recent.size == 0 -%}{% assign recent = site.posts | slice: 0, 4 %}{%- endif -%}
+  {%- assign recent = site.posts | slice: 0, 4 -%}
   <div class="bts-widget">
     <div class="w-head"><h3>Recently updated</h3><span class="n">{{ recent | size }}</span></div>
     <div class="bts-recent">
       {%- for p in recent -%}
-        {%- assign updated = p.last_modified_at | default: p.date -%}
+        {%- assign upd = p.last_modified_at | default: p.date -%}
         <a href="{{ p.url | relative_url }}">
           <div class="r-top">
-            <span>{{ updated | date: "%Y-%m-%d" }}</span>
+            <span>{{ upd | date: "%Y-%m-%d" }}</span>
             <span>{{ p.lang | default: "EN" | upcase }}</span>
           </div>
           <div class="r-t {% if p.lang == 'ko' %}kr{% endif %}">
@@ -49,13 +31,13 @@
     </div>
   </div>
 
-  {%- comment -%} ── trending tags ─────────────────────────────
-    Top 9 tags by count. Top 3 get .hot treatment.
-    Liquid can't sort hashes directly; we sort via tag counts.
-  {%- endcomment -%}
+  {%- comment -%} trending tags — manual sort via count|name rows {%- endcomment -%}
   {%- assign tag_list = "" | split: "" -%}
   {%- for t in site.tags -%}
-    {%- capture row -%}{{ t[1] | size }}|{{ t[0] }}{%- endcapture -%}
+    {%- assign cnt = t[1] | size -%}
+    {%- assign pad = cnt | prepend: "000" -%}
+    {%- assign pad = pad | slice: -3, 3 -%}
+    {%- capture row -%}{{ pad }}|{{ t[0] }}{%- endcapture -%}
     {%- assign tag_list = tag_list | push: row -%}
   {%- endfor -%}
   {%- assign tag_list = tag_list | sort | reverse -%}
@@ -65,37 +47,35 @@
     <div class="bts-tagcloud">
       {%- for row in tag_list limit: 9 -%}
         {%- assign parts = row | split: "|" -%}
-        {%- assign count = parts[0] -%}
-        {%- assign name  = parts[1] -%}
-        {%- assign slug  = name | slugify -%}
+        {%- assign cnt = parts[0] | plus: 0 -%}
+        {%- assign name = parts[1] -%}
+        {%- assign slug = name | slugify -%}
         <a class="bts-tag {% if forloop.index <= 3 %}hot{% endif %}" href="{{ '/tags/' | append: slug | append: '/' | relative_url }}">
-          #{{ name }}<span class="c">{{ count }}</span>
+          #{{ name }}<span class="c">{{ cnt }}</span>
         </a>
       {%- endfor -%}
     </div>
   </div>
 
-  {%- comment -%} ── ORCID — matches prototype markup ────────── {%- endcomment -%}
   {%- if site.social.orcid -%}
     <div class="bts-widget">
       <div class="w-head"><h3>ORCID</h3></div>
       <div class="bts-orcid">
-        <div class="hdr">Verified researcher</div>
+        <div class="hdr">Researcher ID</div>
         <div class="id">{{ site.social.orcid }}</div>
-        <a class="link" href="https://orcid.org/{{ site.social.orcid }}" rel="me">orcid.org ↗</a>
+        <a class="link" href="https://orcid.org/{{ site.social.orcid }}" rel="me">view on orcid.org ↗</a>
       </div>
     </div>
   {%- endif -%}
 
-  {%- comment -%} ── colophon — matches prototype markup ─────── {%- endcomment -%}
   <div class="bts-widget">
     <div class="w-head"><h3>Colophon</h3></div>
     <div class="bts-colophon">
-      <div class="row"><span class="k">theme</span><b>chirpy 7.5.0</b></div>
-      <div class="row"><span class="k">engine</span><b>jekyll · markdown</b></div>
-      <div class="row"><span class="k">diagrams</span><b>mermaid</b></div>
-      <div class="row"><span class="k">host</span><b>github pages</b></div>
-      <div class="row"><span class="k">&nbsp;</span><b>&copy; {{ site.time | date: "%Y" }} {{ site.author.name | default: "Seonkyu Jeong" }}</b></div>
+      <div class="row"><span class="k">type</span><b>Fraunces · Inter Tight</b></div>
+      <div class="row"><span class="k">mono</span><b>JetBrains Mono</b></div>
+      <div class="row"><span class="k">korean</span><b>Pretendard</b></div>
+      <div class="row"><span class="k">hosted</span><b>GitHub Pages</b></div>
+      <div class="row"><span class="k">license</span><b>CC BY-NC · MIT</b></div>
     </div>
   </div>
 </aside>

@@ -1,0 +1,49 @@
+---
+layout: default
+---
+<article class="bts-article">
+  <header class="bts-article-head">
+    <div class="meta-line">
+      <span>{{ page.date | date: "%Y-%m-%d" }}</span>
+      <span class="d"></span>
+      {%- if page.categories.size > 0 -%}<span class="cat">{{ page.categories | first }}</span><span class="d"></span>{%- endif -%}
+      <span class="lang">{{ page.lang | default: "en" | upcase }}</span>
+      {%- if page.read_time -%}<span class="d"></span><span>{{ page.read_time }} min read</span>{%- endif -%}
+    </div>
+    <h1 class="title {% if page.lang == 'ko' %}kr{% endif %}">{{ page.title }}</h1>
+    {%- if page.subtitle -%}<p class="sub {% if page.lang == 'ko' %}kr{% endif %}">{{ page.subtitle }}</p>{%- endif -%}
+    {%- if page.tags.size > 0 -%}
+      <div class="tags-row">
+        {%- for t in page.tags -%}<a class="tg" href="{{ '/tags/' | append: t | slugify | append: '/' | relative_url }}">#{{ t }}</a>{%- endfor -%}
+      </div>
+    {%- endif -%}
+  </header>
+
+  {%- if page.toc -%}
+    <nav class="bts-toc">
+      <div class="nav-label">Contents</div>
+      {{ content | toc_only }}
+    </nav>
+  {%- endif -%}
+
+  <div class="bts-prose {% if page.lang == 'ko' %}kr{% endif %}">
+    {{ content }}
+  </div>
+
+  {%- if page.previous or page.next -%}
+  <nav class="bts-post-nav">
+    {%- if page.previous -%}
+      <a class="pn prev" href="{{ page.previous.url | relative_url }}">
+        <span class="k">← previous</span>
+        <span class="t">{{ page.previous.title }}</span>
+      </a>
+    {%- else -%}<span></span>{%- endif -%}
+    {%- if page.next -%}
+      <a class="pn next" href="{{ page.next.url | relative_url }}">
+        <span class="k">next →</span>
+        <span class="t">{{ page.next.title }}</span>
+      </a>
+    {%- else -%}<span></span>{%- endif -%}
+  </nav>
+  {%- endif -%}
+</article>

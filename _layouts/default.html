@@ -1,78 +1,38 @@
----
-layout: compress
----
-
 <!doctype html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}" data-mode="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }} — {{ site.tagline }}{% endif %}</title>
+  {% seo title=false %}
 
-{% include origin-type.html %}
-{% include lang.html %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+  <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
 
-{% if site.theme_mode %}
-  {% capture prefer_mode %}data-mode="{{ site.theme_mode }}"{% endcapture %}
-{% endif %}
-
-<html lang="{{ page.lang | default: site.alt_lang | default: site.lang }}" {{ prefer_mode }}>
-  {% include head.html lang=lang %}
-
-  <body>
-    {%- comment -%}
-      Claude Design handoff v2 layout structure:
-
-        [topbar, full width, sticky top]
-        .bts-frame (grid)
-          [sidebar]  [main]  [right-panel]
-
-      Chirpy's original default placed sidebar OUTSIDE main-wrapper
-      and topbar INSIDE the centered container. We replace that
-      with the prototype's 3-column grid at body level so topbar
-      spans edge to edge and columns align properly.
-
-      site.css provides all .bts-* styles. Chirpy's own theme.css
-      still loads for baseline typography + dark mode toggle JS,
-      but our site.css is loaded after and overrides where needed.
-    {%- endcomment -%}
-
-    {%- include topbar.html -%}
-
-    <div class="bts-frame">
-      {%- include sidebar.html -%}
-
-      <main class="bts-main" aria-label="Main Content">
-        {% if layout.layout == 'default' %}
-          {% include refactor-content.html content=content lang=lang %}
-        {% else %}
-          {{ content }}
-        {% endif %}
-
-        {% for _include in layout.tail_includes %}
-          {% assign _include_path = _include | append: '.html' %}
-          {% include {{ _include_path }} lang=lang %}
-        {% endfor %}
-      </main>
-
-      {%- include right-panel.html -%}
-    </div>
-
-    <div id="mask" class="d-none position-fixed w-100 h-100 z-1"></div>
-
-    {%- comment -%} Search UI (Chirpy-managed) {%- endcomment -%}
-    {% include_cached search-results.html lang=lang %}
-
-    <aside aria-label="Scroll to Top">
-      <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow">
-        <i class="fas fa-angle-up"></i>
-      </button>
-    </aside>
-
-    {% if site.pwa.enabled %}
-      {% include_cached notification.html lang=lang %}
-    {% endif %}
-
-    {% for _include in layout.script_includes %}
-      {% assign _include_path = _include | append: '.html' %}
-      {% include {{ _include_path }} %}
-    {% endfor %}
-
-    {% include_cached search-loader.html lang=lang %}
-  </body>
+  <script>
+    (function () {
+      try {
+        var m = localStorage.getItem("mode");
+        if (!m && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) m = "dark";
+        if (m) document.documentElement.setAttribute("data-mode", m);
+      } catch (_) {}
+    })();
+  </script>
+</head>
+<body>
+  {% include topbar.html %}
+  <div class="bts-frame">
+    {% include sidebar.html %}
+    <main class="bts-main">
+      {{ content }}
+    </main>
+    {% include right-panel.html %}
+  </div>
+  {% include footer.html %}
+  <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}" defer></script>
+</body>
 </html>

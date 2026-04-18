@@ -1,0 +1,63 @@
+<svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet" class="viz-svg" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid-work" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M 16 0 L 0 0 0 16" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.15"></path>
+    </pattern>
+  </defs>
+  <rect width="300" height="220" fill="url(#grid-work)" color="var(--muted-2)"></rect>
+
+  
+  <g font-family="JetBrains Mono" font-size="7" fill="var(--muted)" text-anchor="middle">
+    <g><rect x="18" y="16" width="54" height="12" rx="2" fill="var(--surface)" stroke="var(--hair)"></rect><text x="45" y="25">E1</text></g>
+    <g><rect x="18" y="42" width="54" height="12" rx="2" fill="var(--surface)" stroke="var(--hair)"></rect><text x="45" y="51">E2</text></g>
+    <g><rect x="18" y="68" width="54" height="12" rx="2" fill="var(--surface)" stroke="var(--hair)"></rect><text x="45" y="77">E3</text></g>
+    <g><rect x="18" y="94" width="54" height="12" rx="2" fill="var(--surface)" stroke="var(--hair)"></rect><text x="45" y="103">E4</text></g>
+    <g><rect x="18" y="120" width="54" height="12" rx="2" fill="var(--surface)" stroke="var(--hair)"></rect><text x="45" y="129">E5</text></g>
+    <g><rect x="18" y="146" width="54" height="12" rx="2" fill="var(--surface)" stroke="var(--hair)"></rect><text x="45" y="155">E6</text></g>
+    <g><rect x="18" y="172" width="54" height="12" rx="2" fill="var(--surface)" stroke="var(--hair)"></rect><text x="45" y="181">E7</text></g>
+  </g>
+
+  
+  <rect x="110" y="78" width="54" height="64" rx="4" fill="var(--accent-soft)" stroke="var(--accent)"></rect>
+  <text x="137" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="var(--accent-ink)" font-weight="500">GATE</text>
+  <text x="137" y="115" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="var(--accent-ink)">PLE</text>
+  <text x="137" y="128" text-anchor="middle" font-family="JetBrains Mono" font-size="6.5" fill="var(--accent-ink)" opacity="0.7">×7</text>
+
+  
+  <g stroke="var(--accent)" stroke-width="0.8" opacity="0.55">
+    <line x1="72" y1="22" x2="110" y2="110"></line>
+    <line x1="72" y1="48" x2="110" y2="110"></line>
+    <line x1="72" y1="74" x2="110" y2="110"></line>
+    <line x1="72" y1="100" x2="110" y2="110"></line>
+    <line x1="72" y1="126" x2="110" y2="110"></line>
+    <line x1="72" y1="152" x2="110" y2="110"></line>
+    <line x1="72" y1="178" x2="110" y2="110"></line>
+  </g>
+
+  
+  <g font-family="JetBrains Mono" font-size="6.5" fill="var(--muted)" text-anchor="middle">
+    <g><rect x="196" y="17" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="216" y="25">T01</text><line x1="164" y1="110" x2="196" y2="22" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="196" y="43" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="216" y="51">T02</text><line x1="164" y1="110" x2="196" y2="48" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="196" y="69" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="216" y="77">T03</text><line x1="164" y1="110" x2="196" y2="74" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="196" y="95" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="216" y="103">T04</text><line x1="164" y1="110" x2="196" y2="100" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="196" y="121" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="216" y="129">T05</text><line x1="164" y1="110" x2="196" y2="126" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="196" y="147" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="216" y="155">T06</text><line x1="164" y1="110" x2="196" y2="152" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="196" y="173" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="216" y="181">T07</text><line x1="164" y1="110" x2="196" y2="178" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="244" y="17" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="264" y="25">T08</text><line x1="164" y1="110" x2="244" y2="22" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="244" y="43" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="264" y="51">T09</text><line x1="164" y1="110" x2="244" y2="48" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="244" y="69" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="264" y="77">T10</text><line x1="164" y1="110" x2="244" y2="74" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="244" y="95" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="264" y="103">T11</text><line x1="164" y1="110" x2="244" y2="100" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="244" y="121" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="264" y="129">T12</text><line x1="164" y1="110" x2="244" y2="126" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+    <g><rect x="244" y="147" width="40" height="10" rx="2" fill="var(--bg-2)" stroke="var(--hair)"></rect><text x="264" y="155">T13</text><line x1="164" y1="110" x2="244" y2="152" stroke="var(--muted-2)" stroke-width="0.5" stroke-dasharray="1.5 2" opacity="0.6"></line></g>
+  </g>
+
+  
+  <text x="18" y="12" font-family="JetBrains Mono" font-size="7" fill="var(--muted)" letter-spacing="0.5">EXPERTS · 7</text>
+  <text x="110" y="72" font-family="JetBrains Mono" font-size="7" fill="var(--muted)" letter-spacing="0.5">PLE GATE</text>
+  <text x="196" y="12" font-family="JetBrains Mono" font-size="7" fill="var(--muted)" letter-spacing="0.5">TASKS · 13</text>
+
+  
+  <path d="M 137 150 C 137 180, 150 198, 200 202" stroke="var(--accent)" stroke-width="1.4" fill="none"></path>
+  <rect x="200" y="196" width="80" height="14" rx="2" fill="var(--ink)"></rect>
+  <text x="240" y="206" text-anchor="middle" font-family="JetBrains Mono" font-size="7.5" fill="var(--bg)" letter-spacing="0.5">→ LIGHTGBM / λ</text>
+</svg>

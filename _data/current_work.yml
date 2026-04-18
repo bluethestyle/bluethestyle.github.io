@@ -1,0 +1,29 @@
+# _data/current_work.yml — drives the "Current work" card on home
+year: 2026
+tag: "Recommendation · MRM · Agentic"
+title: "Heterogeneous Expert PLE for Financial Product Recommendation"
+desc: >-
+  A 13-task multi-task learning system with seven structurally distinct
+  expert networks, distilled to LightGBM for AWS Lambda serving, with
+  regulatory-grade audit infrastructure.
+meta: >-
+  Built by three people on personal time · early 2026 · with Claude Code
+  (Anthropic) as the primary development partner
+viz_caption: hetero-expert PLE
+nums:
+  - v: 7
+    l: experts
+  - v: 13
+    l: tasks
+  - v: λ
+    l: lambda
+links:
+  - label: "Paper 1 · Architecture & Ablation"
+    href: "https://doi.org/10.5281/zenodo.19621884"
+    tag: DOI
+  - label: "Paper 2 · Agentic Reason Generation & Compliance"
+    href: "https://doi.org/10.5281/zenodo.19622052"
+    tag: DOI
+  - label: "Source code"
+    href: "https://github.com/bluethestyle/aws_ple_for_financial"
+    tag: MIT

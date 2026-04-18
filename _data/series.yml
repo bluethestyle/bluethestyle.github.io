@@ -1,27 +1,19 @@
-# _data/series.yml
-# Drives the "Series · active" block in _includes/sidebar.html
-#
-# Fields:
-#   tag     — short label shown in the pill (UPPERCASE styling is CSS-driven)
-#   title   — series title
-#   ep      — current episode published
-#   total   — planned episodes
-#   en      — URL to the English landing page
-#   ko      — URL to the Korean landing page
-#   active  — set to false to hide from the sidebar (still visible elsewhere)
-
 - tag: "FinAI Build"
+  slug: finai-build
   title: "Building a Financial AI in Three Months"
+  desc: "One developer, a stack of agents, and a ninety-day clock. Documenting the real cost, the real mistakes, and the real architecture."
   ep: 1
   total: 8
+  active: true
   en: /series/three-months/
   ko: /series/three-months-ko/
-  active: true
 
 - tag: "MRM Thread"
+  slug: mrm-thread
   title: "The MRM Thread"
+  desc: "SR 11-7 was written for statisticians. It needs a rewrite for systems whose weights churn every quarter — and whose behavior emerges from prompts."
   ep: 1
   total: 6
+  active: true
   en: /series/mrm-thread/
   ko: /series/mrm-thread-ko/
-  active: true

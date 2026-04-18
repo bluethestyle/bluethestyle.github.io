@@ -1,21 +1,15 @@
-theme: jekyll-theme-chirpy
-
-lang: en  # site default; individual posts specify lang
-timezone: Asia/Seoul
-
-# Site info
-title: Seonkyu Jeong
-tagline: Independent researcher — financial AI, MRM, agentic systems. GARP FRM. Seoul.
+title: bluethestyle
+tagline: field notes
 description: >-
   Notes, working papers, and long-form thinking on financial AI,
   model risk management, and agentic systems.
 url: "https://bluethestyle.github.io"
+baseurl: ""
+
 since: 2026
+timezone: Asia/Seoul
+lang: en
 
-github:
-  username: bluethestyle
-
-# Author block (read by the Claude Design v2 hero/sidebar/topbar)
 author:
   name: Seonkyu Jeong
   role: Independent researcher
@@ -23,114 +17,38 @@ author:
   frm: true
 
 social:
-  name: Seonkyu Jeong
-  email: jsk320098@gmail.com
+  email:  jsk320098@gmail.com
   github: bluethestyle
-  orcid: 0009-0005-3291-9112
+  orcid:  0009-0005-3291-9112
   zenodo: https://zenodo.org/communities/bluethestyle
-  links:
-    - https://github.com/bluethestyle
-    - https://orcid.org/0009-0005-3291-9112
 
-# Theme mode: null allows user to toggle
-theme_mode: # light | dark | null
-
-# CDN endpoint for assets — leave empty for GitHub Pages default
-cdn: ""
-
-# Path configuration
-avatar: ""  # no avatar for now; can add later at /assets/img/avatar.png
-
-# Note preview on home page
-post_excerpts: true
-
-# Image lazy-load
-lazy_load_img: true
-
-# Default permalink pattern — keep existing pattern
-permalink: /:year/:month/:day/:title/
-
-# Pagination (required for Chirpy's home layout to display post cards)
-paginate: 10
-paginate_path: "/page:num/"
-
-# Markdown + highlighter
+# Build
 markdown: kramdown
 highlighter: rouge
+permalink: /:year/:month/:day/:slug/
 
 kramdown:
+  input: GFM
   syntax_highlighter: rouge
-  syntax_highlighter_opts:
-    css_class: highlight
-    block:
-      line_numbers: true
-      start_line: 1
-
-collections:
-  tabs:
-    output: true
-    sort_by: order
-
-defaults:
-  - scope:
-      path: ""
-      type: posts
-    values:
-      layout: post
-      comments: false
-      toc: true
-      permalink: /:year/:month/:day/:title/
-  - scope:
-      path: _tabs
-      type: tabs
-    values:
-      layout: page
-      permalink: /:title/
-  - scope:
-      path: assets/img/favicons
-    values:
-      swcache: true
-  - scope:
-      path: assets/js/dist
-    values:
-      swcache: true
-
-sass:
-  style: compressed
-
-compress_html:
-  clippings: all
-  comments: all
-  endings: all
-  profile: false
-  blanklines: false
-  ignore:
-    envs: [development]
-
-exclude:
-  - "*.gem"
-  - "*.gemspec"
-  - docs
-  - tools
-  - README.md
-  - LICENSE
-  - "*.config.js"
-  - package*.json
-  - Gemfile
-  - Gemfile.lock
-  - vendor
-  - .gitignore
-
-jekyll-archives:
-  enabled: [categories, tags]
-  layouts:
-    category: category
-    tag: tag
-  permalinks:
-    tag: /tags/:name/
-    category: /categories/:name/
+  toc_levels: 2..3
 
 plugins:
-  - jekyll-paginate
-  - jekyll-redirect-from
+  - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-sitemap
+
+defaults:
+  - scope: { path: "", type: "posts" }
+    values:
+      layout: post
+      lang: en
+  - scope: { path: "", type: "pages" }
+    values:
+      layout: page
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - node_modules
+  - vendor

@@ -1,0 +1,24 @@
+# _data/categories.yml
+# Human-facing metadata for each category. `name` must match the
+# string used in post front matter's `categories:` list exactly.
+# `color` refers to CSS palette vars --c1..--c4 / --c1s..--c4s.
+- slug: finai-build
+  name: FinAI Build
+  ko: 3개월 개발기
+  desc: Building a financial AI in three months — engineering notes.
+  color: 1
+- slug: mrm-thread
+  name: MRM Thread
+  ko: MRM 스레드
+  desc: Model risk management for AI recommendation systems.
+  color: 2
+- slug: field-notes
+  name: Field Notes
+  ko: 현장 노트
+  desc: Short observations from client work. (empty)
+  color: 3
+- slug: commentary
+  name: Commentary
+  ko: 논평
+  desc: Readings of regulatory drafts and papers. (empty)
+  color: 4

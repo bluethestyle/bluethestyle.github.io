@@ -1,0 +1,62 @@
+---
+layout: default
+permalink: /tags/
+title: Tags
+---
+{%- assign tag_list = "" | split: "" -%}
+{%- for t in site.tags -%}
+  {%- assign cnt = t[1] | size -%}
+  {%- assign pad = cnt | prepend: "000" | slice: -3, 3 -%}
+  {%- capture row -%}{{ pad }}|{{ t[0] }}{%- endcapture -%}
+  {%- assign tag_list = tag_list | push: row -%}
+{%- endfor -%}
+{%- assign tag_list = tag_list | sort | reverse -%}
+
+<section class="bts-hero" style="padding-bottom:24px; margin-bottom:24px;">
+  <div class="label"><span class="pulse"></span>Taxonomy · {{ site.tags | size }} tags</div>
+  <h1>Tags <em>—</em> a weighted map of recurring terms.</h1>
+</section>
+
+<section class="bts-block">
+  <div class="bts-tag-cloud">
+    {%- assign max_cnt = tag_list | first | split: "|" | first | plus: 0 -%}
+    {%- for row in tag_list -%}
+      {%- assign parts = row | split: "|" -%}
+      {%- assign cnt = parts[0] | plus: 0 -%}
+      {%- assign name = parts[1] -%}
+      {%- assign slug = name | slugify -%}
+      {%- assign ratio = cnt | times: 100 | divided_by: max_cnt -%}
+      {%- if ratio >= 80 -%}{%- assign sz = 48 -%}{%- assign hot = "hot" -%}
+      {%- elsif ratio >= 60 -%}{%- assign sz = 38 -%}{%- assign hot = "hot" -%}
+      {%- elsif ratio >= 40 -%}{%- assign sz = 30 -%}{%- assign hot = "" -%}
+      {%- elsif ratio >= 25 -%}{%- assign sz = 22 -%}{%- assign hot = "" -%}
+      {%- else -%}{%- assign sz = 16 -%}{%- assign hot = "" -%}
+      {%- endif -%}
+      <a class="tag {{ hot }}" href="#{{ slug }}" style="font-size: {{ sz }}px;">
+        {% if forloop.index <= 2 %}<span class="dot"></span>{% endif %}
+        {{ name }}<span class="c">{{ cnt }}</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</section>
+
+<section class="bts-block">
+  <div class="bts-sec-head"><div class="l"><h2 class="title">All tags</h2><span class="count">{{ tag_list | size }}</span></div></div>
+  <div class="bts-tag-table">
+    <div class="row head"><span>idx</span><span>name</span><span>count</span><span>share</span><span></span></div>
+    {%- for row in tag_list -%}
+      {%- assign parts = row | split: "|" -%}
+      {%- assign cnt = parts[0] | plus: 0 -%}
+      {%- assign name = parts[1] -%}
+      {%- assign slug = name | slugify -%}
+      {%- assign pct = cnt | times: 100 | divided_by: site.posts.size -%}
+      <a class="row" href="{{ '/tags/' | append: slug | append: '/' | relative_url }}" id="{{ slug }}">
+        <span class="idx">{{ forloop.index | prepend: '00' | slice: -2, 2 }}</span>
+        <span class="nm">#{{ name }} {% if forloop.index <= 3 %}<span class="hot">HOT</span>{% endif %}</span>
+        <span>{{ cnt }}</span>
+        <span class="pct"><span class="pbar"><span style="width: {{ pct }}%"></span></span>{{ pct }}%</span>
+        <span class="arr">→</span>
+      </a>
+    {%- endfor -%}
+  </div>
+</section>

@@ -1,19 +1,8 @@
-# Jekyll build artifacts
-_site/
-.sass-cache/
-.jekyll-cache/
+*.gem
+.bundle
+_site
+.jekyll-cache
 .jekyll-metadata
-
-# Bundler
-vendor/
-.bundle/
+vendor
 Gemfile.lock
-
-# OS
 .DS_Store
-Thumbs.db
-
-# Editor
-.vscode/
-.idea/
-*.swp

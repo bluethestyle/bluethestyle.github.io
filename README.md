@@ -1,109 +1,100 @@
-# bluethestyle.github.io
+# bluethestyle — Jekyll site (standalone)
 
-Source for the personal blog of **Seonkyu Jeong** —
-an independent researcher working on financial AI, model risk
-management, and agentic systems.
-
-🔗 **Live site**: [https://bluethestyle.github.io](https://bluethestyle.github.io)
-
-Built with [Jekyll](https://jekyllrb.com) and hosted on
-[GitHub Pages](https://pages.github.com).
+A complete, ready-to-deploy Jekyll site for **bluethestyle**. Serves the design
+from the prototype without depending on any upstream theme (Chirpy, Minima, etc.).
+Deploys to GitHub Pages via the included Actions workflow.
 
 ---
 
-## What lives here
+## What you get
 
-- **`index.md`** — home page (bio, research summary, post list)
-- **`about.md`** — longer author bio, co-authors, licensing
-- **`_posts/`** — blog posts, one file per post (`YYYY-MM-DD-slug.md`)
-- **`_config.yml`** — Jekyll site configuration
-
----
-
-## Research artifacts
-
-The research this blog discusses lives in a separate repository:
-
-- **[bluethestyle/aws_ple_for_financial](https://github.com/bluethestyle/aws_ple_for_financial)**
-  — source code (MIT License) for the Heterogeneous Expert PLE project
-
-Accompanying preprints on Zenodo (CC BY 4.0):
-
-- Paper 1 — *Heterogeneous Expert PLE: Architecture & Ablation*
-  [doi.org/10.5281/zenodo.19621884](https://doi.org/10.5281/zenodo.19621884)
-- Paper 2 — *From Prediction to Persuasion: Agentic Reason Generation & Compliance*
-  [doi.org/10.5281/zenodo.19622052](https://doi.org/10.5281/zenodo.19622052)
-
----
-
-## Adding a post
-
-Create a file in `_posts/` named `YYYY-MM-DD-slug.md`:
-
-```markdown
----
-layout: default
-title: "Post title here"
-date: 2026-05-01
----
-
-# {% raw %}{{ page.title }}{% endraw %}
-
-*{% raw %}{{ page.date | date: "%Y-%m-%d" }}{% endraw %}*
-
-Post content...
+```
+.
+├── _config.yml                 ← site config (author, social, URL)
+├── Gemfile                     ← ruby deps (jekyll 4.3 + 3 plugins)
+├── .github/workflows/pages.yml ← CI — builds & deploys on push to main
+│
+├── _layouts/
+│   ├── default.html            ← page shell (topbar + 3-col grid + footer)
+│   ├── home.html               ← hero + current-work + co-authors + post index + series
+│   ├── post.html               ← blog post
+│   └── page.html               ← static page (e.g. /about/)
+│
+├── _includes/
+│   ├── topbar.html             ← logo · tabs · search · lang · dark-mode
+│   ├── sidebar.html            ← LEFT column — bio · nav · elsewhere · active series
+│   ├── right-panel.html        ← RIGHT column — stats · recent · tags · ORCID · colophon
+│   ├── footer.html             ← bottom bar
+│   └── ple-diagram.svg         ← the 7→gate→13 diagram on the home page
+│
+├── _data/
+│   ├── series.yml              ← "Series · active" sidebar + home grid
+│   └── coauthors.yml           ← co-authors block on home
+│
+├── _posts/                     ← 4 sample posts (EN + 1 KO), dated 2026-03/04
+│
+├── assets/
+│   ├── css/site.css            ← ALL styling (plain CSS, .bts-* scoped)
+│   └── js/theme-toggle.js      ← dark-mode toggle, localStorage-backed
+│
+├── index.html                  ← uses layout: home
+├── categories.html             ← /categories/
+├── tags.html                   ← /tags/
+├── archives.html               ← /archives/  (includes 12-week cadence heatmap)
+└── about.md                    ← /about/
 ```
 
-Push to `main` — GitHub Pages rebuilds in 1-2 minutes.
-Check the [Actions tab](https://github.com/bluethestyle/bluethestyle.github.io/actions)
-for build status.
-
-## Local preview (optional)
+## Local preview
 
 ```bash
-# one-time setup
-gem install bundler jekyll
-
-# create a Gemfile
-cat > Gemfile <<'EOF'
-source "https://rubygems.org"
-gem "github-pages", group: :jekyll_plugins
-EOF
-
-# serve locally
 bundle install
 bundle exec jekyll serve
+# → http://127.0.0.1:4000
 ```
 
-Open [http://localhost:4000](http://localhost:4000) — changes
-auto-reload on file save.
+Ruby 3.0+ required. On macOS: `brew install ruby` then `gem install bundler`.
 
+## Deploy on GitHub Pages
+
+1. Push this repo to GitHub as `bluethestyle.github.io` (or any repo; adjust `url` in `_config.yml`).
+2. Repo → Settings → **Pages** → Source: **GitHub Actions**.
+3. Push to `main`. The included `.github/workflows/pages.yml` runs `jekyll build` and publishes `_site/`.
+
+## Customise
+
+- **Author + social** — `_config.yml` top of file. Every template reads from `site.author` and `site.social`.
+- **Active series** — `_data/series.yml`. Controls the sidebar *Series · active* block and the home-page series grid.
+- **Co-authors** — `_data/coauthors.yml`. Controls the co-authors block on home.
+- **Current working paper** — edit the `<article class="bts-work-card">` block in `_layouts/home.html` directly. (It's hard-coded to one paper; revisit when there's a second.)
+- **Colors + type** — `:root` block at the top of `assets/css/site.css`. Both light (Paper) and dark (Ink) themes defined there as CSS custom properties; nothing else touches colors directly.
+
+## Post front matter
+
+```yaml
 ---
-
-## Co-authors
-
-The research discussed on this blog is joint work with
-**Euncheol Sim** and **Youngchan Kim**. Both have write access to
-this repository to contribute corrections, co-authored posts, or
-Korean translations.
-
+title: "[FinAI Build] Ep 1 — The Premise"
+subtitle: "One developer, a stack of agents, and a ninety-day clock."
+date: 2026-04-15
+last_modified_at: 2026-04-18
+lang: en              # or "ko" — flips font stack and the lang badge
+categories: [FinAI Build]
+tags: [finai-build, claude-code, agents]
+toc: true             # optional — kramdown TOC at top
+read_time: 7          # optional — shows in meta line
 ---
+```
 
-## License
+## Bilingual (EN + KO)
 
-- **Text and posts**: Creative Commons Attribution 4.0 International
-  (CC BY 4.0)
-- **Jekyll template / layout files**: MIT License
+No plugin needed. Just set `lang: ko` on a post. The layout switches to
+**Pretendard** and adjusts sizes/letter-spacing. The language toggle in the
+topbar currently points to `/` (EN) and `/ko/` (KO); create `ko/index.html`
+with `layout: home` and a KO `_posts_ko/` collection when you're ready for a
+parallel site — or leave it pointing at a filtered archive.
 
-Research papers and source code linked from this blog have their
-own licenses; see their respective repositories for details.
+## Known edges
 
----
-
-## Acknowledgments
-
-Posts on this blog may be drafted with
-[Claude Code (Anthropic)](https://claude.com/claude-code)
-assistance. Ideas, experience, and final review are by the author.
-This practice is consistent with the authors' stated methodology
-across the entire research project.
+- The trending-tags block zero-pads counts before string-sorting. It handles up to **999 posts per tag**. If you ever hit that, widen the `"000"` pad in `right-panel.html`.
+- The archive heatmap is generated in Liquid at build time — no JS. It's O(posts × 84). Fine up to a few thousand posts; beyond that, cache it.
+- Search box in the topbar is visual only. Wire up lunr.js or Pagefind when you want real search.
+- Dark mode inherits the OS preference on first load, then persists the user's explicit choice in `localStorage["mode"]`.
