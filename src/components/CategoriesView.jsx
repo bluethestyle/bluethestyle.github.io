@@ -31,17 +31,22 @@ function CategoriesView() {
             const cvar = "var(--c" + c.color + ")";
             const cs = "var(--c" + c.color + "s)";
             const active = c.count > 0;
+            const Tag = active ? "a" : "div";
+            const href = active ? `/categories/${c.slug}/` : undefined;
             return (
-              <div key={c.slug} style={{
+              <Tag key={c.slug} href={href} style={{
+                display: "block",
+                color: "inherit",
+                textDecoration: "none",
                 padding: "26px 28px",
                 background: "var(--surface)",
                 border: "1px solid var(--hair)",
                 borderRadius: 10,
                 position: "relative",
                 opacity: active ? 1 : 0.6,
-                cursor: "pointer",
+                cursor: active ? "pointer" : "default",
                 transition: "transform .15s, box-shadow .15s"
-              }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 10px 30px rgba(0,0,0,0.06)";}} onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
+              }} onMouseEnter={e=>{if(active){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 10px 30px rgba(0,0,0,0.06)";}}} onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
                 <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14}}>
                   <div style={{display:"inline-flex", alignItems:"center", gap:10}}>
                     <span style={{width:10, height:10, borderRadius:2, background:cvar}}></span>
@@ -61,7 +66,7 @@ function CategoriesView() {
                     </span>
                   ))}
                 </div>
-              </div>
+              </Tag>
             );
           })}
         </div>

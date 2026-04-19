@@ -1,0 +1,73 @@
+---
+import Base from "../../layouts/Base.astro";
+import { CATEGORIES, POSTS } from "../../data.js";
+
+export async function getStaticPaths() {
+  return CATEGORIES.filter((c) => c.count > 0).map((c) => {
+    const posts = POSTS
+      .filter((p) => !p.draft && (p.cat === c.name || p.cat === c.ko))
+      .sort((a, b) => b.date.localeCompare(a.date));
+    return { params: { slug: c.slug }, props: { cat: c, posts } };
+  });
+}
+
+const { cat, posts } = Astro.props;
+const cvar = `var(--c${cat.color})`;
+const cs = `var(--c${cat.color}s)`;
+---
+<Base title={`${cat.name} — bluethestyle`} tab="categories">
+  <section class="hero" style="padding-bottom:32px; margin-bottom:32px">
+    <div class="label">
+      <span class="pulse" style={`background:${cvar};box-shadow:0 0 0 3px ${cs}`}></span>
+      Category · {posts.length} post{posts.length === 1 ? "" : "s"}
+    </div>
+    <h1 style="font-size:52px">
+      <em>{cat.name}</em>
+      <span style="display:block; font-family:var(--kr); font-size:28px; font-style:normal; color:var(--muted); margin-top:8px; letter-spacing:-0.02em">{cat.ko}</span>
+    </h1>
+    <p>{cat.desc}</p>
+    <div style="margin-top:14px">
+      <a href="/categories/" style="font-family:var(--mono); font-size:11px; color:var(--muted);">← all categories</a>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head">
+      <div class="sec-head-l">
+        <div class="title">Posts in <em>{cat.name}</em></div>
+        <div class="count">{posts.length} published</div>
+      </div>
+    </div>
+
+    <div class="post-index">
+      <div class="year">2026</div>
+      <div>
+        {posts.map((p) => {
+          const isKo = p.lang === "KO";
+          return (
+            <a class="post-row" href={p.url}>
+              <div>
+                <div class="meta-line">
+                  <span>{p.date.slice(5).replace("-", " · ")}</span>
+                  <span class="d"></span>
+                  <span class="cat">{p.cat}</span>
+                  <span class="d"></span>
+                  <span class="lang">{p.lang}</span>
+                </div>
+                <h3 class={"title" + (isKo ? " kr" : "")}>{p.title}</h3>
+                <p class={"ex" + (isKo ? " kr" : "")}>{p.ex}</p>
+                <div class="tags-row">
+                  {p.tags.map((t) => <span class="tg">#{t}</span>)}
+                </div>
+              </div>
+              <div class="right">
+                <span>read</span>
+                <span class="arr">↗</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</Base>
