@@ -10,14 +10,14 @@ alt_lang: /2026/04/19/ple-1-mtl-evolution-ko/
 next_title: "PLE-2 — Progressive Layered Extraction: Explicit Expert Separation and CGC Gates"
 next_desc: "PLE's fix: explicit separation of shared vs task-specific experts (Tang et al., 2020). Two CGC gate variants — weighted-sum (CGCLayer) and block-scaling (CGCAttention) — with the full math. Entropy regularization and dimension normalization to keep heterogeneous experts healthy."
 next_status: draft
-source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/tech_ref_ple_adatt_en.pdf
-source_label: "PLE + adaTT Tech Reference §1 (EN, PDF)"
 ---
 
 *PLE-1 of the "Study Thread" series — a parallel English/Korean
 sub-thread running PLE-1 → PLE-6 that summarizes the papers and
 math foundations behind the PLE architecture used in this project.
-PLE-6 will attach the full PLE + adaTT tech reference PDF.*
+Source: the on-prem `기술참조서/PLE_기술_참조서` document (the full
+PDF will be attached to PLE-6). adaTT is split off into its own
+ADATT-1 ~ ADATT-4 sub-thread.*
 
 ## Why care
 

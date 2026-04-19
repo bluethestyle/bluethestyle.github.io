@@ -10,14 +10,13 @@ alt_lang: /2026/04/19/ple-1-mtl-evolution-en/
 next_title: "PLE-2 — Progressive Layered Extraction: 명시적 전문가 분리와 CGC 게이트"
 next_desc: "Shared/Task Expert를 명시적으로 분리한 PLE(Tang et al., 2020) 아키텍처. CGC 게이트의 두 변형 — 가중합 방식의 CGCLayer와 블록 스케일링 방식의 CGCAttention — 의 수식, 그리고 Expert Collapse를 막는 entropy 정규화 및 이종 차원 보정까지."
 next_status: draft
-source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/tech_ref_ple_adatt.pdf
-source_label: "PLE + adaTT 기술 참조서 §1 (KO, PDF)"
 ---
 
-*"Study Thread" 시리즈의 PLE 서브스레드 1편. PLE-1 → PLE-6 로
-이어지는 영문/국문 병렬 서브스레드로, 본 프로젝트의 PLE 아키텍처
-뒤에 있는 논문과 수학 기초를 정리한다. PLE-6 편에서는 PLE + adaTT
-기술 참조서 전체 PDF 를 첨부한다.*
+*"Study Thread" 시리즈의 PLE 서브스레드 1편. 영문/국문 병렬로
+PLE-1 → PLE-6 에 걸쳐 본 프로젝트의 PLE 아키텍처 뒤에 있는 논문과
+수학 기초를 정리한다. 출처는 온프렘 프로젝트 `기술참조서/PLE_기술_참조서`
+이고, 마지막 PLE-6 편에서 전체 PDF 를 첨부한다. adaTT 는 별도 서브스레드
+(ADATT-1 ~ ADATT-4) 로 분리해 다룬다.*
 
 ## 왜 다루는가
 
