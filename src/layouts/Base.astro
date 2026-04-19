@@ -1,9 +1,13 @@
 ---
 import "../styles/site.css";
-import { SITE, RECENT, TAGS, POSTS, CATEGORIES } from "../data.js";
+import { SITE, RECENT, TAGS, POSTS, CATEGORIES, SERIES } from "../data.js";
 const { title = "bluethestyle", tab = "home" } = Astro.props;
 const trendingTags = [...TAGS].sort((a, b) => b.count - a.count).slice(0, 9);
 const publishedCount = POSTS.filter(p => !p.draft).length;
+const lastDate = [...POSTS].filter(p => !p.draft).sort((a, b) => b.date.localeCompare(a.date))[0]?.date;
+const lastLabel = lastDate
+  ? new Date(lastDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }).toLowerCase()
+  : "";
 ---
 <!doctype html>
 <html lang="en">
@@ -43,17 +47,40 @@ const publishedCount = POSTS.filter(p => !p.draft).length;
           <div class="who">Seonkyu Jeong</div>
           <div class="role"><b>Independent researcher</b><br/>financial AI · MRM · agents<br/>GARP FRM · Seoul</div>
         </div>
+
+        <div class="nav-label">Navigate</div>
+        <ul class="nav-list">
+          <li><a href="/" class={tab === "home" ? "on" : ""}><span class="nav-inner"><span class="num">01</span><span class="lbl">HOME</span></span></a></li>
+          <li><a href="/categories/" class={tab === "categories" ? "on" : ""}><span class="nav-inner"><span class="num">02</span><span class="lbl">CATEGORIES</span></span><span class="n">{CATEGORIES.length}</span></a></li>
+          <li><a href="/tags/" class={tab === "tags" ? "on" : ""}><span class="nav-inner"><span class="num">03</span><span class="lbl">TAGS</span></span><span class="n">{TAGS.length}</span></a></li>
+          <li><a href="/archives/" class={tab === "archives" ? "on" : ""}><span class="nav-inner"><span class="num">04</span><span class="lbl">ARCHIVES</span></span><span class="n">{publishedCount}</span></a></li>
+        </ul>
+
         <div class="nav-label">Elsewhere</div>
         <div class="socials">
-          <a href="/feed.xml">RSS <span class="arr">↗</span></a>
-          <a href="mailto:jsk320098@gmail.com">Email <span class="arr">↗</span></a>
-          <a href="https://github.com/bluethestyle">GitHub <span class="arr">↗</span></a>
-          <a href="https://orcid.org/0009-0005-3291-9112">ORCID <span class="arr">↗</span></a>
+          <a href="/feed.xml"><span>RSS</span><span class="arr">↗</span></a>
+          <a href="mailto:jsk320098@gmail.com"><span>Email</span><span class="arr">↗</span></a>
+          <a href="https://github.com/bluethestyle" rel="me"><span>GitHub</span><span class="arr">↗</span></a>
+          <a href={`https://orcid.org/${SITE.orcid}`} rel="me"><span>ORCID</span><span class="arr">↗</span></a>
+          <a href="https://zenodo.org/communities/bluethestyle" rel="me"><span>Zenodo</span><span class="arr">↗</span></a>
         </div>
+
+        <div class="nav-label">Series · active</div>
+        <div class="series-mini">
+          {SERIES.map((s) => (
+            <a href={s.en} class="series-row">
+              <span class="cat">[{s.tag}]</span>
+              <span class="prog">ep {s.ep}/{s.total}</span>
+            </a>
+          ))}
+        </div>
+
         <div class="kv">
           <div><span class="k">build</span>idx.2026.04</div>
           <div><span class="k">stack</span>astro · react</div>
-          <div><span class="k">license</span>cc by-nc 4.0</div>
+          <div><span class="k">last</span>{lastLabel}</div>
+          <div><span class="k">posts</span>{publishedCount}</div>
+          <div><span class="k">lic</span>cc by-nc 4.0</div>
         </div>
       </aside>
       <!-- main -->

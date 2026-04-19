@@ -398,6 +398,62 @@ a { color: inherit; text-decoration: none; }
   content: ""; flex: 1; height: 1px; background: var(--hair);
 }
 
+/* nav-list (numbered navigation) */
+.nav-list {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.nav-list li { margin: 0; }
+.nav-list a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px 8px 0;
+  border-bottom: 1px solid var(--hair-2);
+  font-family: var(--mono); font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  position: relative;
+  transition: color .12s, padding .12s, background .12s;
+}
+.nav-list li:last-child a { border-bottom: 0; }
+.nav-list a:hover { color: var(--ink); }
+.nav-list a.on { color: var(--ink); background: var(--hair-2); }
+.nav-list a.on::before {
+  content: "";
+  position: absolute; left: -8px; top: 6px; bottom: 6px;
+  width: 2px; background: var(--accent); border-radius: 1px;
+}
+.nav-list .nav-inner { display: inline-flex; align-items: baseline; gap: 10px; }
+.nav-list .num {
+  font-size: 9.5px; color: var(--muted-2);
+  letter-spacing: 0.04em;
+}
+.nav-list a.on .num { color: var(--accent-ink); }
+.nav-list .lbl { letter-spacing: 0.08em; }
+.nav-list .n { font-size: 10px; color: var(--muted-2); }
+
+/* series-mini (compact series rows in left sidebar) */
+.series-mini {
+  display: flex; flex-direction: column; gap: 1px;
+  margin-bottom: 28px;
+}
+.series-mini .series-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--hair-2);
+  font-family: var(--mono); font-size: 10.5px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  transition: color .12s, padding .12s;
+}
+.series-mini .series-row:last-child { border-bottom: 0; }
+.series-mini .series-row:hover { color: var(--ink); padding-left: 4px; }
+.series-mini .cat { color: var(--ink-2); }
+.series-mini .prog { color: var(--muted-2); }
+
 .socials { display: flex; flex-direction: column; gap: 1px; margin-bottom: 28px; }
 .socials a {
   display: flex; align-items: center; justify-content: space-between;
