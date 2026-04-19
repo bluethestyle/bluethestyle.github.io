@@ -27,22 +27,36 @@ const catName = post.data.categories?.[0];
 const catEntry = CATEGORIES.find((c) => c.name === catName || c.ko === catName);
 const seriesEntry = SERIES.find((s) => s.slug === post.data.series);
 
-// Resolve next post URL by matching series + next part + same lang
+// Resolve prev/next posts in the same series + same lang
+function entryUrl(entry) {
+  const ed = entry.data.date;
+  const y = ed.getFullYear();
+  const m = String(ed.getMonth() + 1).padStart(2, "0");
+  const day = String(ed.getDate()).padStart(2, "0");
+  const base = entry.id.replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, "");
+  return `/${y}/${m}/${day}/${base}/`;
+}
 let nextUrl = null;
-if (post.data.next_title && post.data.next_status !== "draft" && post.data.series && post.data.part) {
+let prevUrl = null;
+let prevTitle = null;
+if (post.data.series && post.data.part) {
   const allPosts = await getCollection("posts");
-  const next = allPosts.find((p) =>
+  if (post.data.next_title && post.data.next_status !== "draft") {
+    const next = allPosts.find((p) =>
+      p.data.series === post.data.series &&
+      p.data.part === post.data.part + 1 &&
+      p.data.lang === post.data.lang,
+    );
+    if (next) nextUrl = entryUrl(next);
+  }
+  const prev = allPosts.find((p) =>
     p.data.series === post.data.series &&
-    p.data.part === post.data.part + 1 &&
+    p.data.part === post.data.part - 1 &&
     p.data.lang === post.data.lang,
   );
-  if (next) {
-    const nd = next.data.date;
-    const ny = nd.getFullYear();
-    const nm = String(nd.getMonth() + 1).padStart(2, "0");
-    const nday = String(nd.getDate()).padStart(2, "0");
-    const nbase = next.id.replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, "");
-    nextUrl = `/${ny}/${nm}/${nday}/${nbase}/`;
+  if (prev) {
+    prevUrl = entryUrl(prev);
+    prevTitle = prev.data.title;
   }
 }
 
@@ -54,6 +68,7 @@ const T = isKo
       next_draft: "준비 중",
       series_label: "시리즈",
       ep_of: (p, t) => `에피소드 ${p} / ${t}`,
+      prev_label: "이전 편",
       all_categories: "카테고리 전체",
       archives: "아카이브",
       attribution: "Claude Code 의 도움을 받아 작성되었습니다. 아이디어, 경험, 최종 검수는 저자가 직접 수행했습니다.",
@@ -66,6 +81,7 @@ const T = isKo
       next_draft: "draft · coming soon",
       series_label: "Series",
       ep_of: (p, t) => `Episode ${p} of ${t}`,
+      prev_label: "Previous in series",
       all_categories: "All categories",
       archives: "Archives",
       attribution: "Drafted with Claude Code assistance. Ideas, experience, and final review by the author.",
@@ -102,6 +118,16 @@ const T = isKo
     </div>
 
     <aside class="post-foot">
+      {prevUrl && prevTitle && (
+        <a class="prev-card" href={prevUrl}>
+          <span class="prev-arr">←</span>
+          <span class="prev-body">
+            <span class="prev-label">{T.prev_label}</span>
+            <span class={"prev-title" + (isKo ? " kr" : "")}>{prevTitle}</span>
+          </span>
+        </a>
+      )}
+
       {post.data.next_title && (
         nextUrl ? (
           <a class="next-card clickable" href={nextUrl}>
@@ -298,6 +324,44 @@ const T = isKo
     border-top: 1px solid var(--hair);
     display: flex; flex-direction: column; gap: 24px;
   }
+  .prev-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s, transform .15s, background .15s;
+  }
+  .prev-card:hover {
+    border-color: var(--accent);
+    transform: translateX(-2px);
+    background: var(--hair-2);
+  }
+  .prev-card .prev-arr {
+    font-family: var(--mono); font-size: 18px;
+    color: var(--muted-2);
+    transition: color .15s;
+  }
+  .prev-card:hover .prev-arr { color: var(--accent); }
+  .prev-card .prev-body {
+    display: flex; flex-direction: column; gap: 3px;
+    min-width: 0;
+  }
+  .prev-card .prev-label {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .prev-card .prev-title {
+    font-size: 14px; line-height: 1.35;
+    color: var(--ink-2);
+    letter-spacing: -0.005em;
+  }
+  .prev-card .prev-title.kr { font-family: var(--kr); font-size: 14px; letter-spacing: -0.015em; }
+
   .next-card {
     display: block;
     padding: 22px 24px;
