@@ -46,6 +46,15 @@ export const SERIES = [
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
   },
+  {
+    slug: "study-thread",
+    title: "Study Thread — Papers & Math Foundations",
+    tag: "Study Thread",
+    desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized in parallel English/Korean.",
+    ep: 0, total: 6,
+    ko: "/series/study-thread-ko/",
+    en: "/series/study-thread/",
+  },
 ];
 
 export const POSTS = [
@@ -71,10 +80,10 @@ export const TAGS = [
 ];
 
 export const CATEGORIES = [
-  { slug: "finai-build",  name: "FinAI Build",  ko: "3개월 개발기",  count: 2, desc: "Building a financial AI in three months — engineering notes.", color: "1" },
-  { slug: "mrm-thread",   name: "MRM Thread",   ko: "MRM 스레드",    count: 2, desc: "Model risk management for AI recommendation systems.",        color: "2" },
-  { slug: "field-notes",  name: "Field Notes",  ko: "현장 노트",     count: 0, desc: "Short observations from client work. (empty)",                 color: "3" },
-  { slug: "commentary",   name: "Commentary",   ko: "논평",          count: 0, desc: "Readings of regulatory drafts and papers. (empty)",             color: "4" },
+  { slug: "finai-build",  name: "FinAI Build",   ko: "3개월 개발기",  count: 2, desc: "Building a financial AI in three months — engineering notes.",                                                color: "1" },
+  { slug: "mrm-thread",   name: "MRM Thread",    ko: "MRM 스레드",    count: 2, desc: "Model risk management for AI recommendation systems.",                                                         color: "2" },
+  { slug: "study-thread", name: "Study Thread",  ko: "스터디 스레드", count: 0, desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized.",      color: "3" },
+  { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 0, desc: "Readings of regulatory drafts and papers. (empty)",                                                           color: "4" },
 ];
 
 export const RECENT = [

@@ -231,6 +231,32 @@ const T = isKo
   .post-body li { margin-bottom: 6px; }
   .post-body hr { border: 0; border-top: 1px solid var(--hair); margin: 36px 0; }
 
+  /* KaTeX math blocks */
+  .post-body .katex-display {
+    margin: 24px 0;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  .post-body .katex { font-size: 1.05em; }
+
+  /* Mermaid diagrams */
+  .post-body pre.mermaid {
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 28px 0;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .post-body pre.mermaid svg {
+    max-width: 100%;
+    height: auto;
+  }
+
   /* Footer card */
   .post-foot {
     margin-top: 56px;
