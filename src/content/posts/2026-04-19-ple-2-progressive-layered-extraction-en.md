@@ -112,9 +112,9 @@ space of genuinely distinguishable lenses.
 > structure level* turned out to be the right move.
 
 This decision is the premise for everything in the sections below —
-the composition of the seven heterogeneous experts, the block-scaling
-CGCAttention gate variant, and the dimension-normalization trick for
-heterogeneous output dims.
+the composition of the seven heterogeneous experts, the secondary
+CGCAttention stage layered on top of the paper's CGCLayer, and the
+dimension-normalization trick for heterogeneous output dims.
 
 ## The Roles of Expert and Gate — An Intuitive View
 

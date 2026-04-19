@@ -7,8 +7,8 @@ lang: en
 series: study-thread
 part: 3
 alt_lang: /2026/04/19/ple-3-heterogeneous-expert-pool-ko/
-next_title: "PLE-4 — Two CGC Gate Variants and HMM Triple-Mode Routing"
-next_desc: "The weighted-sum CGCLayer vs the block-scaling CGCAttention — what each variant does and when to pick which. Plus entropy regularization to prevent Expert Collapse, dimension normalization to correct heterogeneous output asymmetry, and the full HMM Triple-Mode routing architecture."
+next_title: "PLE-4 — The Two-Stage CGC Gate (CGCLayer + CGCAttention) and HMM Triple-Mode Routing"
+next_desc: "Two CGC stages — Stage 1 CGCLayer (paper-exact Shared+Task weighted sum) and Stage 2 CGCAttention (block-scaling over the Shared concat, layered on top of Stage 1) — with the full math. Entropy regularization to prevent Expert Collapse, dimension normalization to correct heterogeneous output asymmetry, and the full HMM Triple-Mode routing architecture."
 next_status: published
 ---
 
@@ -243,5 +243,6 @@ Causal for causal graphs, and Optimal Transport for distributional
 distance. The 512D concatenation simply packs those seven views into
 one vector; from there the real question becomes "which task should
 trust which Expert, and by how much." That is the job of CGC gating,
-and **PLE-4** takes up the math of its two variants — weighted-sum
-CGCLayer and block-scaling CGCAttention — in detail.
+and **PLE-4** takes up the math of its two stages — Stage 1 CGCLayer
+(Shared + Task weighted sum) and Stage 2 CGCAttention (block-scaling
+over the Shared concat) — in detail.

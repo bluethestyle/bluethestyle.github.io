@@ -507,8 +507,9 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 여기까지가 PLE 서브스레드의 끝이다. PLE-1 에서 Shared-Bottom 과 MMoE
 의 한계에서 출발해, PLE-2 의 명시적 Shared/Task Expert 분리와 수학적
 직관, PLE-3 의 입력 구조(PLEClusterInput · 734D)와 7개 이종 Shared
-Expert Pool, PLE-4 의 CGC 게이팅 두 변형(CGCLayer · CGCAttention)과
-HMM Triple-Mode 라우팅, PLE-5 의 GroupTaskExpertBasket · Logit
+Expert Pool, PLE-4 의 CGC 게이팅 두 단계(1단계 CGCLayer가 Shared+Task
+가중합, 2단계 CGCAttention이 Shared concat 블록 스케일링)와 HMM
+Triple-Mode 라우팅, PLE-5 의 GroupTaskExpertBasket · Logit
 Transfer · Task Tower 까지 — 그리고 이번 6편에서 해석성(SAE),
 불확실성(Evidential), 18 태스크 사양, 논문 대비 구현의 혁신, 디버깅
 가이드, 부록까지 — 본 프로젝트 PLE 계열 아키텍처의 모든 주요 구성

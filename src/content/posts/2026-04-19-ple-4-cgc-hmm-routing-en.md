@@ -1,5 +1,5 @@
 ---
-title: "[Study Thread] PLE-4 — Two CGC Gate Variants and HMM Triple-Mode Routing"
+title: "[Study Thread] PLE-4 — The Two-Stage CGC Gate (CGCLayer + CGCAttention) and HMM Triple-Mode Routing"
 date: 2026-04-19 15:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, cgc, hmm, regularization]
@@ -16,11 +16,12 @@ next_status: published
 sub-thread running PLE-1 → PLE-6 that summarizes the papers and math
 foundations behind the PLE architecture used in this project. Source:
 the on-prem `기술참조서/PLE_기술_참조서` document. This fourth post
-covers the heart of PLE — its two CGC gate variants, the original
-paper's CGCLayer (weighted sum) and this implementation's CGCAttention
-(block scaling) — along with the regularization that keeps Expert
-Collapse away, and the HMM-based Triple-Mode routing that sits beside
-the gate.*
+covers the heart of PLE as a two-stage gate — Stage 1: the paper's
+CGCLayer mixing Shared and Task experts together via a weighted sum,
+and Stage 2: CGCAttention layered on top, applying per-task block
+scaling to the Shared Expert concat — along with the regularization
+that keeps Expert Collapse away, and the HMM-based Triple-Mode routing
+that sits beside the gate.*
 
 ## CGC (Customized Gate Control) — Per-Task Expert Weighting
 
@@ -29,31 +30,49 @@ the gate.*
 CGC extends the gating mechanism of MMoE (Ma et al., KDD 2018). A
 per-task independent gate learns task-specific affinities by applying
 different weights to the Shared Expert outputs. The original PLE paper
-(Tang et al., RecSys 2020) defines **CGCLayer**, which mixes expert
-outputs as a *vector weighted sum*. This project's implementation uses
-**CGCAttention**, which instead *scales each expert output block* by a
-scalar weight. This fourth post walks through the difference between
-the two variants, the entropy and dimension regularizers layered on top
-of CGCAttention, and the HMM Triple-Mode routing that rides next to it.
+(Tang et al., RecSys 2020) defines **CGCLayer**, which serves as the
+Stage 1 primary gate: a per-task gate that mixes *the Shared Expert
+pool together with Task-$k$ experts* as a vector weighted sum. On top
+of that, this implementation adds **CGCAttention** as a Stage 2
+secondary attention: it takes the already-concatenated Shared Expert
+output and lays on per-task block scaling. This fourth post walks
+through the roles of the two stages, the entropy and dimension
+regularizers layered on top of CGCAttention, and the HMM Triple-Mode
+routing that rides next to the gate.
 
-### Variant 1 — CGCLayer: vector weighted sum (original PLE paper)
+### Stage 1 — CGCLayer: the paper-exact Shared + Task weighted sum
 
-The original paper's CGCLayer follows the MMoE gate recipe directly. A
-per-task gate produces a weighted sum over the expert outputs.
+The Stage 1 primary gate uses the original paper's CGCLayer directly.
+Task $k$'s gate computes a Softmax-weighted sum over an axis that
+concatenates *both* the Shared Expert pool and the Task-$k$-specific
+experts. The per-task expert lives inside this layer.
 
-$$\mathbf{h}_k^{cgc} = \sum_{i=1}^N g_{k,i} \cdot \mathbf{h}_i^{expert}, \quad \mathbf{g}_k = \text{Softmax}(\mathbf{W}_k^{gate} \cdot \mathbf{h}_{shared})$$
+$$\mathbf{h}_k = \sum_{i=1}^{N} g_{k,i} \cdot \mathbf{h}_i^{\text{all}}, \quad \mathbf{h}^{\text{all}} = [\mathbf{h}^{\text{task}}_k \,\|\, \mathbf{h}^{\text{shared}}]$$
 
-- **Prerequisite**: every expert must produce the *same output dimension*.
-  The weighted sum only makes sense if all $\mathbf{h}_i^{expert}$ live
-  in the same $\mathbb{R}^d$.
-- **Strength**: a clean equation; each task can express a natural mixture
-  like "Expert A 70%, Expert B 30%."
-- **Limitation**: it does not fit a setup like this project where expert
-  dimensions are *heterogeneous* (unified_hgcn 128D, and the rest —
-  perslay, temporal, deepfm, lightgcn, etc. — at 64D). Forcing a common
-  dimension means taking an information loss to make the math work.
+$$\mathbf{g}_k = \text{Softmax}(\mathbf{W}_k^{gate} \cdot \mathbf{h}_{shared}) \in \mathbb{R}^{N}, \quad N = |\text{shared}| + |\text{task}_k|$$
 
-### Variant 2 — CGCAttention: block scaling (this implementation)
+- **Role**: the *primary* per-task gate. A single Softmax runs over the
+  concatenated expert axis, producing one fixed-dim vector per task.
+  This follows the exact equation from Tang et al. (RecSys 2020).
+- **Character**: the task-specific expert is selected *inside* this
+  layer — each task can express a natural mixture such as "Shared-A 60%,
+  Shared-B 15%, Task-k-specific 25%", blending the Shared pool and the
+  Task pool at once. The output is a single fixed-dim vector per task.
+- **Heterogeneous dimension issue**: the Shared Expert pool has
+  heterogeneous output dims (unified_hgcn 128D, and perslay/temporal/
+  deepfm/lightgcn etc. at 64D). That is exactly what motivated stacking
+  the Stage 2 CGCAttention on top of the Shared concat; Stage 1
+  CGCLayer still runs as-is.
+
+### Stage 2 — CGCAttention: per-task block attention layered on top of the heterogeneous Shared Expert concat
+
+Stage 2 attaches orthogonally to Stage 1. Separately from Stage 1's
+already-gated per-task output from CGCLayer, CGCAttention takes the
+Shared Expert concat (512D) and applies a per-task block scaling on
+top of it, producing a *shared-only, per-task* representation. The
+outputs of both paths are then used together downstream (Logit Transfer
+and Task Tower input).
+
 
 `_build_cgc()` (lines 566–677) manages per-task independent
 `nn.Sequential(Linear + Softmax)` modules inside an `nn.ModuleDict`.
@@ -93,8 +112,9 @@ to expert $i$.
 > et al., NeurIPS 2017): the same principle — *selectively combine
 > information in proportion to relevance* — applied across tokens
 > (Transformer), across experts (CGC), and across heads (Multi-Head
-> Attention). Unlike the original paper, our CGC adds block scaling and
-> dimension normalization to cope with heterogeneous expert dimensions.
+> Attention). Keeping the paper's CGCLayer intact, our CGC additionally
+> adds block scaling and dimension normalization to cope with
+> heterogeneous expert dimensions.
 
 ### Initial bias — domain_experts
 

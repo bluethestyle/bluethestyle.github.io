@@ -551,8 +551,10 @@ That is the end of the PLE sub-thread. Starting from the limits of
 Shared-Bottom and MMoE in PLE-1, through the explicit Shared/Task
 Expert separation and the mathematical intuition behind it in PLE-2,
 the input structure (PLEClusterInput · 734D) and seven heterogeneous
-Shared Expert pool in PLE-3, the two CGC gate variants (CGCLayer and
-CGCAttention) and HMM Triple-Mode routing in PLE-4, GroupTaskExpertBasket,
+Shared Expert pool in PLE-3, the two CGC gate stages (Stage 1 CGCLayer
+weighting Shared + Task together, Stage 2 CGCAttention block-scaling
+the Shared concat) and HMM Triple-Mode routing in PLE-4,
+GroupTaskExpertBasket,
 Logit Transfer, and Task Tower in PLE-5, and in this sixth post
 interpretability (SAE), uncertainty (Evidential), the 18-task spec,
 the paper-vs-implementation innovations, debugging guide, and

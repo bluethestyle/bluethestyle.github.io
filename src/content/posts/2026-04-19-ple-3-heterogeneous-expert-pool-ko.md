@@ -7,8 +7,8 @@ lang: ko
 series: study-thread
 part: 3
 alt_lang: /2026/04/19/ple-3-heterogeneous-expert-pool-en/
-next_title: "PLE-4 — CGC 게이팅의 두 변형과 HMM Triple-Mode 라우팅"
-next_desc: "가중합 방식의 CGCLayer와 블록 스케일링 방식의 CGCAttention — 두 CGC 변형의 수식과 언제 무엇을 쓰는지. Expert Collapse를 막는 entropy 정규화, 이종 차원 비대칭을 보정하는 차원 정규화, 그리고 HMM Triple-Mode 라우팅의 전체 구조."
+next_title: "PLE-4 — CGC 게이팅의 두 단계(CGCLayer + CGCAttention)와 HMM Triple-Mode 라우팅"
+next_desc: "Shared/Task Expert를 명시적으로 분리한 PLE(Tang et al., 2020) 아키텍처. CGC 게이팅의 두 단계 — 1단계 CGCLayer(Shared + Task 가중합, 논문 원형)와 그 위에 얹는 2단계 CGCAttention(Shared concat 블록 스케일링) — 의 수식, Expert Collapse를 막는 entropy 정규화 및 이종 차원 보정까지."
 next_status: published
 ---
 
@@ -220,6 +220,6 @@ persistence diagram, HMM triple-mode 텐서, 두 종류의 시퀀스, 그리고
 로. 512D 의
 concatenation 은 이 7개의 관점을 한 벡터로 모아둔 것이고, 여기서부터는
 "어떤 태스크가 어떤 Expert 의 의견을 얼마나 믿을 것인가" 가 문제가
-된다. 그것이 CGC 게이팅의 역할이며, **PLE-4** 에서 두 가지 변형 —
-가중합 방식의 CGCLayer 와 블록 스케일링 방식의 CGCAttention — 을
-수식으로 따라간다.
+된다. 그것이 CGC 게이팅의 역할이며, **PLE-4** 에서 두 단계 —
+1단계 CGCLayer(Shared+Task 가중합)와 2단계 CGCAttention(Shared concat
+블록 스케일링) — 를 수식으로 따라간다.
