@@ -3,385 +3,93 @@ layout: default
 permalink: /categories/
 title: Categories
 ---
+{%- assign pal = "c1,c2,c3,c4" | split: "," -%}
+{%- assign cat_list = "" | split: "" -%}
+{%- for c in site.categories -%}
+  {%- assign cnt = c[1] | size -%}
+  {%- assign pad = cnt | prepend: "000" | slice: -3, 3 -%}
+  {%- capture row -%}{{ pad }}|{{ c[0] }}{%- endcapture -%}
+  {%- assign cat_list = cat_list | push: row -%}
+{%- endfor -%}
+{%- assign cat_list = cat_list | sort | reverse -%}
 
-{%- comment -%}
-  Categories tab — rewritten to match the prototype
-  (handoff/screens/04-categories.png): hero + All categories 2-col
-  grid with per-card language date pills + Distribution bar.
-
-  Korean subtitle + description map for each canonical category.
-  Planned (empty) categories render as faded placeholders so the
-  page always shows 4 slots.
-{%- endcomment -%}
-
-{%- assign total_posts = site.posts | size -%}
-{%- assign total_cats  = site.categories | size -%}
-{%- assign planned_cats = "Field Notes,Commentary" | split: "," -%}
-{%- assign active_total = 0 -%}
-{%- for c in site.categories -%}{% assign active_total = active_total | plus: 1 %}{%- endfor -%}
-{%- assign grand_total = active_total | plus: planned_cats.size -%}
-
-
-<!-- ================================================================
-     1. Breadcrumb / mono caption
-     ================================================================ -->
-<div class="bts-cat-caption">
-  <span class="dot">●</span>
-  <span class="cap">NAVIGATION · {{ grand_total }} CATEGORIES</span>
-</div>
-
-
-<!-- ================================================================
-     2. Hero
-     ================================================================ -->
-<section class="bts-hero" style="padding-bottom:24px; margin-bottom:12px;">
-  <h1>
-    <em>Categories</em> — everything here is a
-    <span class="hl">field&nbsp;note</span>, grouped.
-  </h1>
-  <p style="max-width: 44rem;">
-    Long-form work is organized into four categories. Each post
-    usually exists as an English / Korean pair. Empty categories
-    are listed so you can see what&rsquo;s coming.
-  </p>
+<section class="bts-hero" style="padding-bottom:24px; margin-bottom:24px;">
+  <div class="label"><span class="pulse"></span>Taxonomy · {{ site.categories | size }} categories</div>
+  <h1>Categories <em>—</em> the shape of what I think about.</h1>
 </section>
 
-<hr style="border: 0; border-top: 1px solid var(--hair); margin: 24px 0 40px;">
-
-
-<!-- ================================================================
-     3. "All categories" heading + filter chips
-     ================================================================ -->
-<div class="bts-cat-head">
-  <div class="l">
-    <h2><em>All</em> categories</h2>
-    <span class="count">{{ grand_total }} total · {{ active_total }} active</span>
-  </div>
-  <div class="bts-cat-filter">
-    <button type="button" class="chip on"     data-filter="all">ALL</button>
-    <button type="button" class="chip"        data-filter="active">ACTIVE</button>
-    <button type="button" class="chip"        data-filter="planned">PLANNED</button>
-  </div>
-</div>
-
-
-<!-- ================================================================
-     4. Category cards — 2-column grid
-     ================================================================ -->
-{%- assign cat_idx = 0 -%}
-<div class="bts-cat-grid2">
-
-  {%- comment -%} Active categories (have posts) {%- endcomment -%}
-  {%- for c in site.categories -%}
-    {%- assign cat_idx = cat_idx | plus: 1 -%}
-    {%- assign name = c[0] -%}
-    {%- assign posts = c[1] -%}
-    {%- assign cnt = posts | size -%}
-
-    {%- comment -%} Korean subtitle + description mapping {%- endcomment -%}
-    {%- assign kr_sub = "" -%}
-    {%- assign cdesc  = "" -%}
-    {%- assign ccolor = "c1" -%}
-    {%- case name -%}
-      {%- when "FinAI Build" -%}
-        {%- assign kr_sub = "3개월 개발기" -%}
-        {%- assign cdesc  = "Building a financial AI in three months — engineering notes." -%}
-        {%- assign ccolor = "c1" -%}
-      {%- when "MRM Thread" -%}
-        {%- assign kr_sub = "MRM 스레드" -%}
-        {%- assign cdesc  = "Model risk management for AI recommendation systems." -%}
-        {%- assign ccolor = "c2" -%}
-      {%- else -%}
-        {%- assign cdesc = "Notes filed under this theme." -%}
-    {%- endcase -%}
-
-    {%- comment -%} Latest post date per language {%- endcomment -%}
-    {%- assign latest_en = "" -%}
-    {%- assign latest_ko = "" -%}
-    {%- for p in posts -%}
-      {%- assign pl = p.lang | default: "en" -%}
-      {%- assign pd = p.date | date: "%m-%d" -%}
-      {%- if pl == "ko" and latest_ko == "" -%}{%- assign latest_ko = pd -%}{%- endif -%}
-      {%- if pl == "en" and latest_en == "" -%}{%- assign latest_en = pd -%}{%- endif -%}
-    {%- endfor -%}
-
-    <a class="bts-cat-card" data-state="active" href="#{{ name | slugify }}"
-       style="--cv: var(--{{ ccolor }}); --cs: var(--{{ ccolor }}s);">
+<div class="bts-cat-grid">
+  {%- for row in cat_list -%}
+    {%- assign parts = row | split: "|" -%}
+    {%- assign cnt = parts[0] | plus: 0 -%}
+    {%- assign name = parts[1] -%}
+    {%- assign slug = name | slugify -%}
+    {%- assign ci = forloop.index0 | modulo: 4 -%}
+    {%- assign c = pal[ci] -%}
+    <a class="bts-cat" href="#{{ slug }}" style="--cv: var(--{{ c }}); --cs: var(--{{ c }}s);">
       <div class="top">
-        <div class="mark">
-          <span class="sq"></span>
-          <span class="n">CAT {{ cat_idx | prepend: '0' | slice: -2, 2 }}</span>
-        </div>
+        <div class="mark"><span class="sq"></span><span class="n">cat {{ forloop.index | prepend: '00' | slice: -2, 2 }}</span></div>
         <span class="badge">{{ cnt }} post{% if cnt != 1 %}s{% endif %}</span>
       </div>
-      <h3 class="title">{{ name }}</h3>
-      {%- if kr_sub != "" -%}<div class="kr-sub">{{ kr_sub }}</div>{%- endif -%}
-      <p class="desc">{{ cdesc }}</p>
-      <div class="lang-pills">
-        {%- if latest_ko != "" -%}<span class="pill ko">KO·{{ latest_ko }}</span>{%- endif -%}
-        {%- if latest_en != "" -%}<span class="pill en">EN·{{ latest_en }}</span>{%- endif -%}
+      <h3>{{ name }}</h3>
+      <div class="chips">
+        {%- assign posts = site.categories[name] -%}
+        {%- for p in posts limit: 3 -%}
+          {%- for t in p.tags limit: 2 -%}<span class="chip">#{{ t }}</span>{%- endfor -%}
+        {%- endfor -%}
       </div>
     </a>
   {%- endfor -%}
-
-  {%- comment -%} Planned (empty) categories {%- endcomment -%}
-  {%- for p_name in planned_cats -%}
-    {%- assign cat_idx = cat_idx | plus: 1 -%}
-    {%- assign kr_sub = "" -%}
-    {%- assign cdesc  = "" -%}
-    {%- assign ccolor = "c3" -%}
-    {%- case p_name -%}
-      {%- when "Field Notes" -%}
-        {%- assign kr_sub = "현장 노트" -%}
-        {%- assign cdesc  = "Short observations from client work." -%}
-        {%- assign ccolor = "c3" -%}
-      {%- when "Commentary" -%}
-        {%- assign kr_sub = "논평" -%}
-        {%- assign cdesc  = "Readings of regulatory drafts and papers." -%}
-        {%- assign ccolor = "c4" -%}
-    {%- endcase -%}
-
-    <div class="bts-cat-card empty" data-state="planned"
-         style="--cv: var(--{{ ccolor }}); --cs: var(--{{ ccolor }}s);">
-      <div class="top">
-        <div class="mark">
-          <span class="sq"></span>
-          <span class="n">CAT {{ cat_idx | prepend: '0' | slice: -2, 2 }}</span>
-        </div>
-        <span class="badge empty">empty</span>
-      </div>
-      <h3 class="title">{{ p_name }}</h3>
-      {%- if kr_sub != "" -%}<div class="kr-sub">{{ kr_sub }}</div>{%- endif -%}
-      <p class="desc">{{ cdesc }} <em>(empty)</em></p>
-    </div>
-  {%- endfor -%}
-
 </div>
 
-
-<!-- ================================================================
-     5. Distribution bar
-     ================================================================ -->
-<section class="bts-block" style="margin-top:56px;">
-  <div class="bts-sec-head">
-    <div class="l">
-      <h2 class="title"><em>Distribution</em></h2>
-      <span class="count">by category</span>
-    </div>
-  </div>
+<section class="bts-block" style="margin-top:48px;">
+  <div class="bts-sec-head"><div class="l"><h2 class="title">Distribution</h2></div></div>
   <div class="bts-cat-dist">
     <div class="bar">
-      {%- for c in site.categories -%}
-        {%- assign cnt = c[1] | size -%}
-        {%- assign pct = cnt | times: 100 | divided_by: total_posts -%}
-        {%- assign ccolor = "c1" -%}
-        {%- if c[0] == "MRM Thread" -%}{%- assign ccolor = "c2" -%}{%- endif -%}
-        <div class="seg" style="width: {{ pct }}%; background: var(--{{ ccolor }});">{{ pct }}%</div>
+      {%- for row in cat_list -%}
+        {%- assign parts = row | split: "|" -%}
+        {%- assign cnt = parts[0] | plus: 0 -%}
+        {%- assign ci = forloop.index0 | modulo: 4 -%}
+        {%- assign c = pal[ci] -%}
+        {%- assign pct = cnt | times: 100 | divided_by: site.posts.size -%}
+        <div class="seg" style="width: {{ pct }}%; background: var(--{{ c }});">{{ pct }}%</div>
       {%- endfor -%}
     </div>
     <div class="legend">
-      {%- for c in site.categories -%}
-        {%- assign cnt = c[1] | size -%}
-        {%- assign ccolor = "c1" -%}
-        {%- if c[0] == "MRM Thread" -%}{%- assign ccolor = "c2" -%}{%- endif -%}
-        <span><span class="sw" style="background: var(--{{ ccolor }});"></span>{{ c[0] }} · {{ cnt }}</span>
+      {%- for row in cat_list -%}
+        {%- assign parts = row | split: "|" -%}
+        {%- assign ci = forloop.index0 | modulo: 4 -%}
+        {%- assign c = pal[ci] -%}
+        <span><span class="sw" style="background: var(--{{ c }});"></span>{{ parts[1] }} · {{ parts[0] | plus: 0 }}</span>
       {%- endfor -%}
     </div>
   </div>
 </section>
 
-
-<!-- ================================================================
-     6. Per-category post lists — anchored by category slug
-        (clicking a card above scrolls to the matching list)
-     ================================================================ -->
-<section class="bts-cat-listings" style="margin-top: 56px;">
-  {%- for c in site.categories -%}
-    {%- assign name = c[0] -%}
-    {%- assign posts = c[1] -%}
+<section class="bts-block">
+  {%- for row in cat_list -%}
+    {%- assign parts = row | split: "|" -%}
+    {%- assign name = parts[1] -%}
     {%- assign slug = name | slugify -%}
-    {%- assign kr_sub = "" -%}
-    {%- case name -%}
-      {%- when "FinAI Build" -%}{% assign kr_sub = "3개월 개발기" %}
-      {%- when "MRM Thread" -%}{% assign kr_sub = "MRM 스레드" %}
-    {%- endcase -%}
-
-    <div id="{{ slug }}" class="bts-cat-list-block" style="margin-top: 48px; scroll-margin-top: 80px;">
+    <div id="{{ slug }}" style="margin-top:40px;">
       <div class="bts-sec-head">
-        <div class="l">
-          <h2 class="title"><em>{{ name }}</em></h2>
-          <span class="count">{{ posts | size }} post{% if posts.size != 1 %}s{% endif %}{% if kr_sub != "" %} · {{ kr_sub }}{% endif %}</span>
-        </div>
+        <div class="l"><h2 class="title">{{ name }}</h2><span class="count">{{ parts[0] | plus: 0 }} posts</span></div>
       </div>
-      <div class="bts-cat-postlist">
-        {%- for p in posts -%}
-          <a class="bts-cat-post-row" href="{{ p.url | relative_url }}">
-            <div class="meta">
-              <span class="date">{{ p.date | date: "%Y-%m-%d" }}</span>
-              <span class="sep">·</span>
-              <span class="lang">{{ p.lang | default: "en" | upcase }}</span>
-              {%- if p.tags.size > 0 -%}
-                <span class="sep">·</span>
-                {%- for t in p.tags limit: 3 -%}
-                  <span class="tg">#{{ t }}</span>
-                {%- endfor -%}
-              {%- endif -%}
+      <div>
+        {%- for p in site.categories[name] -%}
+          <a class="bts-post-row" href="{{ p.url | relative_url }}">
+            <div>
+              <div class="meta-line">
+                <span>{{ p.date | date: "%Y-%m-%d" }}</span>
+                <span class="d"></span>
+                <span class="lang">{{ p.lang | default: "en" | upcase }}</span>
+              </div>
+              <h3 class="title {% if p.lang == 'ko' %}kr{% endif %}">{{ p.title }}</h3>
             </div>
-            <h3 class="ti {% if p.lang == 'ko' %}kr{% endif %}">{{ p.title }}</h3>
-            {%- if p.excerpt -%}
-              <p class="ex {% if p.lang == 'ko' %}kr{% endif %}">
-                {{ p.excerpt | strip_html | truncate: 160 }}
-              </p>
-            {%- endif -%}
-            <span class="arr">→</span>
+            <div class="right"><span class="arr">→</span></div>
           </a>
         {%- endfor -%}
       </div>
     </div>
   {%- endfor -%}
 </section>
-
-
-<!-- ================================================================
-     Inline styles + filter JS
-     (kept self-contained so the layout can live without changing site.css)
-     ================================================================ -->
-<style>
-  .bts-cat-caption {
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--muted);
-    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.4rem;
-  }
-  .bts-cat-caption .dot { color: var(--accent); }
-
-  .bts-cat-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
-  }
-  .bts-cat-head .l { display: flex; align-items: baseline; gap: 1rem; }
-  .bts-cat-head h2 {
-    font-family: var(--display); font-size: 28px; font-weight: 400;
-    letter-spacing: -0.02em; margin: 0;
-  }
-  .bts-cat-head h2 em { font-style: italic; }
-  .bts-cat-head .count {
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted);
-  }
-
-  .bts-cat-filter { display: flex; gap: 0.4rem; }
-  .bts-cat-filter .chip {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
-    padding: 6px 12px; border-radius: 3px; border: 1px solid var(--hair);
-    background: transparent; color: var(--muted); cursor: pointer;
-    text-transform: uppercase;
-  }
-  .bts-cat-filter .chip.on  { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-  .bts-cat-filter .chip:hover:not(.on) { color: var(--ink); border-color: var(--ink); }
-
-  .bts-cat-grid2 {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 1.2rem;
-  }
-  @media (max-width: 820px) { .bts-cat-grid2 { grid-template-columns: 1fr; } }
-
-  .bts-cat-card {
-    border: 1px solid var(--hair); border-radius: 10px;
-    background: var(--surface); padding: 1.2rem 1.3rem;
-    display: flex; flex-direction: column; gap: 0.7rem;
-    transition: border-color 0.12s, transform 0.2s;
-    text-decoration: none;
-    color: inherit;
-  }
-  .bts-cat-card:hover {
-    border-color: var(--cv);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(20,20,20,0.06);
-  }
-  .bts-cat-card.empty { background: var(--bg-2); opacity: 0.75; cursor: default; }
-  .bts-cat-card.empty:hover { transform: none; box-shadow: none; }
-
-  .bts-cat-card .top {
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .bts-cat-card .mark {
-    display: flex; align-items: center; gap: 0.5rem;
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em;
-    color: var(--muted); text-transform: uppercase;
-  }
-  .bts-cat-card .mark .sq {
-    width: 10px; height: 10px; border-radius: 2px; background: var(--cv);
-  }
-  .bts-cat-card .badge {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
-    padding: 3px 8px; border: 1px solid var(--hair); border-radius: 3px;
-    color: var(--ink-2); background: var(--surface);
-  }
-  .bts-cat-card .badge.empty { color: var(--muted); }
-
-  .bts-cat-card .title {
-    font-family: var(--display); font-size: 26px; font-weight: 400;
-    letter-spacing: -0.01em; line-height: 1.1; margin: 0;
-    color: var(--ink);
-  }
-  .bts-cat-card.empty .title { color: var(--muted); }
-
-  .bts-cat-card .kr-sub {
-    font-family: var(--kr); font-size: 13px; color: var(--muted);
-    margin-top: -0.3rem;
-  }
-
-  .bts-cat-card .desc {
-    font-family: var(--sans); font-size: 13.5px; line-height: 1.5;
-    color: var(--muted); margin: 0;
-  }
-  .bts-cat-card.empty .desc em { color: var(--muted-2); font-style: normal; }
-
-  .bts-cat-card .lang-pills {
-    display: flex; gap: 0.4rem; margin-top: 0.3rem;
-  }
-  .bts-cat-card .lang-pills .pill {
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
-    padding: 3px 8px; border-radius: 3px;
-  }
-  .bts-cat-card .lang-pills .pill.ko { background: var(--c1s); color: var(--c1); }
-  .bts-cat-card .lang-pills .pill.en { background: var(--c2s); color: var(--c2); }
-  .bts-cat-card[style*="--c2"] .lang-pills .pill.ko { background: var(--c2s); color: var(--c2); }
-
-  .bts-cat-dist { margin-top: 1rem; }
-  .bts-cat-dist .bar {
-    display: flex; width: 100%; height: 36px; overflow: hidden;
-    border-radius: 6px; border: 1px solid var(--hair);
-  }
-  .bts-cat-dist .seg {
-    color: #fff; font-family: var(--mono); font-size: 11px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .bts-cat-dist .legend {
-    display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.8rem;
-    font-family: var(--mono); font-size: 10.5px; color: var(--muted);
-    letter-spacing: 0.04em;
-  }
-  .bts-cat-dist .legend .sw {
-    display: inline-block; width: 10px; height: 10px;
-    border-radius: 2px; margin-right: 0.4rem; vertical-align: middle;
-  }
-</style>
-
-<script>
-  (function () {
-    var chips = document.querySelectorAll('.bts-cat-filter .chip');
-    var cards = document.querySelectorAll('.bts-cat-card[data-state]');
-    chips.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        chips.forEach(function (b) { b.classList.remove('on'); });
-        btn.classList.add('on');
-        var f = btn.getAttribute('data-filter');
-        cards.forEach(function (card) {
-          var st = card.getAttribute('data-state');
-          card.style.display = (f === 'all' || f === st) ? '' : 'none';
-        });
-      });
-    });
-  })();
-</script>
