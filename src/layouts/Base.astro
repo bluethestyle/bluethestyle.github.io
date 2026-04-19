@@ -1,6 +1,9 @@
 ---
 import "../styles/site.css";
+import { SITE, RECENT, TAGS, POSTS, CATEGORIES } from "../data.js";
 const { title = "bluethestyle", tab = "home" } = Astro.props;
+const trendingTags = [...TAGS].sort((a, b) => b.count - a.count).slice(0, 9);
+const publishedCount = POSTS.filter(p => !p.draft).length;
 ---
 <!doctype html>
 <html lang="en">
@@ -57,7 +60,66 @@ const { title = "bluethestyle", tab = "home" } = Astro.props;
       <main class="main"><slot /></main>
       <!-- sidebar-r -->
       <aside class="sidebar-r">
-        <slot name="right" />
+        <div class="widget">
+          <div class="w-head"><h3>Index</h3><span class="n">live</span></div>
+          <div class="stats">
+            <div class="stat"><div class="v">{publishedCount}</div><div class="l">posts</div></div>
+            <div class="stat"><div class="v">{CATEGORIES.length}</div><div class="l">categories</div></div>
+            <div class="stat"><div class="v">{TAGS.length}</div><div class="l">tags</div></div>
+            <div class="stat"><div class="v">{SITE.counts.years}</div><div class="l">years</div></div>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="w-head"><h3>Recently updated</h3><span class="n">{RECENT.length}</span></div>
+          <div class="recent">
+            {RECENT.map((r) => {
+              const isKo = /[\uac00-\ud7af]/.test(r.title);
+              return (
+                <a href="#">
+                  <div class="r-top">
+                    <span>today</span>
+                    <span>{r.date}</span>
+                  </div>
+                  <div class={"r-t" + (isKo ? " kr" : "")}>
+                    {r.title}
+                    <span class="arr">↗</span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="w-head"><h3>Trending tags</h3><span class="n">{TAGS.length}</span></div>
+          <div class="tags-w">
+            {trendingTags.map((t) => (
+              <a class={"tag-pill" + (t.hot ? " hot" : "")} href={`/tags/#${t.slug}`}>
+                #{t.name}<span class="c">{t.count}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="w-head"><h3>ORCID</h3></div>
+          <div class="orcid">
+            <div class="hdr">Verified researcher</div>
+            <div class="id">{SITE.orcid}</div>
+            <a class="link" href={`https://orcid.org/${SITE.orcid}`} rel="me">orcid.org ↗</a>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="w-head"><h3>Colophon</h3></div>
+          <div class="kv">
+            <div><span class="k">theme</span>paper · ink · warm · vellum</div>
+            <div><span class="k">engine</span>astro · react</div>
+            <div><span class="k">host</span>github pages</div>
+            <div><span class="k">©</span>2026 {SITE.owner}</div>
+          </div>
+        </div>
       </aside>
     </div>
   </body>
