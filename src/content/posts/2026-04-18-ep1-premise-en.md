@@ -68,11 +68,15 @@ high*." And a regulator asking "why did your model recommend this
 product to this customer?" gets no useful answer from a latent
 factor.
 
-**It could not keep up with task diversity.** As the business
-added more use cases — next best product, churn prediction,
-customer value tiering — ALS did not generalize. You ended up
-with one ALS model per task, each tuned separately, each drifting
-separately.
+**It could not keep up with task diversity.** ALS is a
+user-item interaction matrix factorization — an algorithm scoped
+to collaborative-filtering recommendation, not a general-purpose
+predictor. As the business added more use cases — churn
+prediction, customer value tiering, next best product — each
+task got its own separate model bolted on (logistic regression,
+XGBoost, rule-based segmentation). You ended up with a
+patchwork of models per task, each tuned separately, each drifting
+separately, with no shared customer representation anywhere.
 
 The goal was to replace it with something that could (a) produce
 business-interpretable explanations by construction, and (b)
