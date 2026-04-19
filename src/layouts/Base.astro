@@ -1,0 +1,64 @@
+---
+import "../styles/site.css";
+const { title = "bluethestyle", tab = "home" } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet" />
+    <style is:global>
+      :root { --display: "Fraunces", Georgia, serif; --sans: "Inter Tight", -apple-system, sans-serif; --mono: "JetBrains Mono", monospace; --kr: "Pretendard Variable", -apple-system, sans-serif; }
+    </style>
+  </head>
+  <body data-theme="paper">
+    <div class="frame">
+      <!-- topbar -->
+      <div class="topbar">
+        <a href="/" class="logo"><span class="dot"></span>bluethestyle<span class="sub">/ field notes</span></a>
+        <div class="tabs">
+          <a href="/" class={tab === "home" ? "on" : ""}>HOME</a>
+          <a href="/categories/" class={tab === "categories" ? "on" : ""}>CATEGORIES <span class="n">04</span></a>
+          <a href="/tags/" class={tab === "tags" ? "on" : ""}>TAGS <span class="n">09</span></a>
+          <a href="/archives/" class={tab === "archives" ? "on" : ""}>ARCHIVES <span class="n">06</span></a>
+        </div>
+        <div class="tb-tools">
+          <div class="status"><span class="live"></span>writing</div>
+          <div class="search"><input placeholder="search…" /><span class="kbd">⌘K</span></div>
+          <div class="lang-sw"><button class="on">EN</button><button>한</button></div>
+        </div>
+      </div>
+      <!-- sidebar-l -->
+      <aside class="sidebar-l">
+        <div class="bio-card">
+          <div class="avatar"></div>
+          <div class="who">Seonkyu Jeong</div>
+          <div class="role"><b>Independent researcher</b><br/>financial AI · MRM · agents<br/>GARP FRM · Seoul</div>
+        </div>
+        <div class="nav-label">Elsewhere</div>
+        <div class="socials">
+          <a href="/feed.xml">RSS <span class="arr">↗</span></a>
+          <a href="mailto:jsk320098@gmail.com">Email <span class="arr">↗</span></a>
+          <a href="https://github.com/bluethestyle">GitHub <span class="arr">↗</span></a>
+          <a href="https://orcid.org/0009-0005-3291-9112">ORCID <span class="arr">↗</span></a>
+        </div>
+        <div class="kv">
+          <div><span class="k">build</span>idx.2026.04</div>
+          <div><span class="k">stack</span>astro · react</div>
+          <div><span class="k">license</span>cc by-nc 4.0</div>
+        </div>
+      </aside>
+      <!-- main -->
+      <main class="main"><slot /></main>
+      <!-- sidebar-r -->
+      <aside class="sidebar-r">
+        <slot name="right" />
+      </aside>
+    </div>
+  </body>
+</html>

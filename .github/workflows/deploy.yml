@@ -1,4 +1,4 @@
-name: Build & deploy to GitHub Pages
+name: Build & deploy Astro to GitHub Pages
 
 on:
   push:
@@ -21,24 +21,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          ruby-version: "3.2"
-          bundler-cache: true
+          node-version: "20"
+          cache: "npm"
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v4
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build site
-        env:
-          JEKYLL_ENV: production
-        run: bundle exec jekyll build
+      - name: Build with Astro
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: dist
 
   deploy:
     needs: build
@@ -47,6 +45,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
