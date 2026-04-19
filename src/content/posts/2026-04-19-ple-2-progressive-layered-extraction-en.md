@@ -56,6 +56,67 @@ What this design solves:
 > at Alibaba, JD.com, Kuaishou, ByteDance and other large Chinese
 > platforms, and is now a de facto standard for industrial MTL.
 
+## Where this project diverges from the paper — from homogeneous MLPs to heterogeneous experts
+
+In the original PLE paper (Tang et al., 2020), both the Shared Experts
+and the Task-specific Experts are *identically structured small MLPs*.
+The idea of "more experts for richer representation" survives, but no
+individual expert carries a different inductive bias from the others —
+what differs across experts is only the gate weight each one receives.
+
+This project takes one step further. **We make the Shared Expert pool
+heterogeneous.** The eight Shared Experts are each chosen to represent
+a *structurally distinct mathematical perspective*.
+
+- *Hyperbolic geometry* (unified_hgcn) — hierarchies in hyperbolic space
+- *Persistent homology* (perslay) — topological shape of transaction patterns
+- *Factorization machine* (deepfm) — symmetric pairwise feature crosses
+- *Temporal dynamics* (temporal) — time-series patterns
+- *Bipartite graph* (lightgcn) — customer-product relations
+- *Causal inference* (causal) — do-operator level features
+- *Optimal transport* (optimal_transport) — distances between distributions
+- *Power-law raw scale* (raw_scale) — finance-native scales preserved before normalization (v3.3)
+
+### Why this choice
+
+Three reasons.
+
+**Encode expressiveness through inductive bias, not parameter count.** A
+single 12GB VRAM card cannot support several Transformer-scale experts
+stacked on top of each other. If each expert instead borrows a
+structure that is already well-optimized in its home domain (HGCN's
+hyperbolic geometry, PersLay's persistent homology, and so on), a
+great deal of expressive capacity is bought per parameter.
+
+**Make explainability structural, not post-hoc.** "unified_hgcn
+contributed 35%, temporal contributed 28%" is not a SHAP approximation
+— it is the *actual gate weight computed by the model*. And the
+names themselves are business-readable ("hierarchy", "temporal
+pattern"), which is not possible with a homogeneous MLP ensemble —
+"MLP #3 contributed 28%" is no explanation for a customer or a
+regulator.
+
+**Strengthen inter-task regularization.** Homogeneous experts tend to
+converge onto similar features during training (a subtler face of
+Expert Collapse). Heterogeneous experts each carry their own
+structural inductive bias, so their roles differentiate naturally.
+When a gate decides "which lens to look through," it picks from a
+space of genuinely distinguishable lenses.
+
+> **Paper vs. implementation — the lesson.** The PLE paper was born
+> from Tencent Video's engagement prediction, where homogeneous MLPs
+> already beat MMoE meaningfully — because all tasks there (VCR, VTR,
+> Share Rate) predicted essentially the same kind of user-item
+> engagement. This project's 13 tasks are far more heterogeneous (next
+> best product, churn prediction, customer value tiering, similar-customer
+> search, and so on). Reflecting that heterogeneity *at the expert
+> structure level* turned out to be the right move.
+
+This decision is the premise for everything in the sections below —
+the composition of the eight heterogeneous experts, the block-scaling
+CGCAttention gate variant, and the dimension-normalization trick for
+heterogeneous output dims.
+
 ## The Roles of Expert and Gate — An Intuitive View
 
 ### Expert: domain specialists looking at the world through different lenses
