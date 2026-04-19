@@ -12,6 +12,12 @@ const posts = defineCollection({
     series: z.string().optional(),
     part: z.number().optional(),
     excerpt: z.string().optional(),
+    alt_lang: z.string().optional(),
+    next_title: z.string().optional(),
+    next_desc: z.string().optional(),
+    next_status: z.enum(["draft", "published"]).optional(),
+    source_url: z.string().optional(),
+    source_label: z.string().optional(),
   }),
 });
 

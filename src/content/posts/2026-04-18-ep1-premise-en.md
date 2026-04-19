@@ -6,15 +6,17 @@ tags: [finai-build, architecture, claude-code, financial-ai, ple]
 lang: en
 series: three-months
 part: 1
+alt_lang: /2026/04/18/ep1-premise-ko/
+next_title: "Ep 2 — Organizing the AI Collaboration"
+next_desc: "How three people actually organized the AI collaboration — which tools got used for what, how we avoided burning subscriptions on the wrong phase, and what patterns emerged that transferred across 3.5 months."
+next_status: draft
+source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf
+source_label: "Development Story (EN, PDF)"
 ---
 
 *Part 1 of "Building a Financial AI in Three Months" — a series on
 building a financial recommendation system with Claude Code, on
 consumer hardware, as three people on personal time.*
-
-🇰🇷 [한국어 버전 →](/2026/04/18/ep1-premise-ko/)
-
----
 
 ## Who we were
 
@@ -177,29 +179,3 @@ home domain, and we could import the structure cheaply.
 Selection pressure in biological evolution drives specialization.
 Resource constraints in engineering do the same thing. Without
 the constraint, there is no identity.
-
----
-
-## Next episode
-
-In [Episode 2](#) we will cover how three people actually
-*organized* the AI collaboration — which tools got used for what,
-how we avoided burning subscriptions on the wrong phase, and what
-patterns emerged that transferred across the 3.5 months.
-
----
-
-<div class="series-nav" style="margin-top: 2em; font-size: 0.9em;">
-<a href="/series/three-months/">← Series index</a>
-· Episode 2 (coming soon)
-</div>
-
----
-
-<small>
-Drafted with Claude Code assistance. Ideas, experience, and final
-review by the author. Source material:
-<a href="https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf">
-Development Story (EN, PDF)
-</a>.
-</small>

@@ -6,13 +6,15 @@ tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: ko
 series: mrm-thread
 part: 1
+alt_lang: /2026/04/18/mrm-ep1-architecture-en/
+next_title: "에피소드 2 — 관문으로서의 Champion-Challenger"
+next_desc: "동기 관문으로서의 Champion-Challenger — `--force-promote` override 패턴과 모든 승격 결정 (승인, 거부, 부트스트랩, 수동 override) 이 SR 11-7 하 HMAC 서명 감사 엔트리가 되는 방식."
+next_status: draft
+source_url: https://doi.org/10.5281/zenodo.19622052
+source_label: "Paper 2 (Zenodo DOI)"
 ---
 
 *시리즈 "MRM 스레드" 1편. AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.*
-
-🇬🇧 [English version →](/2026/04/18/mrm-ep1-architecture-en/)
-
----
 
 ## 표준적 그림
 
@@ -106,17 +108,3 @@ MRM 감독이 *여전히 해야 하는 것*:
 에피소드 3 은 에이전트 파이프라인의 "chain of custody" 가 어떤 모습인지 다룬다: 7개 감사 테이블, HMAC 해시 체인, EU AI Act Article 13-14 및 KFCPA §17 매핑을 체크리스트가 아니라 코드 경로로서 설명.
 
 세 편 모두의 원문 자료는 [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052). 이 시리즈는 논문을 대체하지 않고 맥락화한다. 전체 규제 매핑 표가 필요하시면 논문 §6 에 있다.
-
----
-
-<div class="series-nav" style="margin-top: 2em; font-size: 0.9em;">
-<a href="/series/mrm-thread-ko/">← MRM 시리즈 목차</a>
-· 에피소드 2 (준비 중)
-</div>
-
----
-
-<small>
-Claude Code 의 도움을 받아 작성되었습니다. 아이디어, 해석, 최종 검수는 저자가 직접 수행했습니다. 저자는 독립 연구자이자 GARP FRM 자격자이며, 어떤 기관을 대변하지 않습니다. 원문 자료:
-<a href="https://doi.org/10.5281/zenodo.19622052">Paper 2 (Zenodo DOI)</a>.
-</small>

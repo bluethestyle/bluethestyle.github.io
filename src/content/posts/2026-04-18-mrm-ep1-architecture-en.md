@@ -6,15 +6,17 @@ tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: en
 series: mrm-thread
 part: 1
+alt_lang: /2026/04/18/mrm-ep1-architecture-ko/
+next_title: "Ep 2 — Champion-Challenger as a Gate"
+next_desc: "Champion-Challenger as a synchronous gate — the `--force-promote` override pattern and how every promotion decision (approval, rejection, bootstrap, manual override) becomes an HMAC-signed audit entry under SR 11-7."
+next_status: draft
+source_url: https://doi.org/10.5281/zenodo.19622052
+source_label: "Paper 2 (Zenodo DOI)"
 ---
 
 *Part 1 of "The MRM Thread" — a short parallel series on regulatory
 compliance and model risk management for AI recommendation systems,
 written from a GARP FRM practitioner perspective.*
-
-🇰🇷 [한국어 버전 →](/2026/04/18/mrm-ep1-architecture-ko/)
-
----
 
 ## The standard picture
 
@@ -212,20 +214,3 @@ The source material for all three is
 this series adapts and contextualizes rather than replaces the
 paper. If you want the complete regulatory mapping tables, they
 are in §6 of the paper.
-
----
-
-<div class="series-nav" style="margin-top: 2em; font-size: 0.9em;">
-<a href="/series/mrm-thread/">← MRM series index</a>
-· Episode 2 (coming soon)
-</div>
-
----
-
-<small>
-Drafted with Claude Code assistance. Ideas, interpretation, and
-final review by the author. The author is an independent
-researcher and GARP FRM, not speaking on behalf of any institution.
-Source material:
-<a href="https://doi.org/10.5281/zenodo.19622052">Paper 2 (Zenodo DOI)</a>.
-</small>
