@@ -297,10 +297,9 @@ html { background: var(--bg); }
 }
 .bts-series-mini a.bts-series-row:last-child { border-bottom: 0; }
 .bts-series-mini .cat {
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.04em;
-  color: var(--accent-ink); background: var(--accent-soft);
-  padding: 3px 8px; border-radius: 3px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
 }
 .bts-series-mini .prog {
   font-family: var(--mono); font-size: 10px;
