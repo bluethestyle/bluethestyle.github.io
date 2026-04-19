@@ -43,7 +43,7 @@ v3.2 에서 `use_group_encoder=true` (기본값) 설정 시
 ```python
 # ple_cluster_adatt.py:533-543
 self.task_experts = GroupTaskExpertBasket(
-    input_dim=task_expert_input_dim,     # 576 + 32 = 608
+    input_dim=task_expert_input_dim,     # 512 + 32 = 544
     group_hidden_dim=128,
     group_output_dim=64,
     cluster_embed_dim=32,
@@ -58,17 +58,17 @@ GroupEncoder 의 단일 태스크 forward 는 다음과 같다.
 
 $$\mathbf{e}_{cluster} = \text{Embedding}(\text{cluster\_id}) \in \mathbb{R}^{32}$$
 
-$$\mathbf{x}_{input} = [\text{CGC\_output}_{576D} \,\|\, \text{HMM\_proj}_{32D} \,\|\, \mathbf{e}_{cluster,32D}] \in \mathbb{R}^{640}$$
+$$\mathbf{x}_{input} = [\text{CGC\_output}_{512D} \,\|\, \text{HMM\_proj}_{32D} \,\|\, \mathbf{e}_{cluster,32D}] \in \mathbb{R}^{576}$$
 
-$$\mathbf{h}_{expert} = \text{MLP}_{640 \to 128 \to 64 \to 32}(\mathbf{x}_{input})$$
+$$\mathbf{h}_{expert} = \text{MLP}_{576 \to 128 \to 64 \to 32}(\mathbf{x}_{input})$$
 
-실제 input_dim = 608D (shared + HMM) + 32D (cluster_embed) = 640D. 그룹
+실제 input_dim = 544D (shared + HMM) + 32D (cluster_embed) = 576D. 그룹
 내 태스크는 GroupEncoder 를 공유하고, 그룹 간은 독립이다.
 
 > **수식 직관.** 이 수식은 "이 고객이 어떤 클러스터에 속하는가"라는
 > 정보를 모델 내부에 주입하는 과정이다. 먼저 클러스터 ID 를 32D
-> 임베딩으로 변환하고, CGC 출력(576D) + HMM 프로젝션(32D) 과 이어 붙여
-> 총 640D 입력을 만든다. 이후 3단 MLP(640→128→64→32) 가 이를 압축하여
+> 임베딩으로 변환하고, CGC 출력(512D) + HMM 프로젝션(32D) 과 이어 붙여
+> 총 576D 입력을 만든다. 이후 3단 MLP(576→128→64→32) 가 이를 압축하여
 > 태스크별 최종 표현(32D) 을 생성한다. 같은 태스크 그룹(예: Engagement
 > 그룹의 CTR/CVR)은 동일한 GroupEncoder 를 공유하여 파라미터를
 > 절약하면서도 클러스터 임베딩으로 차별화한다.

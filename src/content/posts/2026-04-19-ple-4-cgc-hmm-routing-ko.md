@@ -53,25 +53,25 @@ $$\mathbf{h}_k^{cgc} = \sum_{i=1}^N g_{k,i} \cdot \mathbf{h}_i^{expert}, \quad \
 `_build_cgc()` (라인 566~677)에서 태스크별 독립적인
 `nn.Sequential(Linear + Softmax)` 모듈을 `nn.ModuleDict`로 관리한다.
 
-$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^8$$
+$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^7$$
 
-$$\tilde{\mathbf{h}}_{k,i} = w_{k,i} \cdot \mathbf{h}_i^{expert} \quad \text{for } i = 1, \ldots, 8$$
+$$\tilde{\mathbf{h}}_{k,i} = w_{k,i} \cdot \mathbf{h}_i^{expert} \quad \text{for } i = 1, \ldots, 7$$
 
-$$\mathbf{h}_k^{cgc} = [\tilde{\mathbf{h}}_{k,1} \,\|\, \tilde{\mathbf{h}}_{k,2} \,\|\, \ldots \,\|\, \tilde{\mathbf{h}}_{k,8}] \in \mathbb{R}^{576}$$
+$$\mathbf{h}_k^{cgc} = [\tilde{\mathbf{h}}_{k,1} \,\|\, \tilde{\mathbf{h}}_{k,2} \,\|\, \ldots \,\|\, \tilde{\mathbf{h}}_{k,7}] \in \mathbb{R}^{512}$$
 
-여기서 $\mathbf{W}_k \in \mathbb{R}^{8 \times 576}$ 는 태스크 $k$ 의
+여기서 $\mathbf{W}_k \in \mathbb{R}^{7 \times 512}$ 는 태스크 $k$ 의
 gate 가중치이고, $\mathbf{h}_i^{expert}$ 는 $i$ 번째 Expert의 출력 블록
 (64D 또는 128D), $w_{k,i}$ 는 태스크 $k$ 가 Expert $i$ 에 부여하는
 attention 가중치이다.
 
-> **수식 직관.** 첫 번째 식은 576D 공유 표현을 보고 8개 Expert 각각의
+> **수식 직관.** 첫 번째 식은 512D 공유 표현을 보고 7개 Expert 각각의
 > "관련성 점수"를 산출한 뒤 Softmax로 확률화하는 과정이다. 두 번째
 > 식은 이 확률(스칼라)을 각 Expert 출력 블록에 곱해 중요도를
 > 조절한다. 세 번째 식은 가중 조절된 블록들을 다시 이어 붙여 원래와
-> 동일한 576D를 복원한다. 결과적으로, 같은 576D 벡터라도 태스크마다
+> 동일한 512D를 복원한다. 결과적으로, 같은 512D 벡터라도 태스크마다
 > Expert별 기여 비중이 다르게 조합된다.
 
-> **차원 유지 설계.** CGCAttention은 576D 입력을 576D 출력으로
+> **차원 유지 설계.** CGCAttention은 512D 입력을 512D 출력으로
 > 변환한다. Expert별 블록에 스칼라 가중치를 곱하는 *블록 스케일링
 > 방식*이므로 기존 파이프라인과 하위 호환된다. 가중치 합이 1
 > (Softmax)이므로 출력 스케일이 보존된다.
@@ -134,7 +134,7 @@ for i, expert_name in enumerate(expert_names):
 
 $$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left( -\frac{1}{|\mathcal{T}|} \right) \sum_{k \in \mathcal{T}} H(\mathbf{w}_k)$$
 
-$$H(\mathbf{w}_k) = -\sum_{i=1}^{8} w_{k,i} \cdot \log(w_{k,i})$$
+$$H(\mathbf{w}_k) = -\sum_{i=1}^{7} w_{k,i} \cdot \log(w_{k,i})$$
 
 여기서 $\mathcal{T}$ 는 활성화된 태스크 집합, $\lambda_{ent} = 0.01$
 (config: `cgc.entropy_lambda`) 이며, 음의 엔트로피를 *최소화*하면
@@ -151,14 +151,14 @@ $$H(\mathbf{w}_k) = -\sum_{i=1}^{8} w_{k,i} \cdot \log(w_{k,i})$$
 > $\mathbf{w} = (w_1, \ldots, w_n)$ 에 대해 다음 세 공리를 만족하는
 > 유일한 함수가 엔트로피다: (1) 연속성 — $w_i$ 가 조금 변하면 $H$ 도
 > 조금 변한다, (2) 최대성 — 균등 분포일 때 $H$ 가 최대, (3) 결합 —
-> 독립 사건의 엔트로피는 덧셈적. *구체적 계산 예시*: Expert 8개에 대해
-> 균등 분포 $w_i = 1/8$ 이면
-> $H = -8 \times (1/8) \times \log(1/8) = \log(8) \approx 2.079$ 비트
+> 독립 사건의 엔트로피는 덧셈적. *구체적 계산 예시*: Expert 7개에 대해
+> 균등 분포 $w_i = 1/7$ 이면
+> $H = -7 \times (1/7) \times \log(1/7) = \log(7) \approx 1.946$ 비트
 > (최대 엔트로피). 한 Expert에 집중
 > $\mathbf{w} = (1, 0, \ldots, 0)$ 이면
 > $H = -1 \times \log(1) = 0$ (최소 엔트로피). 만약
-> $\mathbf{w} = (0.65, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)$ 이면
-> $H \approx 1.33$ — 최대의 약 64%만 활용. 엔트로피 정규화는 이 값을
+> $\mathbf{w} = (0.64, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06)$ 이면
+> $H \approx 1.32$ — 최대의 약 68%만 활용. 엔트로피 정규화는 이 값을
 > 최대 쪽으로 밀어 Expert 활용을 분산시킨다.
 
 > **⚠ Expert Collapse 위험.** CGC entropy lambda가 0이면 정규화
@@ -194,16 +194,16 @@ return torch.cat(parts, dim=-1)
 
 $$\text{scale}_i = \sqrt{\frac{\text{mean\_dim}}{\text{dim}_i}}$$
 
-$$\text{mean\_dim} = \frac{128 + 64 \times 7}{8} = 72.0$$
+$$\text{mean\_dim} = \frac{128 + 64 \times 6}{7} \approx 73.14$$
 
-- unified_hgcn (128D): scale $= \sqrt{72.0 / 128} \approx 0.750$ (감쇠)
-- 나머지 Expert (64D): scale $= \sqrt{72.0 / 64} \approx 1.061$ (증폭)
+- unified_hgcn (128D): scale $= \sqrt{73.14 / 128} \approx 0.756$ (감쇠)
+- 나머지 Expert (64D): scale $= \sqrt{73.14 / 64} \approx 1.069$ (증폭)
 - 동일 attention = 동일 L2 기여
 
 > **수식 직관.** unified_hgcn(128D)은 다른 Expert(64D)보다 출력 차원이
 > 2배 크므로, 동일한 attention 가중치를 받더라도 L2 노름 기준 기여가
 > 과대하다. 이 스케일링은 "차원이 큰 Expert는 줄이고 작은 Expert는
-> 키워서" attention $w_{k,i} = 0.125$ (균등)일 때 모든 Expert의 실질
+> 키워서" attention $w_{k,i} \approx 0.143$ (균등, $1/7$)일 때 모든 Expert의 실질
 > 기여가 동등하도록 보정한다.
 
 ### CGC Freeze 동기화

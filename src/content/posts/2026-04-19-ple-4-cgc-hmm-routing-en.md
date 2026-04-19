@@ -58,28 +58,28 @@ $$\mathbf{h}_k^{cgc} = \sum_{i=1}^N g_{k,i} \cdot \mathbf{h}_i^{expert}, \quad \
 `_build_cgc()` (lines 566–677) manages per-task independent
 `nn.Sequential(Linear + Softmax)` modules inside an `nn.ModuleDict`.
 
-$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^8$$
+$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^7$$
 
-$$\tilde{\mathbf{h}}_{k,i} = w_{k,i} \cdot \mathbf{h}_i^{expert} \quad \text{for } i = 1, \ldots, 8$$
+$$\tilde{\mathbf{h}}_{k,i} = w_{k,i} \cdot \mathbf{h}_i^{expert} \quad \text{for } i = 1, \ldots, 7$$
 
-$$\mathbf{h}_k^{cgc} = [\tilde{\mathbf{h}}_{k,1} \,\|\, \tilde{\mathbf{h}}_{k,2} \,\|\, \ldots \,\|\, \tilde{\mathbf{h}}_{k,8}] \in \mathbb{R}^{576}$$
+$$\mathbf{h}_k^{cgc} = [\tilde{\mathbf{h}}_{k,1} \,\|\, \tilde{\mathbf{h}}_{k,2} \,\|\, \ldots \,\|\, \tilde{\mathbf{h}}_{k,7}] \in \mathbb{R}^{512}$$
 
-Here $\mathbf{W}_k \in \mathbb{R}^{8 \times 576}$ is task $k$'s gate
+Here $\mathbf{W}_k \in \mathbb{R}^{7 \times 512}$ is task $k$'s gate
 weight, $\mathbf{h}_i^{expert}$ is the $i$-th expert's output block (64D
 or 128D), and $w_{k,i}$ is the attention weight that task $k$ assigns
 to expert $i$.
 
-> **Equation intuition.** The first equation takes the 576D shared
-> representation, produces a "relevance score" for each of the 8 experts,
+> **Equation intuition.** The first equation takes the 512D shared
+> representation, produces a "relevance score" for each of the 7 experts,
 > and runs those through a Softmax to turn them into probabilities. The
 > second equation multiplies each expert block by its scalar probability
 > to modulate its importance. The third equation concatenates the scaled
-> blocks back into a vector of the same 576D shape. The net effect: the
-> same 576D vector flows out, but every task gets a different mixture of
+> blocks back into a vector of the same 512D shape. The net effect: the
+> same 512D vector flows out, but every task gets a different mixture of
 > contributions from each expert.
 
-> **Dimension-preserving design.** CGCAttention maps a 576D input to a
-> 576D output. Because it multiplies each expert block by a scalar
+> **Dimension-preserving design.** CGCAttention maps a 512D input to a
+> 512D output. Because it multiplies each expert block by a scalar
 > (*block scaling*), it is backward-compatible with the rest of the
 > pipeline. The weights sum to 1 (Softmax), so the output scale is
 > preserved.
@@ -143,7 +143,7 @@ of the CGC attention distribution to prevent **Expert Collapse**.
 
 $$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left( -\frac{1}{|\mathcal{T}|} \right) \sum_{k \in \mathcal{T}} H(\mathbf{w}_k)$$
 
-$$H(\mathbf{w}_k) = -\sum_{i=1}^{8} w_{k,i} \cdot \log(w_{k,i})$$
+$$H(\mathbf{w}_k) = -\sum_{i=1}^{7} w_{k,i} \cdot \log(w_{k,i})$$
 
 Here $\mathcal{T}$ is the set of active tasks and
 $\lambda_{ent} = 0.01$ (config key `cgc.entropy_lambda`). *Minimizing*
@@ -163,14 +163,14 @@ distribution out.
 > is the unique function satisfying three axioms: (1) continuity — a
 > small change in $w_i$ produces a small change in $H$; (2) maximality
 > — $H$ is largest on the uniform distribution; (3) additivity — the
-> entropy of independent events adds. *A concrete calculation*: for 8
-> experts on a uniform $w_i = 1/8$,
-> $H = -8 \times (1/8) \times \log(1/8) = \log(8) \approx 2.079$ bits
+> entropy of independent events adds. *A concrete calculation*: for 7
+> experts on a uniform $w_i = 1/7$,
+> $H = -7 \times (1/7) \times \log(1/7) = \log(7) \approx 1.946$ bits
 > (maximum entropy). Fully concentrated on one expert,
 > $\mathbf{w} = (1, 0, \ldots, 0)$, gives
 > $H = -1 \times \log(1) = 0$ (minimum entropy). For
-> $\mathbf{w} = (0.65, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)$,
-> $H \approx 1.33$ — about 64% of the maximum. Entropy regularization
+> $\mathbf{w} = (0.64, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06)$,
+> $H \approx 1.32$ — about 68% of the maximum. Entropy regularization
 > pushes this number back toward the maximum and spreads expert
 > utilization.
 
@@ -210,10 +210,10 @@ imbalance caused by the asymmetric expert output dimensions (128D vs
 
 $$\text{scale}_i = \sqrt{\frac{\text{mean\_dim}}{\text{dim}_i}}$$
 
-$$\text{mean\_dim} = \frac{128 + 64 \times 7}{8} = 72.0$$
+$$\text{mean\_dim} = \frac{128 + 64 \times 6}{7} \approx 73.14$$
 
-- unified_hgcn (128D): scale $= \sqrt{72.0 / 128} \approx 0.750$ (attenuated)
-- other experts (64D): scale $= \sqrt{72.0 / 64} \approx 1.061$ (amplified)
+- unified_hgcn (128D): scale $= \sqrt{73.14 / 128} \approx 0.756$ (attenuated)
+- other experts (64D): scale $= \sqrt{73.14 / 64} \approx 1.069$ (amplified)
 - same attention $\Rightarrow$ same L2 contribution
 
 > **Equation intuition.** unified_hgcn (128D) has twice the output
@@ -221,7 +221,7 @@ $$\text{mean\_dim} = \frac{128 + 64 \times 7}{8} = 72.0$$
 > attention weight its L2-norm contribution is disproportionately
 > large. This scaling "shrinks large-dimension experts and grows
 > small-dimension experts" so that, when attention is uniform at
-> $w_{k,i} = 0.125$, every expert actually contributes the same.
+> $w_{k,i} \approx 0.143$ ($1/7$), every expert actually contributes the same.
 
 ### CGC freeze synchronization
 

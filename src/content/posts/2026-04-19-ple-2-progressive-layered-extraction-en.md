@@ -7,8 +7,8 @@ lang: en
 series: study-thread
 part: 2
 alt_lang: /2026/04/19/ple-2-progressive-layered-extraction-ko/
-next_title: "PLE-3 — Input Structure and Heterogeneous Shared Expert Pool (576D)"
-next_desc: "The full PLEClusterInput field spec, 734D feature-tensor index mapping, and HMM mode routing. Plus the eight heterogeneous Shared Experts this project actually runs (Economics, Temporal, HMM, TDA, GMM, GCN, PersLay, UnifiedHGCN) — each interpreting the customer through a structurally different mathematical lens."
+next_title: "PLE-3 — Input Structure and Heterogeneous Shared Expert Pool (512D)"
+next_desc: "The full PLEClusterInput field spec, 734D feature-tensor index mapping, and HMM mode routing. Plus the seven heterogeneous Shared Experts this project actually runs (Economics, Temporal, HMM, TDA, GMM, GCN, PersLay, UnifiedHGCN) — each interpreting the customer through a structurally different mathematical lens."
 next_status: published
 ---
 
@@ -65,7 +65,7 @@ individual expert carries a different inductive bias from the others —
 what differs across experts is only the gate weight each one receives.
 
 This project takes one step further. **We make the Shared Expert pool
-heterogeneous.** The eight Shared Experts are each chosen to represent
+heterogeneous.** The seven Shared Experts are each chosen to represent
 a *structurally distinct mathematical perspective*.
 
 - *Hyperbolic geometry* (unified_hgcn) — hierarchies in hyperbolic space
@@ -75,7 +75,6 @@ a *structurally distinct mathematical perspective*.
 - *Bipartite graph* (lightgcn) — customer-product relations
 - *Causal inference* (causal) — do-operator level features
 - *Optimal transport* (optimal_transport) — distances between distributions
-- *Power-law raw scale* (raw_scale) — finance-native scales preserved before normalization (v3.3)
 
 ### Why this choice
 
@@ -113,7 +112,7 @@ space of genuinely distinguishable lenses.
 > structure level* turned out to be the right move.
 
 This decision is the premise for everything in the sections below —
-the composition of the eight heterogeneous experts, the block-scaling
+the composition of the seven heterogeneous experts, the block-scaling
 CGCAttention gate variant, and the dimension-normalization trick for
 heterogeneous output dims.
 
@@ -122,7 +121,7 @@ heterogeneous output dims.
 ### Expert: domain specialists looking at the world through different lenses
 
 An Expert is a *specialist* that interprets the input data through one
-specific perspective. This system's eight Shared Experts each provide a
+specific perspective. This system's seven Shared Experts each provide a
 view from a completely different domain.
 
 - **unified_hgcn**: interprets product/category hierarchy in *hyperbolic space*.
@@ -132,13 +131,12 @@ view from a completely different domain.
 - **lightgcn**: represents *customer-item graph relations*.
 - **causal**: extracts *causal relations* between features.
 - **optimal_transport**: measures *distances between distributions*.
-- **raw_scale**: preserves the *power-law distribution pattern* of pre-normalization raw features (v3.3).
 
 Each is a different "lens" through which the same customer data is
 viewed. Some tasks (like CTR) care about temporal patterns, while others
 (like Brand Prediction) care about hierarchical relations.
 
-#### Comparing the eight Shared Experts: input, learning target, irreplaceability
+#### Comparing the seven Shared Experts: input, learning target, irreplaceability
 
 | Expert | Input | Learning target | Why it can't be replaced by another Expert | Output dim |
 |---|---|---|---|---|
@@ -149,31 +147,28 @@ viewed. Some tasks (like CTR) care about temporal patterns, while others
 | PersLay | Persistence Diagram | Topological structure | Loops / clusters / branches in consumption patterns | 64D |
 | Causal | Normalized 644D | Directional causal structure between features (DAG) | Confounder removal, asymmetric causal structure | 64D |
 | OT | Normalized 644D | Customer–prototype distribution distance | Encodes distributional geometry via the Wasserstein distance | 64D |
-| RawScale | Raw 90D | Power-law distribution pattern (v3.3) | Preserves raw scale / distribution information lost to normalization | 64D |
 
-> **Why all eight Experts are needed.** The eight Experts each capture a
+> **Why all seven Experts are needed.** The seven Experts each capture a
 > different facet of the same customer, and the CGC Gate learns the
 > per-task optimal combination. Three Experts (DeepFM, Causal, OT) take
 > the same normalized 644D as input, but extract fundamentally different
 > mathematical structures — symmetric / asymmetric / distance — so they
-> are not redundant. RawScaleExpert (v3.3) takes the pre-normalization
-> raw 90D features as input and preserves power-law distribution
-> information.
+> are not redundant.
 
 ### Gate: how much should we listen to each specialist?
 
 The Gate is an *attention mechanism* that decides, per task, "how much do
 we trust each Expert's opinion?"
 
-$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^8$$
+$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^7$$
 
 What this equation says is clear.
 
 - $\mathbf{W}_k \cdot \mathbf{h}_{shared}$: look at the current input and *score* each Expert's relevance.
 - $\text{Softmax}$: convert scores into a probability distribution summing to 1.
-- $\mathbf{w}_k \in \mathbb{R}^8$: the *trust vector* that task $k$ assigns to the 8 Experts.
+- $\mathbf{w}_k \in \mathbb{R}^7$: the *trust vector* that task $k$ assigns to the 7 Experts.
 
-> **Analogy — a medical diagnosis committee.** Eight specialists
+> **Analogy — a medical diagnosis committee.** Seven specialists
 > (Experts) diagnose a patient (input data) each from their own field.
 > The internist, the surgeon, the radiologist, and so on each write an
 > opinion (Expert output). The Gate is the *primary doctor* deciding
@@ -268,7 +263,7 @@ functions* than a single network could.
 > Adaptive Recommender* (STAR, CIKM 2021) and Kuaishou's *PEPNet* (KDD
 > 2023) adopt MoE structures that select Experts depending on the input
 > condition. This system's CGC gating belongs to the Dense MoE family
-> (all Experts are used), and since the Expert count is small (8),
+> (all Experts are used), and since the Expert count is small (7),
 > compute efficiency holds even without sparse selection.
 
 ### How a Progressive structure affects information flow
@@ -313,10 +308,10 @@ corresponding Expert's voice.
 
 ### CGC Attention weights
 
-$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^8$$
+$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^7$$
 
 **Reading**: "Look at the current input ($\mathbf{h}_{shared}$), score
-the relevance of each of the 8 Experts, then normalize them with
+the relevance of each of the 7 Experts, then normalize them with
 Softmax. Since the Softmax output sums to 1, this is exactly 'the
 attention distribution that task $k$ assigns to the Experts for the
 current input'."
@@ -329,7 +324,7 @@ updates and the distribution adjusts to fit the data.
 
 ### Entropy regularization
 
-$$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left(-\frac{1}{|\mathcal{T}|}\right) \sum_{k \in \mathcal{T}} H(\mathbf{w}_k), \quad H(\mathbf{w}_k) = -\sum_{i=1}^{8} w_{k,i} \cdot \log(w_{k,i})$$
+$$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left(-\frac{1}{|\mathcal{T}|}\right) \sum_{k \in \mathcal{T}} H(\mathbf{w}_k), \quad H(\mathbf{w}_k) = -\sum_{i=1}^{7} w_{k,i} \cdot \log(w_{k,i})$$
 
 **Reading**: "If the gate distribution has low entropy (concentrated on
 one Expert), penalize it — at the very least, encourage the task to make
@@ -460,9 +455,9 @@ ratio. The Shared Experts carry the base knowledge useful to every
 task; the task-specific Experts carry the specialized knowledge only
 one task needs.
 
-**Extension (this project)**: on top of PLE's idea, we added 8
+**Extension (this project)**: on top of PLE's idea, we added 7
 heterogeneous domain Experts (GCN, TDA, DeepFM, Temporal, Graph,
-Causal, OT, RawScale), a GroupEncoder $+$ ClusterEmbedding (4 groups,
+Causal, OT), a GroupEncoder $+$ ClusterEmbedding (4 groups,
 20 clusters), HMM Triple-Mode routing, the Logit Transfer chain,
 Evidential uncertainty, and SAE interpretability — completing the
 *PLE-Cluster-adaTT system specialized for AIOps recommendations*.
@@ -471,7 +466,7 @@ Evidential uncertainty, and SAE interpretability — completing the
 
 | Principle | Implementation |
 |---|---|
-| Balance of sharing and separation | 8 Shared Experts + CGC gate + GroupTaskExpertBasket |
+| Balance of sharing and separation | 7 Shared Experts + CGC gate + GroupTaskExpertBasket |
 | Minimizing inter-task interference | Expert separation + entropy regularization + domain_experts bias |
 | Inter-task knowledge transfer | Logit Transfer (explicit) + adaTT gradient transfer (adaptive) |
 | Per-cluster specialization | GroupEncoder + ClusterEmbedding + Soft Routing |

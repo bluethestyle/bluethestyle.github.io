@@ -1,5 +1,5 @@
 ---
-title: "[Study Thread] PLE-3 — 입력 구조와 이종 Shared Expert Pool (576D)"
+title: "[Study Thread] PLE-3 — 입력 구조와 이종 Shared Expert Pool (512D)"
 date: 2026-04-19 14:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, expert-pool, hmm, shared-experts]
@@ -12,7 +12,7 @@ next_desc: "가중합 방식의 CGCLayer와 블록 스케일링 방식의 CGCAtt
 next_status: published
 ---
 
-*"Study Thread" 시리즈의 PLE 서브스레드 3편. 영문/국문 병렬로 PLE-1 → PLE-6 에 걸쳐 본 프로젝트의 PLE 아키텍처 뒤에 있는 논문과 수학 기초를 정리한다. 출처는 온프렘 프로젝트 `기술참조서/PLE_기술_참조서` 이다. 이번 3편은 PLE 모델이 실제로 받는 입력 구조(PLEClusterInput, 734D features 텐서)와, 본 프로젝트가 "이종 Expert Pool" 이라 부르는 8개의 구조적으로 다른 Shared Expert — 각자 고객을 다른 수학적 관점으로 해석하는 — 의 구성과 Forward 디스패치 전략을 다룬다.*
+*"Study Thread" 시리즈의 PLE 서브스레드 3편. 영문/국문 병렬로 PLE-1 → PLE-6 에 걸쳐 본 프로젝트의 PLE 아키텍처 뒤에 있는 논문과 수학 기초를 정리한다. 출처는 온프렘 프로젝트 `기술참조서/PLE_기술_참조서` 이다. 이번 3편은 PLE 모델이 실제로 받는 입력 구조(PLEClusterInput, 734D features 텐서)와, 본 프로젝트가 "이종 Expert Pool" 이라 부르는 7개의 구조적으로 다른 Shared Expert — 각자 고객을 다른 수학적 관점으로 해석하는 — 의 구성과 Forward 디스패치 전략을 다룬다.*
 
 ## PLEClusterInput — 입력 데이터 구조
 
@@ -126,9 +126,9 @@ def set_hmm_routing(cls, hmm_config: dict) -> None:
 `get_hmm_for_task()` (라인 188~198)는 태스크 이름으로 해당 HMM 텐서를
 반환하며, 매핑에 없는 태스크는 `"behavior"` 모드를 기본값으로 사용한다.
 
-## Shared Expert 결합 (576D)
+## Shared Expert 결합 (512D)
 
-### 8개 Shared Expert 구성
+### 7개 Shared Expert 구성
 
 `_build_shared_experts()` (라인 395~451)에서
 `SharedExpertFactory.create_from_config()` 를 호출하여 config 의
@@ -143,22 +143,19 @@ def set_hmm_routing(cls, hmm_config: dict) -> None:
 | `lightgcn` | 64D | 64D | Graph-based CF (사전 계산 임베딩) |
 | `causal` | 정규화 644D | 64D | SCM/NOTEARS 기반 인과 관계 추출 |
 | `optimal_transport` | 정규화 644D | 64D | Sinkhorn 기반 Wasserstein 거리 표현 |
-| `raw_scale` | 원시 90D | 64D | RawScaleExpert: 정규화 전 멱법칙 분포 보존 (LayerNorm+MLP, v3.3) |
 
-$$\mathbf{h}_{shared} = [\text{unified\_hgcn}_{128D} \,\|\, \text{perslay}_{64D} \,\|\, \text{deepfm}_{64D} \,\|\, \text{temporal}_{64D} \,\|\, \text{lightgcn}_{64D} \,\|\, \text{causal}_{64D} \,\|\, \text{OT}_{64D} \,\|\, \text{raw\_scale}_{64D}]$$
+$$\mathbf{h}_{shared} = [\text{unified\_hgcn}_{128D} \,\|\, \text{perslay}_{64D} \,\|\, \text{deepfm}_{64D} \,\|\, \text{temporal}_{64D} \,\|\, \text{lightgcn}_{64D} \,\|\, \text{causal}_{64D} \,\|\, \text{OT}_{64D}]$$
 
-$$\dim(\text{shared\_concat}) = 7 \times 64 + 1 \times 128 = 576D$$
+$$\dim(\text{shared\_concat}) = 6 \times 64 + 1 \times 128 = 512D$$
 
 여기서 $\|$ 는 텐서 결합(concatenation). DeepFM/Causal/OT 는
-`inputs.features[:, :644]` (정규화 644D), RawScaleExpert 는
-`inputs.features[:, 644:]` (원시 90D) 를 입력으로 받는다.
+`inputs.features[:, :644]` (정규화 644D) 를 입력으로 받는다.
 
-> **수식 직관.** 이 수식은 8명의 서로 다른 전문가가 각자의 분석 결과를
+> **수식 직관.** 이 수식은 7명의 서로 다른 전문가가 각자의 분석 결과를
 > 한 줄로 이어 붙인 것이다. 직관적으로, 그래프 구조 분석(128D)과 위상
-> 분석(64D), FM 교차(64D) 등 이질적인 시각의 결과물을 하나의 576차원
+> 분석(64D), FM 교차(64D) 등 이질적인 시각의 결과물을 하나의 512차원
 > 벡터로 합치면, 후속 CGC 게이트가 "이 고객에게는 어떤 전문가의 의견이
-> 중요한가"를 태스크별로 판단할 수 있는 재료가 된다. v3.3 에서 추가된
-> RawScaleExpert(64D)는 정규화 시 손실되는 원시 스케일 정보를 보존한다.
+> 중요한가"를 태스크별로 판단할 수 있는 재료가 된다.
 
 > **최신 동향.** 이종(heterogeneous) Expert 결합은 2024-2025년 추천
 > 시스템 연구의 핵심 트렌드다. 기존 MoE 연구(MMoE, PLE)는 동일 구조의
@@ -168,8 +165,8 @@ $$\dim(\text{shared\_concat}) = 7 \times 64 + 1 \times 128 = 576D$$
 > 각각에 특화된 Expert 를 두어 YouTube 추천 성능을 개선했다. Meta 의
 > *DHEN* (Deep Heterogeneous Expert Network, 2023) 은 이종 Expert 의
 > 상호작용을 명시적으로 모델링하여 Instagram 피드 랭킹에 적용했다.
-> 본 시스템의 8개 이종 Expert(GCN, PersLay, DeepFM, Temporal, LightGCN,
-> Causal, OT, RawScale) 결합은 이러한 최신 흐름과 정확히 부합하며, 단일
+> 본 시스템의 7개 이종 Expert(GCN, PersLay, DeepFM, Temporal, LightGCN,
+> Causal, OT) 결합은 이러한 최신 흐름과 정확히 부합하며, 단일
 > 도메인 Expert 로는 포착할 수 없는 다면적(multi-aspect) 고객 표현을
 > 구축한다.
 
@@ -195,8 +192,6 @@ for name, expert in self.shared_experts.items():
         out, _ = expert(collaborative_features)  # 사전 계산 64D
     elif name in ("causal", "optimal_transport"):
         out, _ = expert(inputs.features[:, :644])   # 정규화 644D
-    elif name == "raw_scale":
-        out, _ = expert(inputs.features[:, 644:])   # 원시 90D (v3.3)
 ```
 
 ### Zero Fallback 전략
@@ -218,12 +213,12 @@ for name, expert in self.shared_experts.items():
 지금까지 PLE 모델이 실제로 받아들이는 *형상* 을 살펴봤다 — 734D 의
 정규화/원시 혼합 벡터, 그리고 그 위에 얹히는 GMM 클러스터 확률, TDA
 persistence diagram, HMM triple-mode 텐서, 두 종류의 시퀀스, 그리고
-사전 계산된 GCN 임베딩들. 그 다음 단계가 8개의 이종 Shared Expert 로,
+사전 계산된 GCN 임베딩들. 그 다음 단계가 7개의 이종 Shared Expert 로,
 각자 다른 수학적 렌즈로 같은 고객을 본다 — Hyperbolic GCN 은 계층
 구조로, PersLay 는 위상으로, DeepFM 은 필드 교차로, Temporal 은
 시계열로, Causal 은 인과 그래프로, Optimal Transport 는 분포 간 거리
-로, 그리고 RawScale 은 정규화가 지워버린 멱법칙 꼬리로. 576D 의
-concatenation 은 이 8개의 관점을 한 벡터로 모아둔 것이고, 여기서부터는
+로. 512D 의
+concatenation 은 이 7개의 관점을 한 벡터로 모아둔 것이고, 여기서부터는
 "어떤 태스크가 어떤 Expert 의 의견을 얼마나 믿을 것인가" 가 문제가
 된다. 그것이 CGC 게이팅의 역할이며, **PLE-4** 에서 두 가지 변형 —
 가중합 방식의 CGCLayer 와 블록 스케일링 방식의 CGCAttention — 을

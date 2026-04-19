@@ -1,5 +1,5 @@
 ---
-title: "[Study Thread] PLE-3 — Input Structure and Heterogeneous Shared Expert Pool (576D)"
+title: "[Study Thread] PLE-3 — Input Structure and Heterogeneous Shared Expert Pool (512D)"
 date: 2026-04-19 14:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, expert-pool, hmm, shared-experts]
@@ -19,7 +19,7 @@ the on-prem `기술참조서/PLE_기술_참조서` document. This third post
 covers the exact input structure the PLE model consumes (the
 `PLEClusterInput` dataclass and its 734D features tensor) and the
 composition and Forward dispatch strategy of what this project calls
-the "heterogeneous Expert Pool" — eight structurally different Shared
+the "heterogeneous Expert Pool" — seven structurally different Shared
 Experts, each reading the customer through a different mathematical
 lens.*
 
@@ -140,9 +140,9 @@ def set_hmm_routing(cls, hmm_config: dict) -> None:
 tensor given a task name; any task not in the mapping falls back to
 `"behavior"` mode as the default.
 
-## Shared Expert composition (576D)
+## Shared Expert composition (512D)
 
-### Eight heterogeneous Shared Experts
+### Seven heterogeneous Shared Experts
 
 `_build_shared_experts()` (lines 395–451) calls
 `SharedExpertFactory.create_from_config()` and dynamically instantiates
@@ -157,25 +157,21 @@ whichever Experts are enabled in the config's `shared_experts` section.
 | `lightgcn` | 64D | 64D | Graph-based CF (pre-computed embedding) |
 | `causal` | normalized 644D | 64D | SCM/NOTEARS-based causal-relation extraction |
 | `optimal_transport` | normalized 644D | 64D | Sinkhorn-based Wasserstein-distance representation |
-| `raw_scale` | raw 90D | 64D | RawScaleExpert: preserves pre-normalization power-law distribution (LayerNorm+MLP, v3.3) |
 
-$$\mathbf{h}_{shared} = [\text{unified\_hgcn}_{128D} \,\|\, \text{perslay}_{64D} \,\|\, \text{deepfm}_{64D} \,\|\, \text{temporal}_{64D} \,\|\, \text{lightgcn}_{64D} \,\|\, \text{causal}_{64D} \,\|\, \text{OT}_{64D} \,\|\, \text{raw\_scale}_{64D}]$$
+$$\mathbf{h}_{shared} = [\text{unified\_hgcn}_{128D} \,\|\, \text{perslay}_{64D} \,\|\, \text{deepfm}_{64D} \,\|\, \text{temporal}_{64D} \,\|\, \text{lightgcn}_{64D} \,\|\, \text{causal}_{64D} \,\|\, \text{OT}_{64D}]$$
 
-$$\dim(\text{shared\_concat}) = 7 \times 64 + 1 \times 128 = 576D$$
+$$\dim(\text{shared\_concat}) = 6 \times 64 + 1 \times 128 = 512D$$
 
 Here $\|$ denotes tensor concatenation. DeepFM, Causal, and OT all
-receive `inputs.features[:, :644]` (the normalized 644D), while
-RawScaleExpert receives `inputs.features[:, 644:]` (the raw 90D).
+receive `inputs.features[:, :644]` (the normalized 644D).
 
 > **Equation intuition.** This formula stitches together the
-> analyses of eight different specialists in a single row.
+> analyses of seven different specialists in a single row.
 > Intuitively: you take the outputs from a graph-structural view
 > (128D), a topological view (64D), an FM-cross view (64D), and so
-> on, and glue them into one 576-dimensional vector. The downstream
+> on, and glue them into one 512-dimensional vector. The downstream
 > CGC gate then has the raw material it needs to judge "whose
-> opinion matters for this customer on this task." The v3.3-era
-> RawScaleExpert (64D) additionally preserves the raw-scale
-> information that normalization would otherwise erase.
+> opinion matters for this customer on this task."
 
 > **What is current in the field.** Heterogeneous Expert composition
 > is one of the core trends in recommender-system research in
@@ -187,8 +183,8 @@ RawScaleExpert receives `inputs.features[:, 644:]` (the raw 90D).
 > and improved YouTube recommendations. Meta's *DHEN* (Deep
 > Heterogeneous Expert Network, 2023) explicitly models interactions
 > between heterogeneous Experts and was deployed on Instagram feed
-> ranking. This system's eight heterogeneous Experts — GCN, PersLay,
-> DeepFM, Temporal, LightGCN, Causal, OT, RawScale — sit squarely
+> ranking. This system's seven heterogeneous Experts — GCN, PersLay,
+> DeepFM, Temporal, LightGCN, Causal, OT — sit squarely
 > in that lineage, and together they build a *multi-aspect*
 > customer representation that no single-domain Expert could capture
 > on its own.
@@ -215,8 +211,6 @@ for name, expert in self.shared_experts.items():
         out, _ = expert(collaborative_features)  # pre-computed 64D
     elif name in ("causal", "optimal_transport"):
         out, _ = expert(inputs.features[:, :644])   # normalized 644D
-    elif name == "raw_scale":
-        out, _ = expert(inputs.features[:, 644:])   # raw 90D (v3.3)
 ```
 
 ### The zero-fallback strategy
@@ -241,13 +235,12 @@ So far we have looked at the exact *shape* of what the PLE model
 consumes — a 734D mix of normalized and raw power-law features,
 supplemented by GMM cluster probabilities, TDA persistence diagrams,
 HMM triple-mode tensors, two kinds of sequences, and pre-computed
-GCN embeddings. On top of that sits a pool of eight heterogeneous
+GCN embeddings. On top of that sits a pool of seven heterogeneous
 Shared Experts, each of which reads the same customer through a
 different mathematical lens — Hyperbolic GCN for hierarchy, PersLay
 for topology, DeepFM for field crosses, Temporal for time series,
-Causal for causal graphs, Optimal Transport for distributional
-distance, and RawScale for the power-law tail that normalization
-erased. The 576D concatenation simply packs those eight views into
+Causal for causal graphs, and Optimal Transport for distributional
+distance. The 512D concatenation simply packs those seven views into
 one vector; from there the real question becomes "which task should
 trust which Expert, and by how much." That is the job of CGC gating,
 and **PLE-4** takes up the math of its two variants — weighted-sum

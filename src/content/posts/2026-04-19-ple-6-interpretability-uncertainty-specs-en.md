@@ -30,7 +30,7 @@ from ADATT-1.*
 
 ### Purpose
 
-Extract interpretable sparse features from the 576D combined
+Extract interpretable sparse features from the 512D combined
 representation of the Shared Experts. Inspired by Anthropic's Sparse
 Autoencoder approach, the goal is to decompose internal neural network
 representations into *human-interpretable units*.
@@ -39,23 +39,23 @@ representations into *human-interpretable units*.
 
 `_build_sae()` (lines 877~896) instantiates `SparseAutoencoder`.
 
-$$\mathbf{z} = \text{ReLU}(\mathbf{W}_{enc} \cdot \mathbf{h}_{shared} + \mathbf{b}_{enc}) \in \mathbb{R}^{2304}$$
+$$\mathbf{z} = \text{ReLU}(\mathbf{W}_{enc} \cdot \mathbf{h}_{shared} + \mathbf{b}_{enc}) \in \mathbb{R}^{2048}$$
 
-$$\hat{\mathbf{h}} = \mathbf{W}_{dec} \cdot \mathbf{z} + \mathbf{b}_{dec} \in \mathbb{R}^{576}$$
+$$\hat{\mathbf{h}} = \mathbf{W}_{dec} \cdot \mathbf{z} + \mathbf{b}_{dec} \in \mathbb{R}^{512}$$
 
 $$\mathcal{L}_{SAE} = \|\mathbf{h}_{shared} - \hat{\mathbf{h}}\|_2^2 + \lambda_1 \|\mathbf{z}\|_1$$
 
-- `expansion_factor=4`: latent\_dim = 576 × 4 = 2304
+- `expansion_factor=4`: latent\_dim = 512 × 4 = 2048
 - `l1_lambda=0.001`: induces sparsity
 - `tied_weights=true`: $\mathbf{W}_{dec} = \mathbf{W}_{enc}^T$ (parameter saving)
 - `loss_weight=0.01`: contribution to total loss
 
-> **Equation intuition.** The first equation is encoding — the 576D
-> shared representation is expanded 4× into a 2304D sparse vector
+> **Equation intuition.** The first equation is encoding — the 512D
+> shared representation is expanded 4× into a 2048D sparse vector
 > $\mathbf{z}$. Thanks to ReLU, most elements become zero, so only a
 > small number of active elements indicate "which concepts are
 > switched on in this customer's representation." The second is
-> decoding — the original 576D is reconstructed from the sparse
+> decoding — the original 512D is reconstructed from the sparse
 > vector, minimising information loss. The third equation's loss is
 > the sum of reconstruction error ($L_2$) and a sparsity constraint
 > ($L_1$). Intuitively it is the balance between two goals: "explain
@@ -91,9 +91,9 @@ $$\mathcal{L}_{SAE} = \|\mathbf{h}_{shared} - \hat{\mathbf{h}}\|_2^2 + \lambda_1
 > dimensionality — but with non-linear transforms allowed, and even
 > in an *overcomplete* representation
 > ($\dim(\mathbf{z}) > \dim(\mathbf{x})$), L1 sparsity can extract
-> meaningful features. This system's SAE uses 576D → 2304D
+> meaningful features. This system's SAE uses 512D → 2048D
 > overcomplete encoding, "disentangling" the Expert information that
-> is mixed up inside 576 dimensions into 2304 interpretable units.
+> is mixed up inside 512 dimensions into 2048 interpretable units.
 
 > **Recent trends.** Applying Sparse Autoencoders to neural network
 > interpretation — *mechanistic interpretability* — was ignited by
@@ -120,7 +120,7 @@ no effect on the Shared Experts' learning.
 _, sae_latent, sae_loss = self.sae(shared_concat.detach())
 ```
 
-> **Using the SAE latent.** `PLEClusterOutput.sae_latent` (a 2304D
+> **Using the SAE latent.** `PLEClusterOutput.sae_latent` (a 2048D
 > sparse vector) is used after inference in the *Expert Neuron
 > Dashboard* to analyse activation patterns. For example, one may
 > interpret "frequently active latent #147 corresponds to a 'card
@@ -321,10 +321,10 @@ deactivated.
 
 | Item | Original paper | This implementation |
 |---|---|---|
-| Expert structure | Shared + Task-specific MLP | 8 domain Shared Experts (GCN, PersLay, DeepFM, ..., RawScale) |
+| Expert structure | Shared + Task-specific MLP | 7 domain Shared Experts (GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT) |
 | Extraction Layer | Stack of PLE Layers | Single layer (CGC → GroupTaskExpertBasket) |
 | Task Expert | Independent MLP per task | GroupEncoder + ClusterEmbedding (20 clusters) |
-| Gate | Shared+Task Expert → gate | Shared Expert block scaling (576D preserved) |
+| Gate | Shared+Task Expert → gate | Shared Expert block scaling (512D preserved) |
 | Knowledge Transfer | Implicit (Expert sharing) | Explicit Logit Transfer + gradient-based adaTT |
 | Cluster specialisation | None | GMM 20-cluster embedding + GroupEncoder |
 | HMM routing | None | Triple-Mode (journey/lifecycle/behavior) |
@@ -335,9 +335,9 @@ deactivated.
 
 | Item | MMoE | This implementation |
 |---|---|---|
-| # Experts | N identical-structure experts | 8 heterogeneous (GCN, PersLay, DeepFM, ..., RawScale) |
+| # Experts | N identical-structure experts | 7 heterogeneous (GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT) |
 | Expert structure | Identical MLP | Domain-specialised architecture each |
-| Gate | Linear(input → N) + Softmax | Linear(576 → 8) + Softmax (CGC) |
+| Gate | Linear(input → N) + Softmax | Linear(512 → 7) + Softmax (CGC) |
 | Expert Collapse | Severe (all tasks pick same expert) | Mitigated (entropy regularisation + domain\_experts bias) |
 | Initial bias | None (random) | Warm start based on domain\_experts |
 | Task specialisation | Separation by gate alone | CGC + HMM routing + GroupTaskExpertBasket |
@@ -346,7 +346,7 @@ deactivated.
 
 Design elements unique to this project:
 
-1. *Heterogeneous Expert combination*: instead of single-structure experts, combine 8 heterogeneous domain experts — GCN, PersLay, DeepFM, RawScale, etc.
+1. *Heterogeneous Expert combination*: instead of single-structure experts, combine 7 heterogeneous domain experts — GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT.
 2. *CGC dimension normalisation*: corrects asymmetric expert output dimensions (128D vs 64D)
 3. *HMM Triple-Mode routing*: selectively injects an HMM mode matched to each task's time scale
 4. *GroupTaskExpertBasket*: GroupEncoder + ClusterEmbedding yields 88% parameter reduction (v3.2)
@@ -438,17 +438,16 @@ Design elements unique to this project:
 | LightGCN | ~20K | Pre-computed embeddings → lightweight |
 | Causal | ~100K | NOTEARS DAG + causal encoder |
 | Optimal Transport | ~100K | Sinkhorn + reference distribution |
-| RawScaleExpert | ~12K | 90D→64D LayerNorm+MLP (v3.3) |
-| CGC (16 tasks) | ~75K | 16 × Linear(576→8) |
+| CGC (16 tasks) | ~57K | 16 × Linear(512→7) |
 | HMM projectors | ~5K | 3 × Linear(16→32) |
 | GroupTaskExpertBasket | ~362K | 4 GroupEncoder × 20 clusters |
 | Task Towers (16) | ~80K | 16 × MLP(32→64→32→out) |
 | adaTT | ~10K | transfer matrix + affinity |
-| SAE | ~2.7M | 576D × 4 expansion (analysis-only) |
+| SAE | ~2.1M | 512D × 4 expansion (analysis-only) |
 | Evidential | ~30K | 16 × Linear(32→out) |
 | Auxiliary projectors | ~40K | coldstart + anonymous + gate |
-| **Total (excl. SAE)** | **~1.7M** | trainable parameters |
-| **Total (incl. SAE)** | **~4.4M** | SAE is detached (analysis-only) |
+| **Total (excl. SAE)** | **~1.65M** | trainable parameters |
+| **Total (incl. SAE)** | **~3.75M** | SAE is detached (analysis-only) |
 
 > **How to check parameter counts.** The `model.summary()` method
 > (lines 1967~2073) prints parameter counts per module. The figures
@@ -519,7 +518,7 @@ model methods:
 | Config section | Description | Reading method |
 |---|---|---|
 | `global` | cluster count, dropout, input\_dim | `__init__` |
-| `shared_experts` | 8 expert settings | `_build_shared_experts` |
+| `shared_experts` | 7 expert settings | `_build_shared_experts` |
 | `cgc` | CGC activation, bias, entropy | `_build_cgc` |
 | `hmm_triple_mode` | 3-mode routing, target tasks | `_build_hmm_projectors` |
 | `task_experts.common` | GroupEncoder settings | `_build_task_experts` |
@@ -551,7 +550,7 @@ fully preserved.
 That is the end of the PLE sub-thread. Starting from the limits of
 Shared-Bottom and MMoE in PLE-1, through the explicit Shared/Task
 Expert separation and the mathematical intuition behind it in PLE-2,
-the input structure (PLEClusterInput · 734D) and eight heterogeneous
+the input structure (PLEClusterInput · 734D) and seven heterogeneous
 Shared Expert pool in PLE-3, the two CGC gate variants (CGCLayer and
 CGCAttention) and HMM Triple-Mode routing in PLE-4, GroupTaskExpertBasket,
 Logit Transfer, and Task Tower in PLE-5, and in this sixth post

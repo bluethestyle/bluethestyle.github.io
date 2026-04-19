@@ -44,7 +44,7 @@ over the legacy `ClusterTaskExpertBasket`.
 ```python
 # ple_cluster_adatt.py:533-543
 self.task_experts = GroupTaskExpertBasket(
-    input_dim=task_expert_input_dim,     # 576 + 32 = 608
+    input_dim=task_expert_input_dim,     # 512 + 32 = 544
     group_hidden_dim=128,
     group_output_dim=64,
     cluster_embed_dim=32,
@@ -59,19 +59,19 @@ The single-task forward through a GroupEncoder is:
 
 $$\mathbf{e}_{cluster} = \text{Embedding}(\text{cluster\_id}) \in \mathbb{R}^{32}$$
 
-$$\mathbf{x}_{input} = [\text{CGC\_output}_{576D} \,\|\, \text{HMM\_proj}_{32D} \,\|\, \mathbf{e}_{cluster,32D}] \in \mathbb{R}^{640}$$
+$$\mathbf{x}_{input} = [\text{CGC\_output}_{512D} \,\|\, \text{HMM\_proj}_{32D} \,\|\, \mathbf{e}_{cluster,32D}] \in \mathbb{R}^{576}$$
 
-$$\mathbf{h}_{expert} = \text{MLP}_{640 \to 128 \to 64 \to 32}(\mathbf{x}_{input})$$
+$$\mathbf{h}_{expert} = \text{MLP}_{576 \to 128 \to 64 \to 32}(\mathbf{x}_{input})$$
 
-The actual input_dim is 608D (shared + HMM) + 32D (cluster_embed) =
-640D. Tasks inside the same group share the GroupEncoder; groups
+The actual input_dim is 544D (shared + HMM) + 32D (cluster_embed) =
+576D. Tasks inside the same group share the GroupEncoder; groups
 themselves remain independent.
 
 > **Intuition.** This is how the model is told "which cluster this
 > customer belongs to." First the cluster ID is mapped to a 32D
-> embedding; this is concatenated with the CGC output (576D) and the
-> HMM projection (32D) for a combined 640D input. A 3-stage MLP
-> (640→128→64→32) then compresses that into a per-task 32D
+> embedding; this is concatenated with the CGC output (512D) and the
+> HMM projection (32D) for a combined 576D input. A 3-stage MLP
+> (576→128→64→32) then compresses that into a per-task 32D
 > representation. Tasks in the same task group (e.g. CTR/CVR in the
 > Engagement group) share a single GroupEncoder, saving parameters,
 > while the cluster embedding still differentiates per-customer
