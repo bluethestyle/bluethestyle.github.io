@@ -62,16 +62,22 @@ html[data-mode="dark"] {
 .kr { font-family: var(--kr); letter-spacing: -0.015em; }
 
 /* ---------- Global reset + body background ---------- */
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; background: #F4F3EE; }
+html[data-mode="dark"], html[data-mode="dark"] body { background: #0E0F0C; }
 body {
-  background: var(--bg);
+  background: var(--bg) !important;
   color: var(--ink);
   font-family: var(--sans);
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
+html { background: var(--bg); }
+
+/* Also tint the Chirpy-era wrapper if any html-rendered stray white slabs show */
+#main-wrapper, .container { background: transparent; }
 
 /* ---------- Shared primitives ---------- */
 .nav-label,
