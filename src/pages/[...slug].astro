@@ -27,6 +27,25 @@ const catName = post.data.categories?.[0];
 const catEntry = CATEGORIES.find((c) => c.name === catName || c.ko === catName);
 const seriesEntry = SERIES.find((s) => s.slug === post.data.series);
 
+// Resolve next post URL by matching series + next part + same lang
+let nextUrl = null;
+if (post.data.next_title && post.data.next_status !== "draft" && post.data.series && post.data.part) {
+  const allPosts = await getCollection("posts");
+  const next = allPosts.find((p) =>
+    p.data.series === post.data.series &&
+    p.data.part === post.data.part + 1 &&
+    p.data.lang === post.data.lang,
+  );
+  if (next) {
+    const nd = next.data.date;
+    const ny = nd.getFullYear();
+    const nm = String(nd.getMonth() + 1).padStart(2, "0");
+    const nday = String(nd.getDate()).padStart(2, "0");
+    const nbase = next.id.replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, "");
+    nextUrl = `/${ny}/${nm}/${nday}/${nbase}/`;
+  }
+}
+
 const T = isKo
   ? {
       lang_btn: "EN",
@@ -84,15 +103,27 @@ const T = isKo
 
     <aside class="post-foot">
       {post.data.next_title && (
-        <div class="next-card">
-          <div class="next-label">
-            <span class="pulse"></span>
-            {T.next_label}
-            {post.data.next_status === "draft" && <span class="draft-tag">{T.next_draft}</span>}
+        nextUrl ? (
+          <a class="next-card clickable" href={nextUrl}>
+            <div class="next-label">
+              <span class="pulse"></span>
+              {T.next_label}
+            </div>
+            <h3 class={isKo ? "kr" : ""}>{post.data.next_title}</h3>
+            {post.data.next_desc && <p class={isKo ? "kr" : ""}>{post.data.next_desc}</p>}
+            <span class="next-arr">→</span>
+          </a>
+        ) : (
+          <div class="next-card">
+            <div class="next-label">
+              <span class="pulse"></span>
+              {T.next_label}
+              {post.data.next_status === "draft" && <span class="draft-tag">{T.next_draft}</span>}
+            </div>
+            <h3 class={isKo ? "kr" : ""}>{post.data.next_title}</h3>
+            {post.data.next_desc && <p class={isKo ? "kr" : ""}>{post.data.next_desc}</p>}
           </div>
-          <h3 class={isKo ? "kr" : ""}>{post.data.next_title}</h3>
-          {post.data.next_desc && <p class={isKo ? "kr" : ""}>{post.data.next_desc}</p>}
-        </div>
+        )
       )}
 
       <div class="foot-meta">
@@ -268,11 +299,33 @@ const T = isKo
     display: flex; flex-direction: column; gap: 24px;
   }
   .next-card {
+    display: block;
     padding: 22px 24px;
     background: var(--surface);
     border: 1px solid var(--hair);
     border-radius: 10px;
     position: relative;
+    color: inherit;
+    text-decoration: none;
+  }
+  .next-card.clickable {
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .next-card.clickable:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(20,20,20,0.06);
+  }
+  .next-card.clickable:hover .next-arr {
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+  .next-card .next-arr {
+    position: absolute;
+    right: 24px; top: 22px;
+    font-family: var(--mono); font-size: 18px;
+    color: var(--muted-2);
+    transition: color .15s, transform .15s;
   }
   .next-card .next-label {
     display: inline-flex; align-items: center; gap: 10px;
