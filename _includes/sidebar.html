@@ -15,7 +15,14 @@
     </div>
   </div>
 
-  {%- assign cat_count  = site.categories | size -%}
+  {%- comment -%}
+    Categories count includes planned-but-empty placeholder
+    categories (Field Notes, Commentary) so the sidebar matches
+    what the /categories/ page actually renders. Keep in sync
+    with the planned_cats list in categories.html.
+  {%- endcomment -%}
+  {%- assign planned_count = 2 -%}
+  {%- assign cat_count  = site.categories | size | plus: planned_count -%}
   {%- assign tag_count  = site.tags | size -%}
   {%- assign post_count = site.posts | size -%}
 
@@ -65,7 +72,7 @@
   {%- comment -%} ── Build stats (prototype format) ─────── {%- endcomment -%}
   <div class="bts-kv">
     <div><span class="k">build</span> idx.{{ site.time | date: "%Y.%m" }}</div>
-    <div><span class="k">stack</span> jekyll · handcraft</div>
+    <div><span class="k">stack</span> jekyll · chirpy</div>
     <div><span class="k">last</span> {{ site.time | date: "%-d %b %Y" | downcase }}</div>
     <div><span class="k">posts</span> {{ post_count }}</div>
     <div><span class="k">lic</span> cc by-nc 4.0</div>

@@ -291,10 +291,10 @@ body {
 }
 .bts-series-mini a.bts-series-row:last-child { border-bottom: 0; }
 .bts-series-mini .cat {
-  font-family: var(--mono); font-size: 9.5px;
-  letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.04em;
   color: var(--accent-ink); background: var(--accent-soft);
-  padding: 2px 7px; border-radius: 3px;
+  padding: 3px 8px; border-radius: 3px;
 }
 .bts-series-mini .prog {
   font-family: var(--mono); font-size: 10px;
