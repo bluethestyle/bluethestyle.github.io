@@ -59,10 +59,47 @@ layout: default
 </section>
 {%- endif -%}
 
-{%- comment -%} ── Posts, grouped by year ── {%- endcomment -%}
+{%- comment -%} ── Series (moved BEFORE Latest posts per prototype) ── {%- endcomment -%}
+{%- if site.data.series -%}
 <section class="bts-block">
   <div class="bts-sec-head">
-    <div class="l"><h2 class="title">Field <em>notes</em></h2><span class="count">{{ site.posts | size }} total</span></div>
+    <div class="l"><h2 class="title"><em>Series</em></h2><span class="count">EN · KO parallel</span></div>
+  </div>
+  <div class="bts-series-grid">
+    {% for s in site.data.series %}
+      <article class="bts-series">
+        <div class="top">
+          <span class="cat">[{{ s.tag }}]</span>
+          <span class="prog">ep {{ s.ep }} of {{ s.total }}</span>
+        </div>
+        <h4><a class="title-link" href="{{ s.en | relative_url }}">{{ s.title }}</a></h4>
+        <p>{{ s.desc }}</p>
+        <div class="bar"><span style="width: {{ s.ep | times: 100 | divided_by: s.total }}%"></span></div>
+        <div class="lang">
+          <span class="lead">read</span>
+          <span class="sep">·</span>
+          <a href="{{ s.en | relative_url }}">english ↗</a>
+          <span class="sep">·</span>
+          <a href="{{ s.ko | relative_url }}">한국어로 읽기 ↗</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{%- endif -%}
+
+{%- comment -%} ── Latest posts (renamed from Field notes per prototype) ── {%- endcomment -%}
+<section class="bts-block" id="latest-posts">
+  <div class="bts-sec-head">
+    <div class="l">
+      <h2 class="title">Latest <em>posts</em></h2>
+      <span class="count">{{ site.posts | size }} · 전체 {{ site.posts | size }}</span>
+    </div>
+    <div class="bts-post-filter">
+      <button type="button" class="chip on" data-filter="all">ALL</button>
+      <button type="button" class="chip"    data-filter="en">EN</button>
+      <button type="button" class="chip"    data-filter="ko">한국어</button>
+    </div>
   </div>
   {%- assign cur_year = "" -%}
   <div class="bts-post-index">
@@ -70,11 +107,12 @@ layout: default
       {%- assign y = p.date | date: "%Y" -%}
       {%- if y != cur_year -%}
         {%- unless forloop.first -%}</div>{%- endunless -%}
-        <div class="bts-year">— {{ y }}</div>
+        <div class="bts-year">{{ y }}</div>
         <div>
         {%- assign cur_year = y -%}
       {%- endif -%}
-      <a class="bts-post-row" href="{{ p.url | relative_url }}">
+      <a class="bts-post-row" href="{{ p.url | relative_url }}"
+         data-lang="{{ p.lang | default: 'en' }}">
         <div>
           <div class="meta-line">
             <span>{{ p.date | date: "%b %d" }}</span>
@@ -97,32 +135,23 @@ layout: default
   </div>
 </section>
 
-{%- comment -%} ── Series ── {%- endcomment -%}
-{%- if site.data.series -%}
-<section class="bts-block">
-  <div class="bts-sec-head">
-    <div class="l"><h2 class="title">Long-form <em>series</em></h2><span class="count">{{ site.data.series | size }}</span></div>
-  </div>
-  <div class="bts-series-grid">
-    {% for s in site.data.series %}
-      <a class="bts-series" href="{{ s.en | relative_url }}">
-        <div class="top">
-          <span class="cat">{{ s.tag }}</span>
-          <span class="prog">ep {{ s.ep }} / {{ s.total }}</span>
-        </div>
-        <h4>{{ s.title }}</h4>
-        <p>{{ s.desc }}</p>
-        <div class="bar"><span style="width: {{ s.ep | times: 100 | divided_by: s.total }}%"></span></div>
-        <div class="lang">
-          <a href="{{ s.en | relative_url }}">english</a>
-          <span class="sep">·</span>
-          <a href="{{ s.ko | relative_url }}">한국어</a>
-        </div>
-      </a>
-    {% endfor %}
-  </div>
-</section>
-{%- endif -%}
+<script>
+  (function () {
+    var chips = document.querySelectorAll('#latest-posts .bts-post-filter .chip');
+    var rows  = document.querySelectorAll('#latest-posts .bts-post-row');
+    chips.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        chips.forEach(function (b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        var f = btn.getAttribute('data-filter');
+        rows.forEach(function (r) {
+          var l = r.getAttribute('data-lang');
+          r.style.display = (f === 'all' || f === l) ? '' : 'none';
+        });
+      });
+    });
+  })();
+</script>
 
 <div class="bts-contact-bar">
   <span class="k">contact</span>

@@ -836,13 +836,25 @@ html[data-mode="dark"] .bts-mode-btn .i-moon { display: block; }
 .bts-series .bar { height: 3px; background: var(--hair); border-radius: 2px; overflow: hidden; }
 .bts-series .bar span { display: block; height: 100%; background: var(--accent); }
 .bts-series .lang {
-  display: flex; gap: 8px;
-  font-family: var(--mono); font-size: 10.5px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-family: var(--mono); font-size: 11px;
   color: var(--muted); letter-spacing: 0.02em;
 }
-.bts-series .lang a { color: var(--muted); text-decoration: none; }
+.bts-series .lang .lead { color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; }
+.bts-series .lang a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
 .bts-series .lang a:hover { color: var(--accent); }
 .bts-series .lang .sep { color: var(--muted-2); }
+
+/* Latest posts filter chips */
+.bts-post-filter { display: flex; gap: 0.4rem; }
+.bts-post-filter .chip {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+  padding: 6px 12px; border-radius: 3px; border: 1px solid var(--hair);
+  background: transparent; color: var(--muted); cursor: pointer;
+  text-transform: uppercase;
+}
+.bts-post-filter .chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.bts-post-filter .chip:hover:not(.on) { color: var(--ink); border-color: var(--ink); }
 
 /* ============ ARTICLE (post + page) ============ */
 .bts-article { max-width: 720px; margin: 0 auto; }
