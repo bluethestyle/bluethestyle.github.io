@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "[MRM Thread] Ep 1 — Why MRM Belongs in the Architecture"
 date: 2026-04-18 12:00:00 +0900
 categories: [MRM Thread]
@@ -7,7 +6,6 @@ tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: en
 series: mrm-thread
 part: 1
-toc: true
 ---
 
 *Part 1 of "The MRM Thread" — a short parallel series on regulatory

@@ -1,0 +1,120 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../layouts/Base.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post) => {
+    const d = post.data.date;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const base = post.id.replace(/^\d{4}-\d{2}-\d{2}-/, "");
+    return {
+      params: { slug: `${y}/${m}/${day}/${base}` },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const d = post.data.date;
+const dateLabel = d.toISOString().slice(0, 10);
+const isKo = post.data.lang === "ko";
+---
+<Base title={post.data.title} tab="">
+  <article class="post">
+    <div class="post-head">
+      <div class="meta-line">
+        <span>{dateLabel}</span>
+        <span class="d"></span>
+        <span class="cat">{post.data.categories[0]}</span>
+        <span class="d"></span>
+        <span class="lang">{post.data.lang.toUpperCase()}</span>
+      </div>
+      <h1 class={isKo ? "kr" : ""}>{post.data.title}</h1>
+      {post.data.tags && (
+        <div class="tags-row">
+          {post.data.tags.map((t) => <span class="tg">#{t}</span>)}
+        </div>
+      )}
+    </div>
+    <div class={"post-body" + (isKo ? " kr" : "")}>
+      <Content />
+    </div>
+    <div class="post-foot">
+      <a href="/archives/">← archives</a>
+    </div>
+  </article>
+</Base>
+
+<style is:global>
+  .post { max-width: 720px; }
+  .post-head { padding-bottom: 28px; margin-bottom: 32px; border-bottom: 1px solid var(--hair); }
+  .post-head .meta-line {
+    font-family: var(--mono); font-size: 10.5px;
+    color: var(--muted); letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 18px;
+  }
+  .post-head .meta-line .d {
+    width: 3px; height: 3px; background: var(--muted-2); border-radius: 50%;
+  }
+  .post-head h1 {
+    font-family: var(--display);
+    font-weight: 400; font-size: 44px; line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+    color: var(--ink);
+  }
+  .post-head h1.kr { font-family: var(--kr); font-weight: 600; letter-spacing: -0.025em; }
+  .post-head .tags-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .post-head .tg {
+    font-family: var(--mono); font-size: 10.5px;
+    color: var(--muted); padding: 2px 8px;
+    border: 1px solid var(--hair); border-radius: 3px;
+  }
+  .post-body { font-size: 16px; line-height: 1.7; color: var(--ink-2); }
+  .post-body.kr { font-family: var(--kr); font-size: 15.5px; letter-spacing: -0.01em; }
+  .post-body h2 {
+    font-family: var(--display); font-weight: 400;
+    font-size: 28px; letter-spacing: -0.015em;
+    margin: 48px 0 16px; color: var(--ink);
+  }
+  .post-body h3 {
+    font-family: var(--display); font-weight: 400;
+    font-size: 22px; letter-spacing: -0.01em;
+    margin: 32px 0 12px; color: var(--ink);
+  }
+  .post-body p { margin: 0 0 18px; }
+  .post-body a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+  .post-body code {
+    font-family: var(--mono); font-size: 13px;
+    background: var(--bg-2); padding: 1px 5px; border-radius: 3px;
+  }
+  .post-body pre {
+    font-family: var(--mono); font-size: 13px;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 8px;
+    padding: 16px 20px; overflow-x: auto;
+    line-height: 1.5;
+  }
+  .post-body pre code { background: transparent; padding: 0; }
+  .post-body blockquote {
+    margin: 24px 0; padding: 4px 20px;
+    border-left: 3px solid var(--accent);
+    color: var(--muted);
+    font-style: italic;
+  }
+  .post-body ul, .post-body ol { margin: 0 0 18px; padding-left: 24px; }
+  .post-body li { margin-bottom: 6px; }
+  .post-body hr { border: 0; border-top: 1px solid var(--hair); margin: 36px 0; }
+  .post-foot {
+    margin-top: 48px; padding-top: 24px;
+    border-top: 1px solid var(--hair);
+    font-family: var(--mono); font-size: 11px;
+    color: var(--muted);
+  }
+  .post-foot a:hover { color: var(--ink); }
+</style>

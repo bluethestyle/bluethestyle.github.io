@@ -96,32 +96,36 @@ function ArchivesView() {
               </span>
             </div>
             <div>
-              {byMonth[ym].map((p,i) => (
-                <div key={i} className={"post-row" + (p.draft ? " draft" : "")}>
-                  <div>
-                    <div className="meta-line">
-                      <span>{p.date.slice(8)}</span>
-                      <span className="d"></span>
-                      <span className="cat">{p.cat}</span>
-                      <span className="d"></span>
-                      <span className="lang">{p.lang}</span>
-                      {p.draft && <>
+              {byMonth[ym].map((p,i) => {
+                const Tag = p.draft ? "div" : "a";
+                const href = p.draft ? undefined : p.url;
+                return (
+                  <Tag key={i} className={"post-row" + (p.draft ? " draft" : "")} href={href}>
+                    <div>
+                      <div className="meta-line">
+                        <span>{p.date.slice(8)}</span>
                         <span className="d"></span>
-                        <span style={{color:"var(--muted-2)", letterSpacing:".08em"}}>DRAFT</span>
-                      </>}
+                        <span className="cat">{p.cat}</span>
+                        <span className="d"></span>
+                        <span className="lang">{p.lang}</span>
+                        {p.draft && <>
+                          <span className="d"></span>
+                          <span style={{color:"var(--muted-2)", letterSpacing:".08em"}}>DRAFT</span>
+                        </>}
+                      </div>
+                      <h3 className={"title" + (p.lang==="KO"?" kr":"")}>{p.title}</h3>
+                      <p className={"ex" + (p.lang==="KO"?" kr":"")}>{p.ex}</p>
+                      <div className="tags-row">
+                        {p.tags.map(t => <span key={t} className="tg">{t}</span>)}
+                      </div>
                     </div>
-                    <h3 className={"title" + (p.lang==="KO"?" kr":"")}>{p.title}</h3>
-                    <p className={"ex" + (p.lang==="KO"?" kr":"")}>{p.ex}</p>
-                    <div className="tags-row">
-                      {p.tags.map(t => <span key={t} className="tg">{t}</span>)}
+                    <div className="right">
+                      <span>{p.draft ? "—" : "read"}</span>
+                      <span className="arr">{p.draft ? "" : "↗"}</span>
                     </div>
-                  </div>
-                  <div className="right">
-                    <span>{p.draft ? "—" : "read"}</span>
-                    <span className="arr">{p.draft ? "" : "↗"}</span>
-                  </div>
-                </div>
-              ))}
+                  </Tag>
+                );
+              })}
             </div>
           </div>
         ))}

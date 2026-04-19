@@ -49,10 +49,10 @@ export const SERIES = [
 ];
 
 export const POSTS = [
-  { date: "2026-04-18", title: "[MRM 스레드] 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다",        cat: "MRM 스레드",   lang: "KO", ex: "시리즈 'MRM 스레드' 1편. AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.", tags: ["mrm","architecture","sr-11-7","regulation"] },
-  { date: "2026-04-18", title: "[MRM Thread] Ep 1 — Why MRM Belongs in the Architecture",                 cat: "MRM Thread",   lang: "EN", ex: "Part 1 of 'The MRM Thread' — a short parallel series on regulatory compliance and model risk management for AI recommendation systems, written from a GARP FRM practitioner perspective.", tags: ["mrm","architecture","sr-11-7","regulation"] },
-  { date: "2026-04-18", title: "[3개월 개발기] 에피소드 1 — 전제 조건",                                  cat: "3개월 개발기", lang: "KO", ex: "시리즈 '3개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.", tags: ["finai-build","claude-code","ple","financial-ai"] },
-  { date: "2026-04-18", title: "[FinAI Build] Ep 1 — The Premise",                                       cat: "FinAI Build",  lang: "EN", ex: "Part 1 of 'Building a Financial AI in Three Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.", tags: ["finai-build","claude-code","ple","financial-ai"] },
+  { date: "2026-04-18", title: "[MRM 스레드] 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다",        cat: "MRM 스레드",   lang: "KO", url: "/2026/04/18/mrm-ep1-architecture-ko/", ex: "시리즈 'MRM 스레드' 1편. AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.", tags: ["mrm","architecture","sr-11-7","regulation"] },
+  { date: "2026-04-18", title: "[MRM Thread] Ep 1 — Why MRM Belongs in the Architecture",                 cat: "MRM Thread",   lang: "EN", url: "/2026/04/18/mrm-ep1-architecture-en/", ex: "Part 1 of 'The MRM Thread' — a short parallel series on regulatory compliance and model risk management for AI recommendation systems, written from a GARP FRM practitioner perspective.", tags: ["mrm","architecture","sr-11-7","regulation"] },
+  { date: "2026-04-18", title: "[3개월 개발기] 에피소드 1 — 전제 조건",                                  cat: "3개월 개발기", lang: "KO", url: "/2026/04/18/ep1-premise-ko/", ex: "시리즈 '3개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.", tags: ["finai-build","claude-code","ple","financial-ai"] },
+  { date: "2026-04-18", title: "[FinAI Build] Ep 1 — The Premise",                                       cat: "FinAI Build",  lang: "EN", url: "/2026/04/18/ep1-premise-en/", ex: "Part 1 of 'Building a Financial AI in Three Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.", tags: ["finai-build","claude-code","ple","financial-ai"] },
   // planned but unpublished — shown greyed in Archives
   { date: "2026-04-25", title: "[FinAI Build] Ep 2 — Hardware & Budget", cat: "FinAI Build",  lang: "EN", ex: "One consumer GPU, three laptops, three months.", tags: ["finai-build","claude-code"], draft: true },
   { date: "2026-04-25", title: "[MRM Thread] Ep 2 — Three Lines of Defense, Rewritten", cat: "MRM Thread", lang: "EN", ex: "Where 3LoD breaks once an agent is in the loop.", tags: ["mrm","sr-11-7"], draft: true },
@@ -78,8 +78,8 @@ export const CATEGORIES = [
 ];
 
 export const RECENT = [
-  { title: "[FinAI Build] Ep 1 — The Premise", date: "2026-04-18" },
-  { title: "[3개월 개발기] 에피소드 1 — 전제 조건", date: "2026-04-18" },
-  { title: "[MRM Thread] Ep 1 — Why MRM Belongs in the Architecture", date: "2026-04-18" },
-  { title: "[MRM 스레드] 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다", date: "2026-04-18" },
+  { title: "[FinAI Build] Ep 1 — The Premise",                                       date: "2026-04-18", url: "/2026/04/18/ep1-premise-en/" },
+  { title: "[3개월 개발기] 에피소드 1 — 전제 조건",                                 date: "2026-04-18", url: "/2026/04/18/ep1-premise-ko/" },
+  { title: "[MRM Thread] Ep 1 — Why MRM Belongs in the Architecture",                date: "2026-04-18", url: "/2026/04/18/mrm-ep1-architecture-en/" },
+  { title: "[MRM 스레드] 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다",      date: "2026-04-18", url: "/2026/04/18/mrm-ep1-architecture-ko/" },
 ];

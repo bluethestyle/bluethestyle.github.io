@@ -192,7 +192,7 @@ function HomeView({ lang }) {
           <div className="year">2026</div>
           <div>
             {latest.map((p,i) => (
-              <div key={i} className="post-row">
+              <a key={i} className="post-row" href={p.url || "#"}>
                 <div>
                   <div className="meta-line">
                     <span>{p.date.slice(5).replace("-"," · ")}</span>
@@ -211,7 +211,7 @@ function HomeView({ lang }) {
                   <span>read</span>
                   <span className="arr">↗</span>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>

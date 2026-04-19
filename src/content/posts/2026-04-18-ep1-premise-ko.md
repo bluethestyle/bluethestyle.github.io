@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "[3개월 개발기] 에피소드 1 — 전제 조건"
 date: 2026-04-18 12:00:00 +0900
 categories: [FinAI Build]
@@ -7,7 +6,6 @@ tags: [finai-build, architecture, claude-code, financial-ai, ple]
 lang: ko
 series: three-months
 part: 1
-toc: true
 ---
 
 *시리즈 "3개월간의 금융 AI 개발기" 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.*

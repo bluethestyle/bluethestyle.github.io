@@ -103,7 +103,7 @@ const lastLabel = lastDate
             {RECENT.map((r) => {
               const isKo = /[\uac00-\ud7af]/.test(r.title);
               return (
-                <a href="#">
+                <a href={r.url || "#"}>
                   <div class="r-top">
                     <span>today</span>
                     <span>{r.date}</span>
