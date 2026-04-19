@@ -18,6 +18,60 @@ source_label: "Development Story (EN, PDF)"
 building a financial recommendation system with Claude Code, on
 consumer hardware, as three people on personal time.*
 
+## What we were replacing
+
+The existing system was a **collaborative filtering recommender**
+built on **ALS** (Alternating Least Squares). It had been in
+production for years. It worked, in the sense that it produced
+recommendations. But it had two problems we could not ignore:
+
+**It could not explain itself.** ALS gives you latent factors —
+numerical dimensions that capture user-item similarity, but those
+dimensions have no business meaning. A branch employee cannot tell
+a customer "we recommended this because *latent factor 7 is
+high*." And a regulator asking "why did your model recommend this
+product to this customer?" gets no useful answer from a latent
+factor.
+
+**It could not keep up with task diversity.** ALS is a
+user-item interaction matrix factorization — an algorithm scoped
+to collaborative-filtering recommendation, not a general-purpose
+predictor. As the business added more use cases — churn
+prediction, customer value tiering, next best product — each
+task got its own separate model bolted on (logistic regression,
+XGBoost, rule-based segmentation). You ended up with a
+patchwork of models per task, each tuned separately, each drifting
+separately, with no shared customer representation anywhere.
+
+The goal was to replace it with something that could (a) produce
+business-interpretable explanations by construction, and (b)
+handle many tasks in one model with shared representation.
+
+## What the production system actually looked like
+
+Before the design story, a few numbers to frame the scale of
+what we were replacing.
+
+The on-premises production system was not a toy. It had:
+
+- 80+ Airflow DAGs
+- Champion-Challenger model competition
+- Weekly automated retraining
+- A 734-dimensional feature tensor
+- 18 simultaneous tasks
+- 62 data table ingestion jobs
+
+The public AWS benchmark version is somewhat smaller (13 tasks
+after removing 5 deterministic-leakage / redundant ones; 349
+features instead of 734) but the architecture and the engineering
+patterns are the same.
+
+Building and replacing a system at that scale, with three people
+and a desktop GPU, is the sort of thing you would dismiss on paper.
+In practice, it is what AI-augmented development actually enabled.
+Which brings us to what "three people and a desktop GPU" actually
+meant.
+
 ## Who we were
 
 Three people. One data scientist serving as PM / lead architect,
@@ -52,59 +106,6 @@ and storage. And occasional team meals.
 
 Looking back, this sounds grim. At the time it just felt like the
 starting condition. Something to work within, not cry about.
-
-## What we were replacing
-
-The existing system was a **collaborative filtering recommender**
-built on **ALS** (Alternating Least Squares). It had been in
-production for years. It worked, in the sense that it produced
-recommendations. But it had two problems we could not ignore:
-
-**It could not explain itself.** ALS gives you latent factors —
-numerical dimensions that capture user-item similarity, but those
-dimensions have no business meaning. A branch employee cannot tell
-a customer "we recommended this because *latent factor 7 is
-high*." And a regulator asking "why did your model recommend this
-product to this customer?" gets no useful answer from a latent
-factor.
-
-**It could not keep up with task diversity.** ALS is a
-user-item interaction matrix factorization — an algorithm scoped
-to collaborative-filtering recommendation, not a general-purpose
-predictor. As the business added more use cases — churn
-prediction, customer value tiering, next best product — each
-task got its own separate model bolted on (logistic regression,
-XGBoost, rule-based segmentation). You ended up with a
-patchwork of models per task, each tuned separately, each drifting
-separately, with no shared customer representation anywhere.
-
-The goal was to replace it with something that could (a) produce
-business-interpretable explanations by construction, and (b)
-handle many tasks in one model with shared representation.
-
-## What the production system actually looked like
-
-Before I describe the architecture, one more number worth
-mentioning.
-
-The on-premises production system — the one this project was
-replacing — was not a toy. It had:
-
-- 80+ Airflow DAGs
-- Champion-Challenger model competition
-- Weekly automated retraining
-- A 734-dimensional feature tensor
-- 18 simultaneous tasks
-- 62 data table ingestion jobs
-
-Building and replacing a system at that scale, with three people
-and a desktop GPU, is the sort of thing you would dismiss on paper.
-In practice, it is what AI-augmented development actually enabled.
-
-The public AWS benchmark version is somewhat smaller (13 tasks
-after removing 5 deterministic-leakage / redundant ones; 349
-features instead of 734) but the architecture and the engineering
-patterns are the same.
 
 ## The architecture decision journey
 
@@ -162,7 +163,7 @@ temporal dynamics, topological shape, causal inference, and so
 on). A shared bottom that lets them cross-fertilize. Gates that
 are *the* explanation, not an artifact of post-hoc analysis.
 
-## Why the constraints mattered
+## Why the constraints were a gift
 
 Had we had a proper GPU cluster, we would not have built this
 architecture. We would have stacked seven Transformer-based heavy
