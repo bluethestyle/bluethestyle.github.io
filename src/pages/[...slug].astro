@@ -222,11 +222,15 @@ const T = isKo
   }
   .post-body pre code { background: transparent; padding: 0; }
   .post-body blockquote {
-    margin: 24px 0; padding: 4px 20px;
+    margin: 24px 0;
+    padding: 14px 20px;
     border-left: 3px solid var(--accent);
-    color: var(--muted);
-    font-style: italic;
+    background: var(--surface);
+    color: var(--ink-2);
   }
+  .post-body blockquote p { margin: 0 0 10px; }
+  .post-body blockquote p:last-child { margin-bottom: 0; }
+  .post-body blockquote strong { color: var(--ink); }
   .post-body ul, .post-body ol { margin: 0 0 18px; padding-left: 24px; }
   .post-body li { margin-bottom: 6px; }
   .post-body hr { border: 0; border-top: 1px solid var(--hair); margin: 36px 0; }
