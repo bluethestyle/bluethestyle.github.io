@@ -105,8 +105,8 @@ title: Categories
       {%- if pl == "en" and latest_en == "" -%}{%- assign latest_en = pd -%}{%- endif -%}
     {%- endfor -%}
 
-    <article class="bts-cat-card" data-state="active"
-             style="--cv: var(--{{ ccolor }}); --cs: var(--{{ ccolor }}s);">
+    <a class="bts-cat-card" data-state="active" href="#{{ name | slugify }}"
+       style="--cv: var(--{{ ccolor }}); --cs: var(--{{ ccolor }}s);">
       <div class="top">
         <div class="mark">
           <span class="sq"></span>
@@ -121,7 +121,7 @@ title: Categories
         {%- if latest_ko != "" -%}<span class="pill ko">KO·{{ latest_ko }}</span>{%- endif -%}
         {%- if latest_en != "" -%}<span class="pill en">EN·{{ latest_en }}</span>{%- endif -%}
       </div>
-    </article>
+    </a>
   {%- endfor -%}
 
   {%- comment -%} Planned (empty) categories {%- endcomment -%}
@@ -141,8 +141,8 @@ title: Categories
         {%- assign ccolor = "c4" -%}
     {%- endcase -%}
 
-    <article class="bts-cat-card empty" data-state="planned"
-             style="--cv: var(--{{ ccolor }}); --cs: var(--{{ ccolor }}s);">
+    <div class="bts-cat-card empty" data-state="planned"
+         style="--cv: var(--{{ ccolor }}); --cs: var(--{{ ccolor }}s);">
       <div class="top">
         <div class="mark">
           <span class="sq"></span>
@@ -153,7 +153,7 @@ title: Categories
       <h3 class="title">{{ p_name }}</h3>
       {%- if kr_sub != "" -%}<div class="kr-sub">{{ kr_sub }}</div>{%- endif -%}
       <p class="desc">{{ cdesc }} <em>(empty)</em></p>
-    </article>
+    </div>
   {%- endfor -%}
 
 </div>
@@ -188,6 +188,57 @@ title: Categories
       {%- endfor -%}
     </div>
   </div>
+</section>
+
+
+<!-- ================================================================
+     6. Per-category post lists — anchored by category slug
+        (clicking a card above scrolls to the matching list)
+     ================================================================ -->
+<section class="bts-cat-listings" style="margin-top: 56px;">
+  {%- for c in site.categories -%}
+    {%- assign name = c[0] -%}
+    {%- assign posts = c[1] -%}
+    {%- assign slug = name | slugify -%}
+    {%- assign kr_sub = "" -%}
+    {%- case name -%}
+      {%- when "FinAI Build" -%}{% assign kr_sub = "3개월 개발기" %}
+      {%- when "MRM Thread" -%}{% assign kr_sub = "MRM 스레드" %}
+    {%- endcase -%}
+
+    <div id="{{ slug }}" class="bts-cat-list-block" style="margin-top: 48px; scroll-margin-top: 80px;">
+      <div class="bts-sec-head">
+        <div class="l">
+          <h2 class="title"><em>{{ name }}</em></h2>
+          <span class="count">{{ posts | size }} post{% if posts.size != 1 %}s{% endif %}{% if kr_sub != "" %} · {{ kr_sub }}{% endif %}</span>
+        </div>
+      </div>
+      <div class="bts-cat-postlist">
+        {%- for p in posts -%}
+          <a class="bts-cat-post-row" href="{{ p.url | relative_url }}">
+            <div class="meta">
+              <span class="date">{{ p.date | date: "%Y-%m-%d" }}</span>
+              <span class="sep">·</span>
+              <span class="lang">{{ p.lang | default: "en" | upcase }}</span>
+              {%- if p.tags.size > 0 -%}
+                <span class="sep">·</span>
+                {%- for t in p.tags limit: 3 -%}
+                  <span class="tg">#{{ t }}</span>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+            <h3 class="ti {% if p.lang == 'ko' %}kr{% endif %}">{{ p.title }}</h3>
+            {%- if p.excerpt -%}
+              <p class="ex {% if p.lang == 'ko' %}kr{% endif %}">
+                {{ p.excerpt | strip_html | truncate: 160 }}
+              </p>
+            {%- endif -%}
+            <span class="arr">→</span>
+          </a>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endfor -%}
 </section>
 
 
@@ -239,9 +290,16 @@ title: Categories
     background: var(--surface); padding: 1.2rem 1.3rem;
     display: flex; flex-direction: column; gap: 0.7rem;
     transition: border-color 0.12s, transform 0.2s;
+    text-decoration: none;
+    color: inherit;
   }
-  .bts-cat-card:hover { border-color: var(--cv); }
-  .bts-cat-card.empty { background: var(--bg-2); opacity: 0.75; }
+  .bts-cat-card:hover {
+    border-color: var(--cv);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(20,20,20,0.06);
+  }
+  .bts-cat-card.empty { background: var(--bg-2); opacity: 0.75; cursor: default; }
+  .bts-cat-card.empty:hover { transform: none; box-shadow: none; }
 
   .bts-cat-card .top {
     display: flex; justify-content: space-between; align-items: center;
