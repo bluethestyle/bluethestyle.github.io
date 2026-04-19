@@ -9,7 +9,7 @@ part: 1
 alt_lang: /2026/04/19/ple-1-mtl-evolution-ko/
 next_title: "PLE-2 — Progressive Layered Extraction: Explicit Expert Separation and CGC Gates"
 next_desc: "PLE's fix: explicit separation of shared vs task-specific experts (Tang et al., 2020). Two CGC gate variants — weighted-sum (CGCLayer) and block-scaling (CGCAttention) — with the full math. Entropy regularization and dimension normalization to keep heterogeneous experts healthy."
-next_status: draft
+next_status: published
 ---
 
 *PLE-1 of the "Study Thread" series — a parallel English/Korean

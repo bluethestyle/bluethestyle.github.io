@@ -9,7 +9,7 @@ part: 1
 alt_lang: /2026/04/19/ple-1-mtl-evolution-en/
 next_title: "PLE-2 — Progressive Layered Extraction: 명시적 전문가 분리와 CGC 게이트"
 next_desc: "Shared/Task Expert를 명시적으로 분리한 PLE(Tang et al., 2020) 아키텍처. CGC 게이트의 두 변형 — 가중합 방식의 CGCLayer와 블록 스케일링 방식의 CGCAttention — 의 수식, 그리고 Expert Collapse를 막는 entropy 정규화 및 이종 차원 보정까지."
-next_status: draft
+next_status: published
 ---
 
 *"Study Thread" 시리즈의 PLE 서브스레드 1편. 영문/국문 병렬로 PLE-1 → PLE-6
