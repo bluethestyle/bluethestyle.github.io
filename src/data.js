@@ -7,7 +7,7 @@ export const SITE = {
   contact: "jsk320098 [at] gmail [dot] com",
   orcid: "0009-0005-3291-9112",
   github: "bluethestyle",
-  counts: { posts: 36, cats: 4, tags: 26, years: 1 }
+  counts: { posts: 44, cats: 4, tags: 39, years: 1 }
 };
 
 export const CURRENT_WORK = {
@@ -51,13 +51,25 @@ export const SERIES = [
     title: "Study Thread — Papers & Math Foundations",
     tag: "Study Thread",
     desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized in parallel English/Korean.",
-    ep: 6, total: 6,
+    ep: 10, total: 10,
     ko: "/series/study-thread-ko/",
     en: "/series/study-thread/",
   },
 ];
 
 export const POSTS = [
+  // ADATT-4
+  { date: "2026-04-20", title: "[Study Thread] ADATT-4 — 학습 루프·Loss Weighting·Optimizer·CGC 동기화", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/", ex: "adaTT 서브스레드 최종편. 2-Phase Training Loop, Loss Weighting(Uncertainty·GradNorm·DWA), Optimizer·Scheduler, CGC-adaTT 동기화, 메모리·성능 최적화, 디버깅 가이드, 설정 총람, 부록 + 전체 adaTT 기술 참조서 PDF 다운로드.", tags: ["study-thread","adatt","training-loop","loss-weighting","optimizer","specs"] },
+  { date: "2026-04-20", title: "[Study Thread] ADATT-4 — Training Loop, Loss Weighting, Optimizer, and CGC Synchronization", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/", ex: "Final post of the adaTT sub-thread. 2-Phase Training Loop, Loss Weighting (Uncertainty / GradNorm / DWA), Optimizer and Scheduler, CGC-adaTT sync, memory and performance, debugging guide, full settings reference, appendix — plus downloadable PDF of the full adaTT tech reference.", tags: ["study-thread","adatt","training-loop","loss-weighting","optimizer","specs"] },
+  // ADATT-3
+  { date: "2026-04-20", title: "[Study Thread] ADATT-3 — Transfer Loss · Group Prior · 3-Phase Schedule", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-ko/", ex: "adaTT Transfer Loss 의 전체 공식과 전이 가중치, G-01 FIX Clamp, Target 마스킹, 태스크 그룹 기반 Prior 행렬 + Prior Blend Annealing, 3-Phase Schedule(Warmup → Dynamic → Frozen), 그리고 Negative Transfer 감지·차단 메커니즘.", tags: ["study-thread","adatt","transfer-loss","group-prior","schedule","negative-transfer"] },
+  { date: "2026-04-20", title: "[Study Thread] ADATT-3 — Transfer Loss, Group Prior, and the 3-Phase Schedule", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-en/", ex: "adaTT's Transfer Loss formula and transfer weights, the G-01 FIX clamp, target-task masking, the task-group-based Prior matrix with Prior Blend Annealing, the 3-Phase Schedule (Warmup → Dynamic → Frozen), and Negative Transfer detection/blocking.", tags: ["study-thread","adatt","transfer-loss","group-prior","schedule","negative-transfer"] },
+  // ADATT-2
+  { date: "2026-04-20", title: "[Study Thread] ADATT-2 — TaskAffinityComputer와 Gradient Cosine Similarity", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-2-task-affinity-gradient-cosine-ko/", ex: "태스크 간 친화도를 실제로 측정하는 TaskAffinityComputer 엔진, gradient cosine similarity 의 수학적 정의와 EMA 평활화, 유클리드 거리 대비 코사인을 쓰는 이유, 그리고 torch.compiler.disable 로 처리한 gradient 추출 경로까지.", tags: ["study-thread","adatt","gradient","cosine-similarity","ema"] },
+  { date: "2026-04-20", title: "[Study Thread] ADATT-2 — TaskAffinityComputer and Gradient Cosine Similarity", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-2-task-affinity-gradient-cosine-en/", ex: "The TaskAffinityComputer engine that measures task-to-task affinity, gradient cosine similarity definition with EMA smoothing, why cosine over Euclidean distance, and the torch.compiler.disable-handled gradient extraction path.", tags: ["study-thread","adatt","gradient","cosine-similarity","ema"] },
+  // ADATT-1
+  { date: "2026-04-20", title: "[Study Thread] ADATT-1 — adaTT 동기: 적응형 타워와 Transformer Attention 유비", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-1-adaptive-tower-motivation-ko/", ex: "adaTT 서브스레드 1편. '왜 적응형 타워인가' 의 근본 동기, Transformer Attention 과의 유비, 조건부 계산·Hypernetwork 계보에서의 위치, 핵심 수식 직관, 그리고 '측정하고·선택하고·조절한다' 내러티브.", tags: ["study-thread","adatt","attention","hypernetwork","mtl"] },
+  { date: "2026-04-20", title: "[Study Thread] ADATT-1 — Why adaTT: Adaptive Towers and the Transformer Attention Analogy", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-1-adaptive-tower-motivation-en/", ex: "Opening the adaTT sub-thread. The root motivation for adaptive towers, the Transformer Attention analogy, where adaTT sits in the conditional-computation / hypernetwork lineage, intuitions for the core equations, and the 'measure, select, modulate' narrative.", tags: ["study-thread","adatt","attention","hypernetwork","mtl"] },
   // PLE-6
   { date: "2026-04-19", title: "[Study Thread] PLE-6 — 해석성·불확실성·전체 사양", cat: "Study Thread", lang: "KO", url: "/2026/04/19/ple-6-interpretability-uncertainty-specs-ko/", ex: "PLE 서브스레드 최종편. SAE 기반 Expert 해석성, Evidential Deep Learning 불확실성 정량화, 18 태스크 전체 사양, 논문 vs 구현 비교, 디버깅 가이드, 부록 — 그리고 전체 PLE 기술 참조서 PDF 다운로드 포함.", tags: ["study-thread","ple","sae","uncertainty","evidential","specs"] },
   { date: "2026-04-19", title: "[Study Thread] PLE-6 — Interpretability, Uncertainty, and Full Specs", cat: "Study Thread", lang: "EN", url: "/2026/04/19/ple-6-interpretability-uncertainty-specs-en/", ex: "Final post of the PLE sub-thread. SAE-based Expert interpretability, Evidential Deep Learning uncertainty quantification, 18-task spec, paper-vs-implementation innovations, debugging guide, appendix — plus a downloadable PDF of the full PLE tech reference.", tags: ["study-thread","ple","sae","uncertainty","evidential","specs"] },
@@ -87,44 +99,57 @@ export const POSTS = [
 ];
 
 export const TAGS = [
-  { slug: "architecture",    name: "architecture",    count: 5, hot: true },
-  { slug: "audit",           name: "audit",           count: 3 },
-  { slug: "cgc",             name: "cgc",             count: 4 },
-  { slug: "claude-code",     name: "claude-code",     count: 4, hot: true },
-  { slug: "evidential",      name: "evidential",      count: 2 },
-  { slug: "expert-pool",     name: "expert-pool",     count: 2 },
-  { slug: "finai-build",     name: "finai-build",     count: 4 },
-  { slug: "financial-ai",    name: "financial-ai",    count: 6, hot: true },
-  { slug: "group-encoder",   name: "group-encoder",   count: 2 },
-  { slug: "hmm",             name: "hmm",             count: 4 },
-  { slug: "logit-transfer",  name: "logit-transfer",  count: 2 },
-  { slug: "mmoe",            name: "mmoe",            count: 4 },
-  { slug: "mrm",             name: "mrm",             count: 5, hot: true },
-  { slug: "mtl",             name: "mtl",             count: 4 },
-  { slug: "ple",             name: "ple",             count: 15, hot: true },
-  { slug: "regularization",  name: "regularization",  count: 2 },
-  { slug: "regulation",      name: "regulation",      count: 3 },
-  { slug: "sae",             name: "sae",             count: 2 },
-  { slug: "shared-bottom",   name: "shared-bottom",   count: 2 },
-  { slug: "shared-experts",  name: "shared-experts",  count: 2 },
-  { slug: "specs",           name: "specs",           count: 2 },
-  { slug: "sr-11-7",         name: "sr-11-7",         count: 2 },
-  { slug: "study-thread",    name: "study-thread",    count: 12, hot: true },
-  { slug: "tang2020",        name: "tang2020",        count: 2 },
-  { slug: "task-tower",      name: "task-tower",      count: 2 },
-  { slug: "uncertainty",     name: "uncertainty",     count: 2 },
+  { slug: "adatt",              name: "adatt",              count: 8, hot: true },
+  { slug: "architecture",       name: "architecture",       count: 5, hot: true },
+  { slug: "attention",          name: "attention",          count: 2 },
+  { slug: "audit",              name: "audit",              count: 3 },
+  { slug: "cgc",                name: "cgc",                count: 4 },
+  { slug: "claude-code",        name: "claude-code",        count: 4, hot: true },
+  { slug: "cosine-similarity",  name: "cosine-similarity",  count: 2 },
+  { slug: "ema",                name: "ema",                count: 2 },
+  { slug: "evidential",         name: "evidential",         count: 2 },
+  { slug: "expert-pool",        name: "expert-pool",        count: 2 },
+  { slug: "finai-build",        name: "finai-build",        count: 4 },
+  { slug: "financial-ai",       name: "financial-ai",       count: 6, hot: true },
+  { slug: "gradient",           name: "gradient",           count: 2 },
+  { slug: "group-encoder",      name: "group-encoder",      count: 2 },
+  { slug: "group-prior",        name: "group-prior",        count: 2 },
+  { slug: "hmm",                name: "hmm",                count: 4 },
+  { slug: "hypernetwork",       name: "hypernetwork",       count: 2 },
+  { slug: "logit-transfer",     name: "logit-transfer",     count: 2 },
+  { slug: "loss-weighting",     name: "loss-weighting",     count: 2 },
+  { slug: "mmoe",               name: "mmoe",               count: 4 },
+  { slug: "mrm",                name: "mrm",                count: 5, hot: true },
+  { slug: "mtl",                name: "mtl",                count: 6, hot: true },
+  { slug: "negative-transfer",  name: "negative-transfer",  count: 2 },
+  { slug: "optimizer",          name: "optimizer",          count: 2 },
+  { slug: "ple",                name: "ple",                count: 15, hot: true },
+  { slug: "regularization",     name: "regularization",     count: 2 },
+  { slug: "regulation",         name: "regulation",         count: 3 },
+  { slug: "sae",                name: "sae",                count: 2 },
+  { slug: "schedule",           name: "schedule",           count: 2 },
+  { slug: "shared-bottom",      name: "shared-bottom",      count: 2 },
+  { slug: "shared-experts",     name: "shared-experts",     count: 2 },
+  { slug: "specs",              name: "specs",              count: 4 },
+  { slug: "sr-11-7",            name: "sr-11-7",            count: 2 },
+  { slug: "study-thread",       name: "study-thread",       count: 20, hot: true },
+  { slug: "tang2020",           name: "tang2020",           count: 2 },
+  { slug: "task-tower",         name: "task-tower",         count: 2 },
+  { slug: "training-loop",      name: "training-loop",      count: 2 },
+  { slug: "transfer-loss",      name: "transfer-loss",      count: 2 },
+  { slug: "uncertainty",        name: "uncertainty",        count: 2 },
 ];
 
 export const CATEGORIES = [
   { slug: "finai-build",  name: "FinAI Build",   ko: "3개월 개발기",  count: 2,  desc: "Building a financial AI in three months — engineering notes.",                                                color: "1" },
   { slug: "mrm-thread",   name: "MRM Thread",    ko: "MRM 스레드",    count: 2,  desc: "Model risk management for AI recommendation systems.",                                                         color: "2" },
-  { slug: "study-thread", name: "Study Thread",  ko: "스터디 스레드", count: 12, desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized.",      color: "3" },
+  { slug: "study-thread", name: "Study Thread",  ko: "스터디 스레드", count: 20, desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized.",      color: "3" },
   { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 0,  desc: "Readings of regulatory drafts and papers. (empty)",                                                           color: "4" },
 ];
 
 export const RECENT = [
-  { title: "[Study Thread] PLE-6 — 해석성·불확실성·전체 사양",                                             date: "2026-04-19", url: "/2026/04/19/ple-6-interpretability-uncertainty-specs-ko/" },
-  { title: "[Study Thread] PLE-6 — Interpretability, Uncertainty, and Full Specs",                         date: "2026-04-19", url: "/2026/04/19/ple-6-interpretability-uncertainty-specs-en/" },
-  { title: "[Study Thread] PLE-5 — GroupTaskExpertBasket · Logit Transfer · Task Tower",                   date: "2026-04-19", url: "/2026/04/19/ple-5-basket-logit-tower-ko/" },
-  { title: "[Study Thread] PLE-5 — GroupTaskExpertBasket, Logit Transfer, Task Tower",                     date: "2026-04-19", url: "/2026/04/19/ple-5-basket-logit-tower-en/" },
+  { title: "[Study Thread] ADATT-4 — 학습 루프·Loss Weighting·Optimizer·CGC 동기화",                        date: "2026-04-20", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/" },
+  { title: "[Study Thread] ADATT-4 — Training Loop, Loss Weighting, Optimizer, and CGC Synchronization",    date: "2026-04-20", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/" },
+  { title: "[Study Thread] ADATT-3 — Transfer Loss · Group Prior · 3-Phase Schedule",                       date: "2026-04-20", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-ko/" },
+  { title: "[Study Thread] ADATT-3 — Transfer Loss, Group Prior, and the 3-Phase Schedule",                 date: "2026-04-20", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-en/" },
 ];

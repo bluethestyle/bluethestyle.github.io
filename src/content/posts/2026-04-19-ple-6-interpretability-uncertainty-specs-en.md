@@ -9,7 +9,7 @@ part: 6
 alt_lang: /2026/04/19/ple-6-interpretability-uncertainty-specs-ko/
 next_title: "ADATT-1 — Why adaTT: Adaptive Towers and the Transformer Attention Analogy"
 next_desc: "The adaTT sub-thread opens. The motivation for 'adaptive towers' starting from the limits of fixed towers, why Transformer Attention is the right mechanism for task adaptation, and where adaTT sits in the lineage of conditional computation and hypernetworks."
-next_status: draft
+next_status: published
 source_url: /PLE_기술_참조서.pdf
 source_label: "PLE Tech Reference (KO, PDF · 56 pages)"
 ---
