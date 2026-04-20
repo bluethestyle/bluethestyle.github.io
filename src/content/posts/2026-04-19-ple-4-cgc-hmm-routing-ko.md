@@ -30,26 +30,26 @@ Task Expert 를 한 축 위에서 가중합하고, **CGCAttention** 이 Shared
 concat 에 태스크별 블록 스케일링을 얹는다.
 
 ```mermaid
-flowchart LR
-  input[(Shared Expert Pool<br/>7 experts · 512D concat)]
+flowchart TB
+  input[(Shared Expert Pool · 7 experts · 512D concat)]
   input --> stage1
   input --> stage2
   subgraph stage1 [Stage 1 — CGCLayer]
-    direction TB
-    s1a[task-k gate<br/>Softmax W·h_shared]
+    direction LR
+    s1a[task-k gate<br/>Softmax W · h_shared]
     s1b[Shared ∪ Task-k<br/>가중합]
-    s1c((h_k — 태스크당<br/>고정 차원 벡터))
+    s1c((h_k<br/>태스크당 고정 차원 벡터))
     s1a --> s1b --> s1c
   end
   subgraph stage2 [Stage 2 — CGCAttention]
-    direction TB
+    direction LR
     s2a[태스크별 7-way<br/>Softmax over experts]
     s2b[블록 스케일링<br/>64D / 128D × w_k,i]
-    s2c((h_k^cgc — 512D<br/>per-task 재조합))
+    s2c((h_k^cgc<br/>512D per-task 재조합))
     s2a --> s2b --> s2c
   end
-  s1c --> ds[downstream<br/>Logit Transfer + Task Tower]
-  s2c --> ds
+  stage1 --> ds[downstream · Logit Transfer + Task Tower]
+  stage2 --> ds
   style stage1 fill:#D8E0FF,stroke:#2E5BFF
   style stage2 fill:#FDD8D1,stroke:#E14F3A
   style ds fill:#FFFFFF,stroke:#141414,stroke-width:2px
@@ -105,7 +105,7 @@ weight 는 0 으로 두고, 태스크가 "선호"하는 Expert 에는
 `bias_high = 1.0`, 나머지에는 `bias_low = -1.0`. 학습 초기 Softmax
 출력이 도메인 지식에 부합하는 분포에서 출발하게 만드는 소프트 프라이어다.
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 510" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 560" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
   <defs><style>
     .task-lbl { font-size: 14px; fill: #141414; text-anchor: end; font-weight: 500; }
     .exp-lbl { font-size: 14px; fill: #141414; font-weight: 500; }
@@ -158,11 +158,14 @@ weight 는 0 으로 두고, 태스크가 "선호"하는 Expert 에는
     <text class="task-lbl" x="210" y="421">Brand_prediction</text>
     <text class="task-lbl" x="210" y="443">Merchant_affinity</text>
   </g>
-  <g transform="translate(220,470)">
+  <g transform="translate(80,470)">
     <rect x="0" y="0" width="18" height="18" class="cell-on"/>
-    <text class="legend" x="26" y="14">선호 (bias_high=1.0)</text>
-    <rect x="180" y="0" width="18" height="18" class="cell-off"/>
-    <text class="legend" x="206" y="14">비선호 (bias_low=-1.0)</text>
+    <text class="legend" x="26" y="14">선호 (bias_high = 1.0)</text>
+    <rect x="0" y="26" width="18" height="18" class="cell-off"/>
+    <text class="legend" x="26" y="40">비선호 (bias_low = -1.0)</text>
+  </g>
+  <g transform="translate(80,530)">
+    <text class="legend" x="0" y="0" font-style="italic" fill="#6B7280">* Causal · OT: 초기 prior 없음 — gate 가 학습 중 자유 탐색</text>
   </g>
 </svg>
 
@@ -251,14 +254,14 @@ bridge 는 *Neural ODE (Chen et al., NeurIPS 2018)* 에서 영감을 받아
 이산 HMM 상태를 연속 시간으로 보간하는 확장이다.
 
 ```mermaid
-flowchart LR
-  hmm[(HMM 16D<br/>10D state + 6D ODE)]
+flowchart TB
+  hmm[(HMM 16D · 10D state + 6D ODE)]
   hmm --> j[Journey<br/>daily scale]
   hmm --> l[Lifecycle<br/>monthly scale]
   hmm --> b[Behavior<br/>monthly scale]
   j --> jt[CTR · CVR · Engagement · Uplift]
   l --> lt[Churn · Retention · Life-stage · LTV]
-  b --> bt[NBA · Balance · Channel · Timing<br/>· Spending · Consumption · Brand · Merchant]
+  b --> bt[NBA · Balance · Channel · Timing · Spending · Consumption · Brand · Merchant]
   style j fill:#D8E0FF,stroke:#2E5BFF
   style l fill:#FDD8D1,stroke:#E14F3A
   style b fill:#C9ECD9,stroke:#1C8C5A
