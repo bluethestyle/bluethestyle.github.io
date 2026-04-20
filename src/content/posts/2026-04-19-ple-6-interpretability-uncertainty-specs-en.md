@@ -292,28 +292,28 @@ are currently active; uplift and category_uplift are deactivated.
 
 ### PLE (Tang et al., 2020) comparison
 
-| Item | Original paper | This implementation |
-|---|---|---|
-| Expert structure | Shared + Task-specific MLP | 7 domain Shared Experts (GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT) |
-| Extraction Layer | Stack of PLE Layers | Single layer (CGC → GroupTaskExpertBasket) |
-| Task Expert | Independent MLP per task | GroupEncoder + ClusterEmbedding (20 clusters) |
-| Gate | Shared+Task Expert → gate | Shared Expert block scaling (512D preserved) |
-| Knowledge Transfer | Implicit (Expert sharing) | Explicit Logit Transfer + gradient-based adaTT |
-| Cluster specialisation | None | GMM 20-cluster embedding + GroupEncoder |
-| HMM routing | None | Triple-Mode (journey/lifecycle/behavior) |
-| Loss weighting | Fixed | Uncertainty Weighting (Kendall et al.) |
-| Uncertainty | None | Evidential Deep Learning (Dirichlet) |
+| Item | Paper → this implementation |
+|---|---|
+| Expert structure | Shared + Task MLP → 7 heterogeneous domain Experts (DeepFM · LightGCN · UHGCN · Temporal · PersLay · Causal · OT) |
+| Extraction Layer | Stack of PLE Layers → single layer (CGC → GroupTaskExpertBasket) |
+| Task Expert | Independent MLP per task → GroupEncoder + ClusterEmbedding (20 clusters) |
+| Gate | Shared+Task single gate → Stage 1 CGCLayer + Stage 2 CGCAttention (block scaling) |
+| Knowledge Transfer | Implicit (Expert sharing) → explicit Logit Transfer + adaTT gradient |
+| Cluster specialisation | None → GMM 20-cluster embedding + soft routing |
+| HMM routing | None → Triple-Mode (journey / lifecycle / behavior) |
+| Loss weighting | Fixed weights → Uncertainty Weighting (Kendall et al. 2018) |
+| Uncertainty | None → Evidential DL (Dirichlet posterior) |
 
 ### MMoE (Ma et al., KDD 2018) comparison
 
-| Item | MMoE | This implementation |
-|---|---|---|
-| # Experts | N identical-structure experts | 7 heterogeneous (GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT) |
-| Expert structure | Identical MLP | Domain-specialised architecture each |
-| Gate | Linear(input → N) + Softmax | Linear(512 → 7) + Softmax (CGC) |
-| Expert Collapse | Severe (all tasks pick same expert) | Mitigated (entropy regularisation + domain\_experts bias) |
-| Initial bias | None (random) | Warm start based on domain\_experts |
-| Task specialisation | Separation by gate alone | CGC + HMM routing + GroupTaskExpertBasket |
+| Item | MMoE → this implementation |
+|---|---|
+| # Experts | N identical-structure experts → 7 heterogeneous (DeepFM · LightGCN · UHGCN · Temporal · PersLay · Causal · OT) |
+| Expert structure | Identical MLP → domain-specialised architecture each |
+| Gate | Linear(input → N) + Softmax → Linear(512 → 7) + Softmax (CGC) |
+| Expert Collapse | Severe (all tasks converge on one expert) → mitigated (entropy regularisation + domain\_experts bias) |
+| Initial bias | None (random) → warm start from domain\_experts |
+| Task specialisation | Separation by gate alone → CGC + HMM routing + GroupTaskExpertBasket |
 
 ### Main architectural innovations
 

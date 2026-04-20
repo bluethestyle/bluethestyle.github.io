@@ -259,28 +259,28 @@ reference 로, 새로운 결정이 아니라 앞 5편에서 내린 결정들의 
 
 ### PLE (Tang et al., 2020) 비교
 
-| 항목 | 원 논문 | 본 구현 |
-|---|---|---|
-| Expert 구조 | Shared + Task-specific MLP | 7개 도메인 Shared Expert (GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT) |
-| Extraction Layer | 다중 PLE Layer 스택 | 단일 레이어 (CGC → GroupTaskExpertBasket) |
-| Task Expert | 태스크별 독립 MLP | GroupEncoder + ClusterEmbedding (20 clusters) |
-| Gate | Shared+Task Expert → gate | Shared Expert 블록 스케일링 (512D 유지) |
-| Knowledge Transfer | 암묵적 (Expert 공유) | 명시적 Logit Transfer + adaTT gradient 기반 |
-| Cluster 특화 | 없음 | GMM 20-cluster 임베딩 + GroupEncoder |
-| HMM 라우팅 | 없음 | Triple-Mode (journey/lifecycle/behavior) |
-| Loss Weighting | 고정 | Uncertainty Weighting (Kendall et al.) |
-| 불확실성 | 없음 | Evidential Deep Learning (Dirichlet) |
+| 항목 | 원 논문 → 본 구현 |
+|---|---|
+| Expert 구조 | Shared + Task MLP → 7개 도메인 이종 Expert (DeepFM · LightGCN · UHGCN · Temporal · PersLay · Causal · OT) |
+| Extraction Layer | 다중 PLE Layer 스택 → 단일 레이어 (CGC → GroupTaskExpertBasket) |
+| Task Expert | 태스크별 독립 MLP → GroupEncoder + ClusterEmbedding (20 clusters) |
+| Gate | Shared+Task 단일 gate → 1단계 CGCLayer + 2단계 CGCAttention (블록 스케일링) |
+| Knowledge Transfer | 암묵적 (Expert 공유) → 명시적 Logit Transfer + adaTT gradient |
+| Cluster 특화 | 없음 → GMM 20-cluster 임베딩 + soft routing |
+| HMM 라우팅 | 없음 → Triple-Mode (journey / lifecycle / behavior) |
+| Loss Weighting | 고정 가중치 → Uncertainty Weighting (Kendall et al. 2018) |
+| 불확실성 정량화 | 없음 → Evidential DL (Dirichlet posterior) |
 
 ### MMoE (Ma et al., KDD 2018) 비교
 
-| 항목 | MMoE | 본 구현 |
-|---|---|---|
-| Expert 수 | 동일 구조 N개 | 이종 7개 (GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT) |
-| Expert 구조 | 동일 MLP | 각각 도메인 특화 아키텍처 |
-| Gate | Linear(input → N) + Softmax | Linear(512 → 7) + Softmax (CGC) |
-| Expert Collapse | 심각 (모든 태스크가 동일 Expert) | 완화 (Entropy 정규화 + domain\_experts bias) |
-| 초기 편향 | 없음 (무작위) | domain\_experts 기반 warm start |
-| 태스크 특화 | gate만으로 분리 | CGC + HMM routing + GroupTaskExpertBasket |
+| 항목 | MMoE → 본 구현 |
+|---|---|
+| Expert 수 | 동일 구조 N개 → 이종 7개 (DeepFM · LightGCN · UHGCN · Temporal · PersLay · Causal · OT) |
+| Expert 구조 | 동일 MLP → 각각 도메인 특화 아키텍처 |
+| Gate | Linear(input → N) + Softmax → Linear(512 → 7) + Softmax (CGC) |
+| Expert Collapse | 심각 (모든 태스크 동일 Expert 로 수렴) → 완화 (Entropy 정규화 + domain\_experts bias) |
+| 초기 편향 | 없음 (무작위) → domain\_experts 기반 warm start |
+| 태스크 특화 | gate 만으로 분리 → CGC + HMM routing + GroupTaskExpertBasket |
 
 ### 주요 아키텍처 혁신
 
