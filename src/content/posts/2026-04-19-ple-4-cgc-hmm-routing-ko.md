@@ -105,7 +105,7 @@ weight 는 0 으로 두고, 태스크가 "선호"하는 Expert 에는
 `bias_high = 1.0`, 나머지에는 `bias_low = -1.0`. 학습 초기 Softmax
 출력이 도메인 지식에 부합하는 분포에서 출발하게 만드는 소프트 프라이어다.
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 560" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 560" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <defs><style>
     .task-lbl { font-size: 14px; fill: #141414; text-anchor: end; font-weight: 500; }
     .exp-lbl { font-size: 14px; fill: #141414; font-weight: 500; }
@@ -186,7 +186,7 @@ $$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left( -\frac{1}{|\mathcal{T}|} \r
 음의 엔트로피를 *최소화* 하면 엔트로피가 *증가* 하여 분산이 유도된다.
 $\lambda_{ent} = 0.01$ 이 기본, 안정 범위 0.005~0.02.
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <g font-size="10" fill="#141414">
     <text x="50" y="14" text-anchor="middle">Expert Collapse</text>
     <text x="50" y="110" text-anchor="middle" fill="#E14F3A">H ≈ 0</text>

@@ -111,7 +111,7 @@ bias: weight starts at 0, a task's "preferred" experts get
 that makes the initial softmax output line up with domain knowledge
 before a single gradient step.
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 560" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 560" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <defs><style>
     .task-lbl { font-size: 14px; fill: #141414; text-anchor: end; font-weight: 500; }
     .exp-lbl { font-size: 14px; fill: #141414; font-weight: 500; }
@@ -195,7 +195,7 @@ Minimizing negative entropy is the same as maximizing $H$, which
 spreads the distribution out. Default $\lambda_{ent} = 0.01$; stable
 range 0.005–0.02.
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <g font-size="10" fill="#141414">
     <text x="50" y="14" text-anchor="middle">Expert Collapse</text>
     <text x="50" y="110" text-anchor="middle" fill="#E14F3A">H ≈ 0</text>
