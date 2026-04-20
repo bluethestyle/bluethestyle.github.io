@@ -105,68 +105,64 @@ weight 는 0 으로 두고, 태스크가 "선호"하는 Expert 에는
 `bias_high = 1.0`, 나머지에는 `bias_low = -1.0`. 학습 초기 Softmax
 출력이 도메인 지식에 부합하는 분포에서 출발하게 만드는 소프트 프라이어다.
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 360" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
-  <defs>
-    <style>
-      .task-lbl { font-size: 11px; fill: #141414; text-anchor: end; }
-      .exp-lbl { font-size: 10.5px; fill: #141414; }
-      .cell-on { fill: #2E5BFF; fill-opacity: 0.85; }
-      .cell-off { fill: #FFFFFF; stroke: #C9C9C9; stroke-width: 1; }
-      .legend { font-size: 10px; fill: #444; }
-    </style>
-  </defs>
-  <g transform="translate(170,70)">
-    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
-      <text class="exp-lbl" transform="translate(6,-8) rotate(-35)">DeepFM</text>
-      <text class="exp-lbl" transform="translate(26,-8) rotate(-35)">LightGCN</text>
-      <text class="exp-lbl" transform="translate(46,-8) rotate(-35)">UHGCN</text>
-      <text class="exp-lbl" transform="translate(66,-8) rotate(-35)">Temporal</text>
-      <text class="exp-lbl" transform="translate(86,-8) rotate(-35)">PersLay</text>
-      <text class="exp-lbl" transform="translate(106,-8) rotate(-35)">Causal</text>
-      <text class="exp-lbl" transform="translate(126,-8) rotate(-35)">OT</text>
-    </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 510" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+  <defs><style>
+    .task-lbl { font-size: 14px; fill: #141414; text-anchor: end; font-weight: 500; }
+    .exp-lbl { font-size: 14px; fill: #141414; font-weight: 500; }
+    .cell-on { fill: #2E5BFF; fill-opacity: 0.88; }
+    .cell-off { fill: #FFFFFF; stroke: #C9C9C9; stroke-width: 1; }
+    .legend { font-size: 13px; fill: #444; }
+  </style></defs>
+  <g>
+    <text class="exp-lbl" transform="translate(231,94) rotate(-35)">DeepFM</text>
+    <text class="exp-lbl" transform="translate(253,94) rotate(-35)">LightGCN</text>
+    <text class="exp-lbl" transform="translate(275,94) rotate(-35)">UHGCN</text>
+    <text class="exp-lbl" transform="translate(297,94) rotate(-35)">Temporal</text>
+    <text class="exp-lbl" transform="translate(319,94) rotate(-35)">PersLay</text>
+    <text class="exp-lbl" transform="translate(341,94) rotate(-35)">Causal</text>
+    <text class="exp-lbl" transform="translate(363,94) rotate(-35)">OT</text>
   </g>
-  <g transform="translate(170,70)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
-    <g><rect x="0"   y="0" width="10" height="10" class="cell-off"/><rect x="20"  y="0" width="10" height="10" class="cell-off"/><rect x="40"  y="0" width="10" height="10" class="cell-on"/><rect x="60"  y="0" width="10" height="10" class="cell-on"/><rect x="80"  y="0" width="10" height="10" class="cell-on"/><rect x="100" y="0" width="10" height="10" class="cell-off"/><rect x="120" y="0" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"   y="14" width="10" height="10" class="cell-off"/><rect x="20"  y="14" width="10" height="10" class="cell-off"/><rect x="40"  y="14" width="10" height="10" class="cell-on"/><rect x="60"  y="14" width="10" height="10" class="cell-on"/><rect x="80"  y="14" width="10" height="10" class="cell-on"/><rect x="100" y="14" width="10" height="10" class="cell-off"/><rect x="120" y="14" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"   y="28" width="10" height="10" class="cell-off"/><rect x="20"  y="28" width="10" height="10" class="cell-off"/><rect x="40"  y="28" width="10" height="10" class="cell-off"/><rect x="60"  y="28" width="10" height="10" class="cell-on"/><rect x="80"  y="28" width="10" height="10" class="cell-on"/><rect x="100" y="28" width="10" height="10" class="cell-off"/><rect x="120" y="28" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"   y="42" width="10" height="10" class="cell-off"/><rect x="20"  y="42" width="10" height="10" class="cell-off"/><rect x="40"  y="42" width="10" height="10" class="cell-off"/><rect x="60"  y="42" width="10" height="10" class="cell-on"/><rect x="80"  y="42" width="10" height="10" class="cell-on"/><rect x="100" y="42" width="10" height="10" class="cell-off"/><rect x="120" y="42" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"   y="56" width="10" height="10" class="cell-off"/><rect x="20"  y="56" width="10" height="10" class="cell-on"/><rect x="40"  y="56" width="10" height="10" class="cell-on"/><rect x="60"  y="56" width="10" height="10" class="cell-off"/><rect x="80"  y="56" width="10" height="10" class="cell-on"/><rect x="100" y="56" width="10" height="10" class="cell-off"/><rect x="120" y="56" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"   y="70" width="10" height="10" class="cell-off"/><rect x="20"  y="70" width="10" height="10" class="cell-off"/><rect x="40"  y="70" width="10" height="10" class="cell-off"/><rect x="60"  y="70" width="10" height="10" class="cell-on"/><rect x="80"  y="70" width="10" height="10" class="cell-on"/><rect x="100" y="70" width="10" height="10" class="cell-off"/><rect x="120" y="70" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"   y="84" width="10" height="10" class="cell-off"/><rect x="20"  y="84" width="10" height="10" class="cell-off"/><rect x="40"  y="84" width="10" height="10" class="cell-off"/><rect x="60"  y="84" width="10" height="10" class="cell-on"/><rect x="80"  y="84" width="10" height="10" class="cell-off"/><rect x="100" y="84" width="10" height="10" class="cell-off"/><rect x="120" y="84" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"   y="98" width="10" height="10" class="cell-off"/><rect x="20"  y="98" width="10" height="10" class="cell-off"/><rect x="40"  y="98" width="10" height="10" class="cell-off"/><rect x="60"  y="98" width="10" height="10" class="cell-on"/><rect x="80"  y="98" width="10" height="10" class="cell-off"/><rect x="100" y="98" width="10" height="10" class="cell-off"/><rect x="120" y="98" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="112" width="10" height="10" class="cell-on"/><rect x="20" y="112" width="10" height="10" class="cell-off"/><rect x="40" y="112" width="10" height="10" class="cell-off"/><rect x="60" y="112" width="10" height="10" class="cell-on"/><rect x="80" y="112" width="10" height="10" class="cell-off"/><rect x="100" y="112" width="10" height="10" class="cell-off"/><rect x="120" y="112" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="126" width="10" height="10" class="cell-off"/><rect x="20" y="126" width="10" height="10" class="cell-off"/><rect x="40" y="126" width="10" height="10" class="cell-off"/><rect x="60" y="126" width="10" height="10" class="cell-on"/><rect x="80" y="126" width="10" height="10" class="cell-off"/><rect x="100" y="126" width="10" height="10" class="cell-off"/><rect x="120" y="126" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="140" width="10" height="10" class="cell-off"/><rect x="20" y="140" width="10" height="10" class="cell-off"/><rect x="40" y="140" width="10" height="10" class="cell-off"/><rect x="60" y="140" width="10" height="10" class="cell-on"/><rect x="80" y="140" width="10" height="10" class="cell-off"/><rect x="100" y="140" width="10" height="10" class="cell-off"/><rect x="120" y="140" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="154" width="10" height="10" class="cell-off"/><rect x="20" y="154" width="10" height="10" class="cell-off"/><rect x="40" y="154" width="10" height="10" class="cell-on"/><rect x="60" y="154" width="10" height="10" class="cell-off"/><rect x="80" y="154" width="10" height="10" class="cell-on"/><rect x="100" y="154" width="10" height="10" class="cell-off"/><rect x="120" y="154" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="168" width="10" height="10" class="cell-off"/><rect x="20" y="168" width="10" height="10" class="cell-off"/><rect x="40" y="168" width="10" height="10" class="cell-off"/><rect x="60" y="168" width="10" height="10" class="cell-on"/><rect x="80" y="168" width="10" height="10" class="cell-off"/><rect x="100" y="168" width="10" height="10" class="cell-off"/><rect x="120" y="168" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="182" width="10" height="10" class="cell-on"/><rect x="20" y="182" width="10" height="10" class="cell-off"/><rect x="40" y="182" width="10" height="10" class="cell-off"/><rect x="60" y="182" width="10" height="10" class="cell-off"/><rect x="80" y="182" width="10" height="10" class="cell-off"/><rect x="100" y="182" width="10" height="10" class="cell-off"/><rect x="120" y="182" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="196" width="10" height="10" class="cell-off"/><rect x="20" y="196" width="10" height="10" class="cell-off"/><rect x="40" y="196" width="10" height="10" class="cell-on"/><rect x="60" y="196" width="10" height="10" class="cell-off"/><rect x="80" y="196" width="10" height="10" class="cell-off"/><rect x="100" y="196" width="10" height="10" class="cell-off"/><rect x="120" y="196" width="10" height="10" class="cell-off"/></g>
-    <g><rect x="0"  y="210" width="10" height="10" class="cell-off"/><rect x="20" y="210" width="10" height="10" class="cell-off"/><rect x="40" y="210" width="10" height="10" class="cell-on"/><rect x="60" y="210" width="10" height="10" class="cell-on"/><rect x="80" y="210" width="10" height="10" class="cell-off"/><rect x="100" y="210" width="10" height="10" class="cell-off"/><rect x="120" y="210" width="10" height="10" class="cell-off"/></g>
+  <g>
+    <!-- ROW_0 CTR -->        <rect x="220" y="100" width="18" height="18" class="cell-off"/><rect x="242" y="100" width="18" height="18" class="cell-off"/><rect x="264" y="100" width="18" height="18" class="cell-on"/><rect x="286" y="100" width="18" height="18" class="cell-on"/><rect x="308" y="100" width="18" height="18" class="cell-on"/><rect x="330" y="100" width="18" height="18" class="cell-off"/><rect x="352" y="100" width="18" height="18" class="cell-off"/>
+    <!-- ROW_1 CVR -->        <rect x="220" y="122" width="18" height="18" class="cell-off"/><rect x="242" y="122" width="18" height="18" class="cell-off"/><rect x="264" y="122" width="18" height="18" class="cell-on"/><rect x="286" y="122" width="18" height="18" class="cell-on"/><rect x="308" y="122" width="18" height="18" class="cell-on"/><rect x="330" y="122" width="18" height="18" class="cell-off"/><rect x="352" y="122" width="18" height="18" class="cell-off"/>
+    <!-- ROW_2 Churn -->      <rect x="220" y="144" width="18" height="18" class="cell-off"/><rect x="242" y="144" width="18" height="18" class="cell-off"/><rect x="264" y="144" width="18" height="18" class="cell-off"/><rect x="286" y="144" width="18" height="18" class="cell-on"/><rect x="308" y="144" width="18" height="18" class="cell-on"/><rect x="330" y="144" width="18" height="18" class="cell-off"/><rect x="352" y="144" width="18" height="18" class="cell-off"/>
+    <!-- ROW_3 Retention -->  <rect x="220" y="166" width="18" height="18" class="cell-off"/><rect x="242" y="166" width="18" height="18" class="cell-off"/><rect x="264" y="166" width="18" height="18" class="cell-off"/><rect x="286" y="166" width="18" height="18" class="cell-on"/><rect x="308" y="166" width="18" height="18" class="cell-on"/><rect x="330" y="166" width="18" height="18" class="cell-off"/><rect x="352" y="166" width="18" height="18" class="cell-off"/>
+    <!-- ROW_4 NBA -->        <rect x="220" y="188" width="18" height="18" class="cell-off"/><rect x="242" y="188" width="18" height="18" class="cell-on"/><rect x="264" y="188" width="18" height="18" class="cell-on"/><rect x="286" y="188" width="18" height="18" class="cell-off"/><rect x="308" y="188" width="18" height="18" class="cell-on"/><rect x="330" y="188" width="18" height="18" class="cell-off"/><rect x="352" y="188" width="18" height="18" class="cell-off"/>
+    <!-- ROW_5 Life-stage --> <rect x="220" y="210" width="18" height="18" class="cell-off"/><rect x="242" y="210" width="18" height="18" class="cell-off"/><rect x="264" y="210" width="18" height="18" class="cell-off"/><rect x="286" y="210" width="18" height="18" class="cell-on"/><rect x="308" y="210" width="18" height="18" class="cell-on"/><rect x="330" y="210" width="18" height="18" class="cell-off"/><rect x="352" y="210" width="18" height="18" class="cell-off"/>
+    <!-- ROW_6 Balance -->    <rect x="220" y="232" width="18" height="18" class="cell-off"/><rect x="242" y="232" width="18" height="18" class="cell-off"/><rect x="264" y="232" width="18" height="18" class="cell-off"/><rect x="286" y="232" width="18" height="18" class="cell-on"/><rect x="308" y="232" width="18" height="18" class="cell-off"/><rect x="330" y="232" width="18" height="18" class="cell-off"/><rect x="352" y="232" width="18" height="18" class="cell-off"/>
+    <!-- ROW_7 Engagement --> <rect x="220" y="254" width="18" height="18" class="cell-off"/><rect x="242" y="254" width="18" height="18" class="cell-off"/><rect x="264" y="254" width="18" height="18" class="cell-off"/><rect x="286" y="254" width="18" height="18" class="cell-on"/><rect x="308" y="254" width="18" height="18" class="cell-off"/><rect x="330" y="254" width="18" height="18" class="cell-off"/><rect x="352" y="254" width="18" height="18" class="cell-off"/>
+    <!-- ROW_8 LTV -->        <rect x="220" y="276" width="18" height="18" class="cell-on"/><rect x="242" y="276" width="18" height="18" class="cell-off"/><rect x="264" y="276" width="18" height="18" class="cell-off"/><rect x="286" y="276" width="18" height="18" class="cell-on"/><rect x="308" y="276" width="18" height="18" class="cell-off"/><rect x="330" y="276" width="18" height="18" class="cell-off"/><rect x="352" y="276" width="18" height="18" class="cell-off"/>
+    <!-- ROW_9 Channel -->    <rect x="220" y="298" width="18" height="18" class="cell-off"/><rect x="242" y="298" width="18" height="18" class="cell-off"/><rect x="264" y="298" width="18" height="18" class="cell-off"/><rect x="286" y="298" width="18" height="18" class="cell-on"/><rect x="308" y="298" width="18" height="18" class="cell-off"/><rect x="330" y="298" width="18" height="18" class="cell-off"/><rect x="352" y="298" width="18" height="18" class="cell-off"/>
+    <!-- ROW_10 Timing -->    <rect x="220" y="320" width="18" height="18" class="cell-off"/><rect x="242" y="320" width="18" height="18" class="cell-off"/><rect x="264" y="320" width="18" height="18" class="cell-off"/><rect x="286" y="320" width="18" height="18" class="cell-on"/><rect x="308" y="320" width="18" height="18" class="cell-off"/><rect x="330" y="320" width="18" height="18" class="cell-off"/><rect x="352" y="320" width="18" height="18" class="cell-off"/>
+    <!-- ROW_11 Spending_category --><rect x="220" y="342" width="18" height="18" class="cell-off"/><rect x="242" y="342" width="18" height="18" class="cell-off"/><rect x="264" y="342" width="18" height="18" class="cell-on"/><rect x="286" y="342" width="18" height="18" class="cell-off"/><rect x="308" y="342" width="18" height="18" class="cell-on"/><rect x="330" y="342" width="18" height="18" class="cell-off"/><rect x="352" y="342" width="18" height="18" class="cell-off"/>
+    <!-- ROW_12 Consumption_cycle --><rect x="220" y="364" width="18" height="18" class="cell-off"/><rect x="242" y="364" width="18" height="18" class="cell-off"/><rect x="264" y="364" width="18" height="18" class="cell-off"/><rect x="286" y="364" width="18" height="18" class="cell-on"/><rect x="308" y="364" width="18" height="18" class="cell-off"/><rect x="330" y="364" width="18" height="18" class="cell-off"/><rect x="352" y="364" width="18" height="18" class="cell-off"/>
+    <!-- ROW_13 Spending_bucket --><rect x="220" y="386" width="18" height="18" class="cell-on"/><rect x="242" y="386" width="18" height="18" class="cell-off"/><rect x="264" y="386" width="18" height="18" class="cell-off"/><rect x="286" y="386" width="18" height="18" class="cell-off"/><rect x="308" y="386" width="18" height="18" class="cell-off"/><rect x="330" y="386" width="18" height="18" class="cell-off"/><rect x="352" y="386" width="18" height="18" class="cell-off"/>
+    <!-- ROW_14 Brand_prediction --><rect x="220" y="408" width="18" height="18" class="cell-off"/><rect x="242" y="408" width="18" height="18" class="cell-off"/><rect x="264" y="408" width="18" height="18" class="cell-on"/><rect x="286" y="408" width="18" height="18" class="cell-off"/><rect x="308" y="408" width="18" height="18" class="cell-off"/><rect x="330" y="408" width="18" height="18" class="cell-off"/><rect x="352" y="408" width="18" height="18" class="cell-off"/>
+    <!-- ROW_15 Merchant_affinity --><rect x="220" y="430" width="18" height="18" class="cell-off"/><rect x="242" y="430" width="18" height="18" class="cell-off"/><rect x="264" y="430" width="18" height="18" class="cell-on"/><rect x="286" y="430" width="18" height="18" class="cell-on"/><rect x="308" y="430" width="18" height="18" class="cell-off"/><rect x="330" y="430" width="18" height="18" class="cell-off"/><rect x="352" y="430" width="18" height="18" class="cell-off"/>
   </g>
-  <g transform="translate(165,79)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
-    <text class="task-lbl" y="0">CTR</text>
-    <text class="task-lbl" y="14">CVR</text>
-    <text class="task-lbl" y="28">Churn</text>
-    <text class="task-lbl" y="42">Retention</text>
-    <text class="task-lbl" y="56">NBA</text>
-    <text class="task-lbl" y="70">Life-stage</text>
-    <text class="task-lbl" y="84">Balance_util</text>
-    <text class="task-lbl" y="98">Engagement</text>
-    <text class="task-lbl" y="112">LTV</text>
-    <text class="task-lbl" y="126">Channel</text>
-    <text class="task-lbl" y="140">Timing</text>
-    <text class="task-lbl" y="154">Spending_category</text>
-    <text class="task-lbl" y="168">Consumption_cycle</text>
-    <text class="task-lbl" y="182">Spending_bucket</text>
-    <text class="task-lbl" y="196">Brand_prediction</text>
-    <text class="task-lbl" y="210">Merchant_affinity</text>
+  <g>
+    <text class="task-lbl" x="210" y="113">CTR</text>
+    <text class="task-lbl" x="210" y="135">CVR</text>
+    <text class="task-lbl" x="210" y="157">Churn</text>
+    <text class="task-lbl" x="210" y="179">Retention</text>
+    <text class="task-lbl" x="210" y="201">NBA</text>
+    <text class="task-lbl" x="210" y="223">Life-stage</text>
+    <text class="task-lbl" x="210" y="245">Balance_util</text>
+    <text class="task-lbl" x="210" y="267">Engagement</text>
+    <text class="task-lbl" x="210" y="289">LTV</text>
+    <text class="task-lbl" x="210" y="311">Channel</text>
+    <text class="task-lbl" x="210" y="333">Timing</text>
+    <text class="task-lbl" x="210" y="355">Spending_category</text>
+    <text class="task-lbl" x="210" y="377">Consumption_cycle</text>
+    <text class="task-lbl" x="210" y="399">Spending_bucket</text>
+    <text class="task-lbl" x="210" y="421">Brand_prediction</text>
+    <text class="task-lbl" x="210" y="443">Merchant_affinity</text>
   </g>
-  <g transform="translate(170,310)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
-    <rect x="0" y="0" width="10" height="10" class="cell-on"/>
-    <text class="legend" x="16" y="9">선호 (bias_high=1.0)</text>
-    <rect x="140" y="0" width="10" height="10" class="cell-off"/>
-    <text class="legend" x="156" y="9">비선호 (bias_low=-1.0)</text>
+  <g transform="translate(220,470)">
+    <rect x="0" y="0" width="18" height="18" class="cell-on"/>
+    <text class="legend" x="26" y="14">선호 (bias_high=1.0)</text>
+    <rect x="180" y="0" width="18" height="18" class="cell-off"/>
+    <text class="legend" x="206" y="14">비선호 (bias_low=-1.0)</text>
   </g>
 </svg>
 

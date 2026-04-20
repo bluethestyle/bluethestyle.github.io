@@ -67,7 +67,7 @@ const T = isKo
       next_label: "다음 편",
       next_draft: "준비 중",
       series_label: "시리즈",
-      ep_of: (p, t) => `에피소드 ${p} / ${t}`,
+      ep_of: (p, t) => t ? `에피소드 ${p} / ${t}` : `에피소드 ${p}`,
       prev_label: "이전 편",
       all_categories: "카테고리 전체",
       archives: "아카이브",
@@ -80,7 +80,7 @@ const T = isKo
       next_label: "Next in series",
       next_draft: "draft · coming soon",
       series_label: "Series",
-      ep_of: (p, t) => `Episode ${p} of ${t}`,
+      ep_of: (p, t) => t ? `Episode ${p} of ${t}` : `Episode ${p}`,
       prev_label: "Previous in series",
       all_categories: "All categories",
       archives: "Archives",
@@ -241,7 +241,7 @@ const T = isKo
   .post { max-width: 720px; }
   .post-head { padding-bottom: 28px; margin-bottom: 32px; border-bottom: 1px solid var(--hair); }
   .post-head .meta-line {
-    font-family: var(--mono); font-size: 10.5px;
+    font-family: var(--mono); font-size: 12px;
     color: var(--muted); letter-spacing: 0.06em;
     text-transform: uppercase;
     display: flex; align-items: center; gap: 8px;
@@ -271,7 +271,7 @@ const T = isKo
   .post-head h1.kr { font-family: var(--kr); font-weight: 600; letter-spacing: -0.025em; }
   .post-head .tags-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
   .post-head .tg {
-    font-family: var(--mono); font-size: 10.5px;
+    font-family: var(--mono); font-size: 12px;
     color: var(--muted); padding: 2px 8px;
     border: 1px solid var(--hair); border-radius: 3px;
   }
@@ -284,7 +284,7 @@ const T = isKo
     background: var(--accent-soft);
     border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
     border-radius: 8px;
-    font-family: var(--mono); font-size: 11.5px;
+    font-family: var(--mono); font-size: 13px;
     color: var(--accent-ink);
     letter-spacing: 0.04em;
     transition: background .12s, transform .12s;
@@ -473,39 +473,41 @@ const T = isKo
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 14px 20px;
+    padding: 22px 24px;
+    background: var(--surface);
     border: 1px solid var(--hair);
-    border-radius: 8px;
+    border-radius: 10px;
     color: inherit;
     text-decoration: none;
-    transition: border-color .15s, transform .15s, background .15s;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
   }
   .prev-card:hover {
     border-color: var(--accent);
     transform: translateX(-2px);
-    background: var(--hair-2);
+    box-shadow: 0 10px 30px rgba(20,20,20,0.06);
   }
   .prev-card .prev-arr {
     font-family: var(--mono); font-size: 18px;
     color: var(--muted-2);
-    transition: color .15s;
+    transition: color .15s, transform .15s;
   }
-  .prev-card:hover .prev-arr { color: var(--accent); }
+  .prev-card:hover .prev-arr { color: var(--accent); transform: translateX(-4px); }
   .prev-card .prev-body {
-    display: flex; flex-direction: column; gap: 3px;
+    display: flex; flex-direction: column; gap: 4px;
     min-width: 0;
   }
   .prev-card .prev-label {
-    font-family: var(--mono); font-size: 10px;
+    font-family: var(--mono); font-size: 12px;
     letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--muted);
   }
   .prev-card .prev-title {
-    font-size: 14px; line-height: 1.35;
-    color: var(--ink-2);
+    font-size: 18px; line-height: 1.35;
+    color: var(--ink);
     letter-spacing: -0.005em;
+    font-weight: 500;
   }
-  .prev-card .prev-title.kr { font-family: var(--kr); font-size: 14px; letter-spacing: -0.015em; }
+  .prev-card .prev-title.kr { font-family: var(--kr); font-size: 18px; font-weight: 600; letter-spacing: -0.015em; }
 
   .next-card {
     display: block;
@@ -538,7 +540,7 @@ const T = isKo
   }
   .next-card .next-label {
     display: inline-flex; align-items: center; gap: 10px;
-    font-family: var(--mono); font-size: 10px;
+    font-family: var(--mono); font-size: 12px;
     color: var(--muted); letter-spacing: 0.14em;
     text-transform: uppercase;
     margin-bottom: 12px;
@@ -553,7 +555,7 @@ const T = isKo
     border-radius: 3px;
     color: var(--muted-2);
     letter-spacing: 0.08em;
-    font-size: 9.5px;
+    font-size: 11px;
   }
   .next-card h3 {
     font-family: var(--display); font-weight: 400;
@@ -576,7 +578,7 @@ const T = isKo
     display: flex; align-items: center; gap: 14px;
     padding: 10px 0;
     border-bottom: 1px solid var(--hair-2);
-    font-family: var(--mono); font-size: 11.5px;
+    font-family: var(--mono); font-size: 13px;
   }
   .foot-meta .foot-row:last-child { border-bottom: 0; }
   .foot-meta .foot-row .k {
@@ -585,7 +587,7 @@ const T = isKo
     color: var(--muted-2);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 12px;
   }
   .foot-meta .foot-row a {
     color: var(--ink-2);
@@ -610,7 +612,7 @@ const T = isKo
 
   .foot-nav {
     display: flex; justify-content: space-between;
-    font-family: var(--mono); font-size: 11px;
+    font-family: var(--mono); font-size: 12px;
     color: var(--muted);
     letter-spacing: 0.04em;
   }
@@ -636,7 +638,7 @@ const T = isKo
     margin: 0;
   }
   .comments-head .hint {
-    font-family: var(--mono); font-size: 10px;
+    font-family: var(--mono); font-size: 12px;
     letter-spacing: 0.08em;
     color: var(--muted);
   }
