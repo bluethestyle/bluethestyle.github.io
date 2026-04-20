@@ -17,27 +17,71 @@ source_label: "PLE Tech Reference (KO, PDF · 56 pages)"
 *The final, sixth post of the "Study Thread" PLE sub-thread. Across
 PLE-1 → PLE-6, in parallel Korean and English editions, I've walked
 through the papers and mathematical foundations behind the PLE
-architecture of this project. The source is the on-prem project's
-`기술참조서/PLE_기술_참조서` (PLE Tech Reference). This part six
-covers Expert interpretability (Sparse Autoencoder), uncertainty
-quantification (Evidential Deep Learning), the full 18-task spec,
-paper-vs-implementation comparison, a debugging guide, and the
-appendix — and at the bottom of this post you can download the full
-PDF. adaTT itself will be treated in a separate sub-thread starting
-from ADATT-1.*
+architecture of this project. By PLE-5 the system is structurally
+done — it trains, it predicts. But two questions remain: "can we see
+what each expert actually learned?" and "can we quantify how much
+we trust a prediction?" This sixth post is the response, followed by
+a reference appendix of the full specs, and a PDF download to close
+out the series.*
 
-## SAE (Sparse Autoencoder) — Expert Interpretability
+## What PLE-5 leaves on the table
 
-### Purpose
+The architecture is complete. CGC picks experts stably.
+GroupTaskExpertBasket handles cluster-level specialization. Logit
+Transfer passes sequential dependencies. Uncertainty Weighting
+auto-balances 16 loss scales. The model runs, produces predictions,
+and can be served.
 
-Extract interpretable sparse features from the 512D combined
-representation of the Shared Experts. Inspired by Anthropic's Sparse
-Autoencoder approach, the goal is to decompose internal neural network
-representations into *human-interpretable units*.
+Yet two questions still nag.
 
-### Architecture
+**Do we actually know what the experts learned?** PLE's core design
+bet was "heterogeneous experts will learn complementary things." It's
+easy to confirm that gate weights are spread out (thanks to entropy
+regularization). That does not guarantee each expert learned
+*meaningfully different* things — seven experts might be
+re-expressing similar patterns in different coordinate systems. The
+512D concat vector is hard to read, and naive activation analysis
+doesn't tell you "what does this neuron mean."
 
-`_build_sae()` (lines 877~896) instantiates `SparseAutoencoder`.
+**We don't know how much to trust each prediction.** Softmax always
+produces a probability distribution — even for out-of-distribution
+inputs, it confidently declares "70% churn probability." In financial
+decisions — lending, risk, credit actions — overconfidence carries
+legal and financial liability. At minimum we need a signal that says
+"don't trust this prediction, fall back to rule."
+
+Two questions, answered in order. Crucially, both answers attach in a
+way that *does not affect the main prediction path*. Interpretability
+and uncertainty are analysis tools, not prediction tools.
+
+## Decision 1 — Sparse Autoencoder for expert interpretability
+
+### The problem — how do we read a 512D concat?
+
+After training, the 512D representation formed by concatenating the
+seven experts' outputs is hard to read directly. Each dimension is
+typically a mixture of several concepts active at once ("this neuron
+is 50% high-value-customer signal, 30% seasonality, 20% brand
+preference" — polysemantic representation is the norm, not the
+exception).
+
+A few alternatives:
+
+- **PCA / ICA.** Linear methods struggle on nonlinear neural
+  representations.
+- **Attention heat-map interpretation.** The CGC gate weights already
+  tell us "how much does task $k$ attend to expert $i$." But what
+  concepts activate *inside* each expert remains opaque.
+- **Sparse Autoencoder (SAE).** Expand the representation into an
+  overcomplete latent space, then enforce L1 sparsity to extract a
+  *monosemantic* decomposition where each latent unit ideally
+  corresponds to one interpretable concept. Anthropic's *Towards
+  Monosemanticity* (Bricken et al., 2023) showed this works on LLMs.
+
+Option three. Lift 512D into a 2048D overcomplete latent with L1
+sparsity.
+
+### SAE architecture
 
 $$\mathbf{z} = \text{ReLU}(\mathbf{W}_{enc} \cdot \mathbf{h}_{shared} + \mathbf{b}_{enc}) \in \mathbb{R}^{2048}$$
 
@@ -62,79 +106,68 @@ $$\mathcal{L}_{SAE} = \|\mathbf{h}_{shared} - \hat{\mathbf{h}}\|_2^2 + \lambda_1
 > the expert representation with as few concepts as possible, but
 > don't lose the original information."
 
-> **Undergraduate math — the difference between L1 and L2 norms.**
-> $\|\mathbf{z}\|_1 = \sum_i |z_i|$ is the sum of absolute values of
-> each element, while
-> $\|\mathbf{h} - \hat{\mathbf{h}}\|_2^2 = \sum_i (h_i - \hat{h}_i)^2$
-> is the sum of squared differences. Minimising the L1 norm induces
-> *exactly zero* for many elements — a sparse solution. This is
-> because of L1's geometric property: the vertices of the L1 ball lie
-> on the axes, so under constrained optimisation the solution tends
-> to sit on an axis (= the other coordinates are zero). The L2 norm,
-> in contrast, has the shape of a sphere, so solutions are spread
-> evenly and zeros are rare. Concrete example:
-> $\mathbf{z} = [3, 0, 0, 2, 0]$ gives $\|\mathbf{z}\|_1 = 5$ with
-> only two non-zero elements — this sparse $\mathbf{z}$ is
-> interpretable as "only 2 of 5 concepts active."
+> **Undergraduate math — why L1 induces sparsity, not L2.**
+> Minimising $\|\mathbf{z}\|_1 = \sum_i |z_i|$ produces solutions
+> where many elements are *exactly zero*. Geometrically, the vertices
+> of the L1 ball lie on the axes, so constrained optimisation tends
+> to land on an axis (other coordinates at zero). The L2 ball is a
+> sphere, spreading solutions evenly with few exact zeros.
+> $\mathbf{z} = [3, 0, 0, 2, 0]$ — only 2 of 5 concepts active — is
+> a natural outcome of L1 regularization.
 
-> **Historical context — autoencoders, from dimensionality reduction
-> to interpretability.** The autoencoder concept began with *Rumelhart,
-> Hinton & Williams (1986)* in the backpropagation paper: "training
-> a network to reconstruct itself forms useful representations in
-> intermediate hidden layers." It later evolved into the Denoising
-> Autoencoder (*Vincent et al., ICML 2008*) and the Variational
-> Autoencoder (VAE, *Kingma & Welling, ICLR 2014*). The *Sparse
-> Autoencoder* is a variant that places an L1 penalty on the hidden
-> representation, forcing only a small number of neurons to activate,
-> systematised by *Andrew Ng* in his 2011 Stanford lectures. The core
-> idea, similar to PCA (Principal Component Analysis), is to reduce
-> dimensionality — but with non-linear transforms allowed, and even
-> in an *overcomplete* representation
-> ($\dim(\mathbf{z}) > \dim(\mathbf{x})$), L1 sparsity can extract
-> meaningful features. This system's SAE uses 512D → 2048D
-> overcomplete encoding, "disentangling" the Expert information that
-> is mixed up inside 512 dimensions into 2048 interpretable units.
+### Main path gradient blocking
 
-> **Recent trends.** Applying Sparse Autoencoders to neural network
-> interpretation — *mechanistic interpretability* — was ignited by
-> Anthropic's 2023 research ("Towards Monosemanticity", Bricken et al.,
-> 2023), which applied an SAE to the residual stream of a large
-> language model to extract interpretable features. In 2024-2025,
-> OpenAI, DeepMind, EleutherAI and others are actively researching
-> SAE-based interpretation, and Templeton et al. (Anthropic, 2024)
-> extracted millions of interpretable features from Claude 3 Sonnet.
-> In recommendation systems too, there is growing research into
-> decomposing a model's internal representation with an SAE to
-> explain "why was this product recommended?", and the explainability
-> requirements of the EU AI Act (in force from 2024) are accelerating
-> this trend.
-
-### Main Path Gradient Blocking
-
-In `forward()` (line 1216), `shared_concat.detach()` disconnects the
-SAE's input. The SAE loss updates only the SAE's own weights and has
-no effect on the Shared Experts' learning.
-
-```python
-# ple_cluster_adatt.py:1216
-_, sae_latent, sae_loss = self.sae(shared_concat.detach())
-```
+The SAE is an analysis tool, not part of the prediction path. We
+apply `shared_concat.detach()` on its input so SAE gradients do not
+update the Shared Experts. The SAE loss trains only the SAE's own
+parameters and does not perturb the main training dynamics.
+`loss_weight=0.01` is an extra safety bolt limiting inertia.
 
 > **Using the SAE latent.** `PLEClusterOutput.sae_latent` (a 2048D
 > sparse vector) is used after inference in the *Expert Neuron
 > Dashboard* to analyse activation patterns. For example, one may
 > interpret "frequently active latent #147 corresponds to a 'card
-> loan usage pattern'."
+> loan usage pattern'." Under emerging explainability regimes (EU AI
+> Act), keeping a decomposable representation like this is valuable
+> on its own.
 
-## Evidential Deep Learning — Uncertainty Quantification
+> **Historical context — autoencoders.** Autoencoders originate in
+> *Rumelhart, Hinton & Williams (1986)*: "training a network to
+> reconstruct itself forms useful representations in intermediate
+> hidden layers." They evolved into Denoising Autoencoders (Vincent
+> et al., ICML 2008) and VAE (Kingma & Welling, ICLR 2014). Sparse
+> Autoencoders were systematised by *Andrew Ng* in his 2011 Stanford
+> lectures and were re-popularised when Anthropic's "Towards
+> Monosemanticity" (Bricken et al., 2023) applied them to the
+> residual stream of LLMs to extract interpretable features.
 
-### Purpose
+## Decision 2 — Evidential Deep Learning for epistemic uncertainty
 
-Quantify the *epistemic uncertainty* of task predictions (how much the
-model "doesn't know") to evaluate recommendation trust. Predictions
-with high uncertainty are routed to *fallback logic* at serving time.
+### The problem — Softmax cannot say "I don't know"
 
-### Principle (Sensoy et al., NeurIPS 2018)
+A softmax classifier always outputs a probability distribution.
+Faced with an out-of-distribution customer — a pattern outside the
+training distribution — it still confidently prints "70% churn
+probability." There is no signal telling serving to fall back to
+rule on a boundary case.
+
+Alternatives:
+
+- **Monte Carlo Dropout (Gal & Ghahramani 2016).** Run inference with
+  dropout on, multiple times, and read variance. Simple, but inference
+  cost scales by $N$ and serving latency suffers.
+- **Deep Ensemble (Lakshminarayanan et al., 2017).** Train $N$
+  independent models and read prediction variance. Gold standard for
+  reliability, but training cost $\times N$.
+- **Evidential Deep Learning (Sensoy et al., NeurIPS 2018).** Predict
+  the parameters of a Dirichlet distribution itself. One forward pass
+  yields both "prediction" and "uncertainty of that prediction"
+  together.
+
+Option three. Inference cost is essentially identical to standard
+softmax, and uncertainty falls out naturally.
+
+### The principle
 
 For classification tasks, predict the *parameters of a Dirichlet
 distribution* instead of a softmax output.
@@ -162,72 +195,33 @@ $$u = K / S \quad (\text{epistemic uncertainty})$$
 > confident when enough evidence accumulates; say honestly 'I don't
 > know' when evidence is absent."
 
-> **Undergraduate math — the Dirichlet distribution: modelling
-> "probabilities of probabilities."** The Dirichlet distribution
-> $\text{Dir}(\mathbf{p} | \boldsymbol{\alpha})$ is a distribution
-> over the probability simplex. It generates a $K$-dimensional
-> probability vector $\mathbf{p} = (p_1, \dots, p_K)$
-> ($\sum p_k = 1$, $p_k \geq 0$), with probability density
-> $f(\mathbf{p} | \boldsymbol{\alpha}) = \frac{\Gamma(\sum \alpha_k)}{\prod \Gamma(\alpha_k)} \prod_{k=1}^K p_k^{\alpha_k - 1}$.
-> $\Gamma(n)$ is the gamma function, with $\Gamma(n) = (n-1)!$ for
-> natural numbers (the continuous extension of factorial).
-> Intuitively: if all $\alpha_k$ equal 1, any $\mathbf{p}$ is equally
-> likely (uniform); if all $\alpha_k$ are large, mass concentrates
-> near the centre $(1/K, \dots, 1/K)$ (confidence); if only a
-> specific $\alpha_k$ is large, mass shifts toward that class.
-> Concrete example ($K = 3$): $\boldsymbol{\alpha} = (1, 1, 1)$ gives
-> a uniform distribution over the triangle;
-> $\boldsymbol{\alpha} = (10, 10, 10)$ concentrates near
-> $(1/3, 1/3, 1/3)$ — "I am confident the three class probabilities
-> are similar"; $\boldsymbol{\alpha} = (100, 1, 1)$ concentrates near
-> $(1, 0, 0)$ — "I am confident class 1 is almost certain." By
-> letting the network predict the Dirichlet's $\boldsymbol{\alpha}$,
-> we can quantify "the variance of the prediction probabilities
-> themselves" and express uncertainty.
+> **Undergraduate math — the Dirichlet distribution.** $\text{Dir}(\mathbf{p} | \boldsymbol{\alpha})$
+> is a distribution over the probability simplex. If all $\alpha_k = 1$,
+> it is uniform; if all are large, mass concentrates near the center
+> $(1/K, \dots, 1/K)$ (confidence); if only a particular $\alpha_k$ is
+> large, mass shifts toward that class. For instance
+> $\boldsymbol{\alpha} = (10, 10, 10)$ says "I'm confident all three
+> classes are equally likely," and $\boldsymbol{\alpha} = (100, 1, 1)$
+> says "I'm confident class 1 is almost certain." When the network
+> predicts $\boldsymbol{\alpha}$, it also quantifies the variance of
+> the prediction itself.
 
 > **Historical context.** Evidential Deep Learning was proposed by
-> *Sensoy, Kaplan & Kandemir (NeurIPS 2018)*. Combining
-> Dempster-Shafer evidence theory (1968, 1976) and Subjective Logic
-> (Jøsang, 2016) with neural networks, they set out to solve the
-> overconfidence problem of softmax outputs. The core idea — modelling
-> "probabilities of probabilities" — was inspired by the Bayesian
-> tradition of placing Dirichlet priors on posterior distributions
-> (Ferguson, 1973). Later, Amini et al. (NeurIPS 2020) extended the
-> framework to regression, proposing *Evidential Regression* that
-> quantifies uncertainty of continuous predictions using the
-> Normal-Inverse-Gamma (NIG) distribution.
+> *Sensoy, Kaplan & Kandemir (NeurIPS 2018)*, combining Dempster-Shafer
+> evidence theory (1968, 1976) and Subjective Logic (Jøsang 2016)
+> with neural networks. In 2020 Amini et al. extended it to regression
+> (*Evidential Regression*) with the Normal-Inverse-Gamma distribution.
+> As of 2024–2025, uncertainty quantification is becoming a
+> regulatory requirement in autonomous driving, medical diagnosis,
+> and financial risk assessment, which has accelerated industrial
+> adoption.
 
-> **Recent trends.** In 2024-2025, the evidential DL field focuses
-> on *improving calibration* and *better OOD (Out-of-Distribution)
-> detection*. The Posterior Network of Pandey & Yu (AAAI 2023) and
-> the Natural Posterior Network of Charpentier et al. combine
-> Normalizing Flows to raise the accuracy of evidence estimation. On
-> the industry side, uncertainty quantification is becoming a
-> regulatory requirement in autonomous driving (Waymo, 2024),
-> medical diagnosis (Google Health), and financial risk assessment,
-> accelerating production adoption. Research applying evidential
-> approaches to LLM hallucination detection (Ren et al., 2024) is
-> also drawing attention.
+### Implementation and auxiliary loss
 
-### Implementation
-
-`_build_evidential_layers()` (lines 898~931) builds a per-task
-`EvidentialLayer`.
-
-```python
-# ple_cluster_adatt.py:921-927
-self.evidential_layers[task_name] = EvidentialLayer(
-    input_dim=self.task_expert_output_dim,  # 32D
-    task_type=task_type,
-    output_dim=output_dim,
-    kl_lambda=0.01,
-    annealing_epochs=10,
-)
-```
-
-In `forward()` (lines 1253~1260), it is applied in parallel to the
-Task Expert output (32D); `compute_evidential_loss()` (lines
-1838~1841) adds the auxiliary KL loss.
+`_build_evidential_layers()` creates per-task `EvidentialLayer`
+instances that attach in parallel to the Task Expert output (32D) and
+predict $\boldsymbol{\alpha}$. `compute_evidential_loss()` adds an
+auxiliary KL loss.
 
 $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoch}/\text{anneal}) \cdot \text{KL}(\text{Dir}(\boldsymbol{\alpha}) \,\|\, \text{Dir}(\mathbf{1}))$$
 
@@ -245,11 +239,16 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 > getting answers right; once you have some skill, learn to express
 > your confidence honestly."
 
-## Full 18-Task Spec
+## Full 18-Task Spec — reference
 
-Below is the complete specification of all 18 tasks defined in the
-system. 16 are currently active; uplift and category\_uplift are
-deactivated.
+With interpretability and uncertainty handled, what's left is the
+*accounting* of how every decision above actually sits in the system.
+What follows is the reference operators consult — not new decisions,
+but the concrete values the previous five posts' decisions resolved
+to.
+
+The complete specification of all 18 tasks defined in the system. 16
+are currently active; uplift and category_uplift are deactivated.
 
 | Task | Group | Loss | dim | HMM mode | Weight | Active |
 |---|---|---|---|---|---|---|
@@ -281,39 +280,13 @@ deactivated.
 | Value | Balance\_util, Channel, Timing | 0.6 | 0.3 |
 | Consumption | NBA, Spending\_category, Consumption\_cycle, Spending\_bucket, Merchant\_affinity, Brand\_prediction | 0.7 | 0.3 |
 
-> **Undergraduate math — what the intra/inter transfer strengths
-> mean.** The adaTT *intra strength* ($= 0.6 \sim 0.8$) is the
-> gradient transfer ratio between tasks within the same group; the
-> *inter strength* ($= 0.3$) is the ratio between tasks across
-> different groups. Mathematically, the amount of gradient
-> transferred from task $i$ to task $j$ is
-> $\mathbf{g}_j^{transferred} = \mathbf{g}_j + \alpha_{ij} \cdot \text{proj}(\mathbf{g}_i, \mathbf{g}_j)$,
-> where
-> $\text{proj}(\mathbf{g}_i, \mathbf{g}_j) = \frac{\mathbf{g}_i \cdot \mathbf{g}_j}{\|\mathbf{g}_j\|^2} \cdot \mathbf{g}_j$
-> is the projection of $\mathbf{g}_i$ onto the direction of
-> $\mathbf{g}_j$. A *projection* is the operation of "extracting
-> only the component of vector $\mathbf{a}$ along the direction of
-> vector $\mathbf{b}$,"
-> $\text{proj}_{\mathbf{b}}(\mathbf{a}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{b}\|^2} \mathbf{b}$.
-> Intuitively, within a group (e.g. CTR and CVR) gradients point in
-> similar directions, so large transfer ($\alpha = 0.8$) is
-> beneficial; across groups (e.g. CTR and Churn) gradients can
-> conflict, so small transfer ($\alpha = 0.3$) is safer.
-
-> **Recent trends — the frontier of gradient-based multi-task
-> optimisation.** adaTT's gradient-based transfer extends a research
-> stream that began with *PCGrad (Yu et al., NeurIPS 2020)*. PCGrad
-> eliminates conflicts by projecting conflicting gradients onto each
-> other's normal direction, while *CAGrad (Liu et al., NeurIPS 2021)*
-> finds a direction that guarantees a minimum improvement for every
-> task. *Nash-MTL (Navon et al., ICML 2022)* formalises this as a
-> Nash bargaining game and derives Pareto-optimal solutions. In
-> 2024-2025, *Aligned-MTL (Senushkin et al., CVPR 2023)* uses the
-> SVD of the gradient matrix to find aligned update directions, and
-> *FairGrad (Mahapatra & Rajan, 2024)* even considers fairness across
-> tasks. This system's adaTT is distinctive in explicitly exploiting
-> *group structure*, and by setting intra/inter strengths separately
-> it injects domain knowledge (e.g. the CTR-CVR relationship).
+> **What intra / inter mean.** adaTT's *intra strength* ($= 0.6 \sim 0.8$)
+> is the gradient transfer ratio between tasks within the same group;
+> *inter strength* ($= 0.3$) is the ratio between tasks across groups.
+> Same-group pairs (e.g. CTR, CVR) have similar gradient directions,
+> so larger transfer is beneficial; cross-group pairs (e.g. CTR,
+> Churn) can conflict, so smaller transfer is safer. Full adaTT math
+> lives in the separate ADATT sub-thread.
 
 ## Paper vs Implementation Comparison
 
@@ -344,14 +317,15 @@ deactivated.
 
 ### Main architectural innovations
 
-Design elements unique to this project:
+Design elements unique to this project — one-line recaps of the
+decisions from the previous five posts:
 
-1. *Heterogeneous Expert combination*: instead of single-structure experts, combine 7 heterogeneous domain experts — GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT.
-2. *CGC dimension normalisation*: corrects asymmetric expert output dimensions (128D vs 64D)
-3. *HMM Triple-Mode routing*: selectively injects an HMM mode matched to each task's time scale
-4. *GroupTaskExpertBasket*: GroupEncoder + ClusterEmbedding yields 88% parameter reduction
-5. *Logit Transfer chain*: execution order is derived automatically from topological sort
-6. *Evidential + SAE*: uncertainty quantification plus expert-representation interpretability
+1. *Heterogeneous Expert combination* (PLE-2, PLE-3): seven heterogeneous domain experts in place of homogeneous MLPs
+2. *CGC dimension normalisation* (PLE-4): corrects the 128D vs 64D asymmetry
+3. *HMM Triple-Mode routing* (PLE-4): injects the right time-scale state into each task group
+4. *GroupTaskExpertBasket* (PLE-5): GroupEncoder + ClusterEmbedding yields 88% parameter reduction
+5. *Logit Transfer chain* (PLE-5): execution order derived automatically from topological sort
+6. *Evidential + SAE* (PLE-6): uncertainty quantification plus expert-representation interpretability
 
 ## Debugging Guide
 
@@ -450,9 +424,8 @@ Design elements unique to this project:
 | **Total (incl. SAE)** | **~3.75M** | SAE is detached (analysis-only) |
 
 > **How to check parameter counts.** The `model.summary()` method
-> (lines 1967~2073) prints parameter counts per module. The figures
-> above are estimates; actual values depend on the config. Run
-> `summary()` after initialising the model for exact numbers.
+> prints parameter counts per module. The figures above are estimates;
+> actual values depend on the config.
 
 ### Training settings summary
 
@@ -471,49 +444,10 @@ Design elements unique to this project:
 | adaTT freeze | 1 epoch (production: 28) |
 | CGC freeze | synced with adaTT `freeze_epoch` |
 
-> **Undergraduate math — the mathematical structure of AdamW.** AdamW
-> was proposed by *Loshchilov & Hutter (ICLR 2019)* as Adam with
-> *decoupled weight decay*. The update rule of base Adam is
-> $\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1 - \beta_1) \mathbf{g}_t$
-> (1st moment = moving average of gradients),
-> $\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2$
-> (2nd moment = moving average of squared gradients),
-> $\hat{\mathbf{m}}_t = \mathbf{m}_t / (1 - \beta_1^t)$,
-> $\hat{\mathbf{v}}_t = \mathbf{v}_t / (1 - \beta_2^t)$ (bias
-> correction),
-> $\boldsymbol{\theta}_t = \boldsymbol{\theta}_{t-1} - \eta \cdot \hat{\mathbf{m}}_t / (\sqrt{\hat{\mathbf{v}}_t} + \epsilon)$.
-> Here $\eta$ is the learning rate; $\beta_1 = 0.9$, $\beta_2 = 0.999$
-> are typical. Intuitively, $\hat{\mathbf{m}}_t$ says "which
-> direction to go" (1st moment = inertia), while
-> $\sqrt{\hat{\mathbf{v}}_t}$ says "how much this direction's
-> gradient fluctuates" (2nd moment = adaptive learning rate) —
-> high-variance parameters are stabilised by automatically shrinking
-> their effective learning rate. AdamW's key difference is to apply
-> weight decay directly to parameters rather than through gradients:
-> $\boldsymbol{\theta}_t = \boldsymbol{\theta}_{t-1}(1 - \eta \lambda) - \eta \cdot \hat{\mathbf{m}}_t / (\sqrt{\hat{\mathbf{v}}_t} + \epsilon)$
-> ($\lambda = 0.01$ = `weight_decay`), correctly implementing L2
-> regularisation.
-
-> **Historical context — the cosine annealing learning rate
-> scheduler.** Cosine annealing was proposed by *Loshchilov & Hutter
-> (ICLR 2017)* in the SGDR (Warm Restarts) paper. The learning rate
-> is decayed as a cosine,
-> $\eta_t = \eta_{min} + \frac{1}{2} (\eta_{max} - \eta_{min})(1 + \cos(\pi t / T_0))$.
-> The learning rate is periodically restored to its maximum (warm
-> restart), repeatedly offering opportunities to escape local
-> minima. $T_0 = 10$ is the length of the first cycle, and
-> $T_{mult} = 2$ doubles the cycle length each time (10→20→40
-> epochs). This gives smoother transitions than StepLR (step decay)
-> and explores a wider loss landscape than exponential decay thanks
-> to warm restarts. Since 2020, cosine schedulers have become the
-> standard for most large-model training — the warm-up + cosine
-> decay combination is used even in GPT-3, PaLM, and other LLMs.
-
 ### Core config paths
 
 The single source of truth for the model is
-`configs/model_config.yaml`. The mapping between major sections and
-model methods:
+`configs/model_config.yaml`.
 
 | Config section | Description | Reading method |
 |---|---|---|
@@ -533,10 +467,10 @@ model methods:
 ## Download the full PLE Tech Reference
 
 That closes a walk from PLE-1 through PLE-6 across the on-prem
-`기술참조서/PLE_기술_참조서` in blog form — equations, historical
-context, implementation details all included. The original PDF is a
-longer reference document with typesetting, index, and page numbers
-fully preserved.
+`기술참조서/PLE_기술_참조서` in blog form. Each post started from the
+problem the previous post's solution had introduced and moved to the
+next decision — a chain. The original PDF is a longer reference
+document with typesetting, index, and page numbers fully preserved.
 
 > **📄 [Download the PLE Tech Reference (full PDF)](/PLE_기술_참조서.pdf)** · KO · ~56 pages
 >
@@ -547,22 +481,20 @@ fully preserved.
 
 ## Closing the PLE sub-thread, onward to adaTT
 
-That is the end of the PLE sub-thread. Starting from the limits of
-Shared-Bottom and MMoE in PLE-1, through the explicit Shared/Task
-Expert separation and the mathematical intuition behind it in PLE-2,
-the input structure (PLEClusterInput · 734D) and seven heterogeneous
-Shared Expert pool in PLE-3, the two CGC gate stages (Stage 1 CGCLayer
-weighting Shared + Task together, Stage 2 CGCAttention block-scaling
-the Shared concat) and HMM Triple-Mode routing in PLE-4,
-GroupTaskExpertBasket,
-Logit Transfer, and Task Tower in PLE-5, and in this sixth post
-interpretability (SAE), uncertainty (Evidential), the 18-task spec,
-the paper-vs-implementation innovations, debugging guide, and
-appendix — all the major components of this project's PLE-family
-architecture have been laid out in blog form.
+That is the end of the PLE sub-thread. Each post was a link in a
+chain, starting from a problem the previous post's solution had
+opened.
+
+- **PLE-1**: Shared-Bottom → MMoE — gradient conflict leading to Expert Collapse.
+- **PLE-2**: explicit Shared/Task split + heterogeneous experts + softmax gate — a three-part answer to MMoE collapse.
+- **PLE-3**: the seven experts, one by one — what gap each fills and why they don't reduce to one another.
+- **PLE-4**: dim-asymmetry and time-scale separation — two-stage CGC + HMM Triple-Mode.
+- **PLE-5**: memory, task dependency, loss balance — GroupTaskExpertBasket, Logit Transfer, Uncertainty Weighting.
+- **PLE-6**: interpretability and uncertainty — SAE and Evidential DL, plus the full-spec reference.
 
 The separate **ADATT-1** opens the adaTT sub-thread. It will cover the
 motivation for "adaptive towers" starting from the limits of fixed
 towers, why Transformer Attention is the right mechanism for task
 adaptation, and where adaTT sits in the lineage of conditional
-computation and hypernetworks.
+computation and hypernetworks — same format, same chain of "problem
+the last decision left → next decision."

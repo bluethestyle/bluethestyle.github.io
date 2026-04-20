@@ -15,128 +15,212 @@ next_status: published
 *PLE-2 of the "Study Thread" series — a parallel English/Korean
 sub-thread running PLE-1 → PLE-6 that summarizes the papers and math
 foundations behind the PLE architecture used in this project. Source:
-the on-prem `기술참조서/PLE_기술_참조서` document. This second post is
-about how PLE (Tang et al., RecSys 2020) fixes the failure modes of
-Shared-Bottom and MMoE — the explicit balance between sharing and
-separation, the roles of Experts and Gates, what the equations actually
-say, and the narrative of "why PLE."*
+the on-prem `기술참조서/PLE_기술_참조서` document. This second post
+picks up exactly where PLE-1 left off — at MMoE's Expert Collapse —
+and walks through the three chained decisions the architecture makes
+in response.*
 
-## PLE: The Explicit Balance Between Sharing and Separation
+## What PLE-1 left on the table
 
-Tang et al. (RecSys 2020)'s PLE splits experts into two kinds.
+MMoE was the answer to Shared-Bottom's gradient conflict. Instead of
+forcing every task through one shared trunk, it puts multiple experts
+between the trunk and the task towers, and a per-task gate learns
+how much of each expert to use. In theory, conflict dissolves — if
+task $i$ leans on Expert A and task $j$ leans on Expert B, they stop
+stepping on each other's gradients.
 
-- *Shared Expert* ($\mathcal{E}^s$): a common expert that every task can access.
-- *Task-specific Expert* ($\mathcal{E}^k$): a private expert that only task $k$ can access.
+In practice it does not play out that way. When training starts, one
+of the experts — because of parameter init, input distribution, or
+loss magnitude differences — receives a slightly larger gradient in
+the first few steps. That expert becomes slightly more useful. Every
+task's gate tilts slightly toward it. That expert receives still more
+gradient, and gets more useful. A winner-take-all positive feedback
+loop — *Expert Collapse* — kicks in. Eventually every task uses the
+same expert; the other experts' parameters barely update. The model
+has quietly degenerated back into Shared-Bottom.
 
-Each task's gate takes both the Shared Expert and its own private expert
-as inputs, and learns the optimal combination ratio.
+The diagnosis is clean. The expert pool is *symmetric*. Every expert
+shares the same architecture, the same input, the same initialization.
+Asking a gate to "learn a division of labor" inside that symmetry is
+basically asking 7 identical employees to do 7 different jobs —
+whoever pulls ahead first attracts all the work.
+
+PLE's answer is in two moves. Break the symmetry at the architecture
+level, then layer a constrained gate on top.
+
+## Decision 1 — split shared and task-private experts explicitly
+
+Tang, Liu, Zhao & Gong (RecSys 2020) argue: don't hope the gate
+learns to divide labor; bake the division into the architecture.
+Concretely, split the experts into two categories.
+
+- *Shared Expert* ($\mathcal{E}^s$): a public expert pool every task can attend to.
+- *Task-specific Expert* ($\mathcal{E}^k$): a private expert only task $k$ can use.
+
+Each task's gate receives both the Shared pool and its private
+expert as inputs, and learns the best combination ratio.
 
 $$\mathbf{h}_k = \sum_{i=1}^{|\mathcal{E}^s|} g_{k,i}^s \cdot \mathbf{e}_i^s + \sum_{j=1}^{|\mathcal{E}^k|} g_{k,j}^k \cdot \mathbf{e}_j^k$$
 
-What this design solves:
+What this one line resolves:
 
-1. **Mitigates Negative Transfer**: the task-specific Expert can learn
-   patterns that only that task cares about, without interference.
-2. **Prevents Expert Collapse**: the Shared Expert is forced to learn
-   information that must be useful to every task, while the Task Expert
-   learns specialized information — roles separate naturally.
-3. **Progressive**: multiple Extraction Layers can be stacked so that
-   per-task representations are refined progressively, low-level to
-   high-level.
+1. **Negative Transfer dampens.** The task-private expert learns
+   patterns only that task cares about, without getting trampled by
+   gradients from other tasks. The surface area where conflicts can
+   happen (shared parameters) shrinks.
+2. **Expert Collapse is blocked structurally.** A task-private
+   expert only ever sees its own task's gradient. The scenario "every
+   task converges onto the same expert" becomes physically impossible.
+3. **Role differentiation becomes automatic.** The Shared Expert ends
+   up carrying "parameters that must remain useful to every task,"
+   while the Task Expert carries "parameters that only need to help
+   one task." The two kinds of representation separate by construction.
 
 > **Historical context.** PLE was proposed by *Tang, Liu, Zhao & Gong
-> (RecSys 2020)* on Tencent's video recommender system. At the time,
-> Tencent Video had to simultaneously optimize multiple engagement
-> metrics: VCR (Video Completion Rate), VTR (Video Through Rate), Share
-> Rate, and so on. MMoE was already in production, but Expert Collapse
-> and the seesaw effect were severe, and PLE was born from the idea "what
-> if we explicitly split Experts into shared and private ones?" In the
-> paper, PLE is reported as the first MTL architecture to improve every
-> task simultaneously relative to MMoE. It has since been adopted widely
-> at Alibaba, JD.com, Kuaishou, ByteDance and other large Chinese
-> platforms, and is now a de facto standard for industrial MTL.
+> (RecSys 2020)* on Tencent's video recommender system, where VCR,
+> VTR, Share Rate and other engagement metrics had to be optimized
+> simultaneously. MMoE was in production, but Expert Collapse and
+> seesaw were severe — PLE was reported as the first MTL architecture
+> to improve every task simultaneously relative to MMoE. It has since
+> become the de facto industrial standard at Alibaba, JD.com,
+> Kuaishou, ByteDance, and similar large platforms.
 
-## Where this project diverges from the paper — from homogeneous MLPs to heterogeneous experts
+## Decision 2 — make the expert pool heterogeneous
 
-In the original PLE paper (Tang et al., 2020), both the Shared Experts
-and the Task-specific Experts are *identically structured small MLPs*.
-The idea of "more experts for richer representation" survives, but no
-individual expert carries a different inductive bias from the others —
-what differs across experts is only the gate weight each one receives.
+The original PLE paper, however, uses *identically structured small
+MLPs* for both Shared and Task-specific experts. The "more experts,
+more capacity" idea survives, but no individual expert carries a
+different inductive bias — what differs across experts is only the
+gate weight each one receives.
 
-This project takes one step further. **We make the Shared Expert pool
-heterogeneous.** The seven Shared Experts are each chosen to represent
-a *structurally distinct mathematical perspective*.
+That setup was fine for Tencent Video. The tasks there (VCR, VTR,
+Share Rate) were essentially variants of the same user–item
+engagement prediction, so a homogeneous pool was expressive enough.
+But the 13 tasks in this project are far more heterogeneous — next
+best product, churn prediction, customer value tiering, similar
+customer search, brand prediction, LTV regression. Feeding all of
+those through seven identical MLPs gives the gate very little
+structural information to discriminate on. "MLP-3 helped CTR, MLP-5
+helped Churn" is a signal hard to separate from noise.
+
+So we went a step further: **make the Shared Expert pool
+heterogeneous.** The seven experts are each chosen to represent a
+structurally distinct mathematical perspective.
 
 - *Hyperbolic geometry* (unified_hgcn) — hierarchies in hyperbolic space
 - *Persistent homology* (perslay) — topological shape of transaction patterns
 - *Factorization machine* (deepfm) — symmetric pairwise feature crosses
 - *Temporal dynamics* (temporal) — time-series patterns
-- *Bipartite graph* (lightgcn) — customer-product relations
+- *Bipartite graph* (lightgcn) — customer–merchant collaborative signal
 - *Causal inference* (causal) — do-operator level features
 - *Optimal transport* (optimal_transport) — distances between distributions
 
-### Why this choice
+Three reasons to do this.
 
-Three reasons.
-
-**Encode expressiveness through inductive bias, not parameter count.** A
-single 12GB VRAM card cannot support several Transformer-scale experts
-stacked on top of each other. If each expert instead borrows a
-structure that is already well-optimized in its home domain (HGCN's
-hyperbolic geometry, PersLay's persistent homology, and so on), a
-great deal of expressive capacity is bought per parameter.
+**Encode expressiveness as inductive bias, not parameter count.** A
+single 12GB VRAM card cannot support multiple Transformer-scale
+experts. If each expert borrows a structure that is already
+well-optimized in its home domain (HGCN's hyperbolic geometry,
+PersLay's persistent homology), we buy a lot of representational
+capacity per parameter. Given a fixed parameter budget, structural
+diversity beats depth for our problem.
 
 **Make explainability structural, not post-hoc.** "unified_hgcn
-contributed 35%, temporal contributed 28%" is not a SHAP approximation
-— it is the *actual gate weight computed by the model*. And the
-names themselves are business-readable ("hierarchy", "temporal
-pattern"), which is not possible with a homogeneous MLP ensemble —
-"MLP #3 contributed 28%" is no explanation for a customer or a
-regulator.
+contributed 35%, temporal contributed 28%" is not a SHAP
+approximation — it is the *actual gate weight computed by the model*,
+and the names are business-readable ("hierarchy", "temporal
+pattern"). A homogeneous MLP ensemble cannot do this; "MLP-3
+contributed 28%" is an explanation neither customers nor regulators
+can read.
 
-**Strengthen inter-task regularization.** Homogeneous experts tend to
-converge onto similar features during training (a subtler face of
-Expert Collapse). Heterogeneous experts each carry their own
-structural inductive bias, so their roles differentiate naturally.
-When a gate decides "which lens to look through," it picks from a
-space of genuinely distinguishable lenses.
+**Role differentiation across tasks becomes sharper.** Homogeneous
+experts tend to converge onto similar features during training
+(another face of Expert Collapse). Heterogeneous experts each carry
+their own structural bias and naturally differentiate. When the gate
+decides which lens to look through, it picks from a space of
+genuinely distinguishable lenses.
 
-> **Paper vs. implementation — the lesson.** The PLE paper was born
-> from Tencent Video's engagement prediction, where homogeneous MLPs
-> already beat MMoE meaningfully — because all tasks there (VCR, VTR,
-> Share Rate) predicted essentially the same kind of user-item
-> engagement. This project's 13 tasks are far more heterogeneous (next
-> best product, churn prediction, customer value tiering, similar-customer
-> search, and so on). Reflecting that heterogeneity *at the expert
-> structure level* turned out to be the right move.
+> **Analogy — referral to a specialist.** A homogeneous MLP ensemble
+> is like showing the same patient to seven internists and asking a
+> gate "whose opinion do I listen to?" The opinions look too similar
+> to pick between — the gate's decision degenerates into noise. A
+> heterogeneous expert pool is seven genuinely different specialists
+> — internist, surgeon, radiologist, psychologist, physiatrist,
+> emergency physician, pharmacist — and the symptom structurally
+> dictates which perspective matters.
 
-This decision is the premise for everything in the sections below —
-the composition of the seven heterogeneous experts, the secondary
-CGCAttention stage layered on top of the paper's CGCLayer, and the
-dimension-normalization trick for heterogeneous output dims.
+This decision underwrites everything below. The seven specific
+experts are introduced one by one in **PLE-3**, and the new problems
+that heterogeneous output dims (64D / 128D) introduce are handled by
+the two-stage CGCAttention construction plus `dim_normalize` in
+**PLE-4**.
 
-## The Roles of Expert and Gate — An Intuitive View
+## Decision 3 — CGC: a softmax-weighted gate
 
-### Expert: domain specialists looking at the world through different lenses
+With shared/task separation and a heterogeneous pool in place, the
+*shape* of the gate is the next decision. Tang et al. propose
+Customized Gate Control (CGC): task $k$'s gate computes a softmax
+weighted sum on a concat axis combining the Shared pool output and
+Task-$k$'s own expert output.
 
-An Expert is a *specialist* that interprets the input data through one
-specific perspective. This system's seven Shared Experts each provide a
-view from a completely different domain.
+$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^N$$
 
-- **unified_hgcn**: interprets product/category hierarchy in *hyperbolic space*.
-- **perslay**: captures the *topological shape* of transaction data.
-- **deepfm**: learns *crossed interactions* between features.
-- **temporal**: captures *temporal patterns* and dynamics.
-- **lightgcn**: represents *customer-item graph relations*.
-- **causal**: extracts *causal relations* between features.
-- **optimal_transport**: measures *distances between distributions*.
+Why softmax weighting — the alternatives we considered:
 
-Each is a different "lens" through which the same customer data is
-viewed. Some tasks (like CTR) care about temporal patterns, while others
-(like Brand Prediction) care about hierarchical relations.
+- **Hard selection (top-1).** "Use only the highest-scoring expert."
+  Compute-cheap but non-differentiable; needs straight-through
+  estimators. More importantly, it cannot express natural mixtures
+  like "task A wants 60% Shared and 40% Task."
+- **Independent sigmoid weights.** "Each expert gets an independent
+  0–1 score." No sum constraint, so degenerate solutions where
+  everything goes to 1 or 0 are hard to rule out.
+- **Attention ($\mathbf{QK}^T / \sqrt{d}$).** CGC is essentially a
+  special case of Attention (Query = task projection, Key = expert
+  representation, Value = expert output), so this is what we pick.
+  The softmax-weighted sum is the shadow cast by Attention
+  mathematics.
 
-#### Comparing the seven Shared Experts: input, learning target, irreplaceability
+$$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{Softmax}\left(\frac{\mathbf{Q} \mathbf{K}^T}{\sqrt{d_k}}\right) \mathbf{V}$$
+
+In CGC, the Query is task $k$'s gate weight, the Key is the shared
+representation $\mathbf{h}_{shared}$, and the Value is each expert's
+output block. The only difference from a Transformer is that
+attention is computed between *experts*, not between tokens in a
+sequence. Same math, different unit.
+
+> **Three reasons to prefer softmax.** (1) *Positivity*: $e^x > 0$,
+> so there are no negative-weight pathologies. (2) *Sum to 1*: the
+> weights form a probability distribution, directly readable as "the
+> attention this task pays to each expert for this input." (3)
+> *Differentiation is clean*: $\frac{d}{dx} e^x = e^x$, gradients
+> are simple. For the same reasons softmax is the default
+> classification head in undergraduate ML, it is the default gate for
+> expert mixing too.
+
+## Experts and gates, in three angles
+
+The three decisions above (split, heterogeneity, softmax weighting)
+compose into a system. Here it is from three different angles.
+
+### Experts as different lenses
+
+The seven Shared Experts are *the same customer data* read through
+seven very different perspectives.
+
+- **unified_hgcn**: product/category hierarchy in *hyperbolic space*.
+- **perslay**: the *topological shape* of transaction data.
+- **deepfm**: *crossed interactions* between features.
+- **temporal**: *temporal patterns* and dynamics.
+- **lightgcn**: customer–merchant *graph relations*.
+- **causal**: *directional causal* structure between features.
+- **optimal_transport**: *distances between distributions*.
+
+Some tasks (CTR) care most about temporal patterns; others (Brand
+Prediction) need hierarchy. Even given the same customer data, which
+lens a task looks through is allowed to differ — that is the starting
+premise of the heterogeneous pool.
+
+#### Comparing the seven Shared Experts: input, target, irreplaceability
 
 | Expert | Input | Learning target | Why it can't be replaced by another Expert | Output dim |
 |---|---|---|---|---|
@@ -148,380 +232,124 @@ viewed. Some tasks (like CTR) care about temporal patterns, while others
 | Causal | Normalized 644D | Directional causal structure between features (DAG) | Confounder removal, asymmetric causal structure | 64D |
 | OT | Normalized 644D | Customer–prototype distribution distance | Encodes distributional geometry via the Wasserstein distance | 64D |
 
-> **Why all seven Experts are needed.** The seven Experts each capture a
+> **Why all seven Experts are needed.** The seven each capture a
 > different facet of the same customer, and the CGC Gate learns the
-> per-task optimal combination. Three Experts (DeepFM, Causal, OT) take
-> the same normalized 644D as input, but extract fundamentally different
-> mathematical structures — symmetric / asymmetric / distance — so they
-> are not redundant.
+> per-task optimal combination. Three Experts (DeepFM, Causal, OT)
+> take the same normalized 644D as input, but extract fundamentally
+> different mathematical structures — *symmetric / asymmetric /
+> distance* — so they are not redundant.
 
-### Gate: how much should we listen to each specialist?
+### The gate as an attention distribution
 
-The Gate is an *attention mechanism* that decides, per task, "how much do
-we trust each Expert's opinion?"
+The gate is an *attention mechanism* that decides, per task, how much
+to trust each expert's opinion. The equation is above; unpacked:
 
-$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^7$$
-
-What this equation says is clear.
-
-- $\mathbf{W}_k \cdot \mathbf{h}_{shared}$: look at the current input and *score* each Expert's relevance.
-- $\text{Softmax}$: convert scores into a probability distribution summing to 1.
-- $\mathbf{w}_k \in \mathbb{R}^7$: the *trust vector* that task $k$ assigns to the 7 Experts.
+- $\mathbf{W}_k \cdot \mathbf{h}_{shared}$: look at the current input
+  and *score* each expert's relevance.
+- $\text{Softmax}$: convert scores into a probability distribution
+  summing to 1.
+- $\mathbf{w}_k \in \mathbb{R}^7$: the *trust vector* that task $k$
+  assigns to the 7 experts.
 
 > **Analogy — a medical diagnosis committee.** Seven specialists
-> (Experts) diagnose a patient (input data) each from their own field.
-> The internist, the surgeon, the radiologist, and so on each write an
-> opinion (Expert output). The Gate is the *primary doctor* deciding
-> "when judging this patient's condition, how much weight should each
-> specialist's opinion carry?" For cardiac symptoms, the internist's
-> opinion gets high weight; for trauma, the surgeon gets high weight.
+> examine a patient, each from their own field. The gate is the
+> *primary physician* deciding whose opinion carries what weight
+> when judging this patient's condition. Cardiac symptoms weight the
+> internist, trauma weights the surgeon — the same picture as "each
+> task needs a different mix of lenses," told without equations.
 
-> **Undergraduate math — why does Softmax use $e^x$ (the natural
-> exponential)?** Softmax turns an arbitrary real-valued vector into a
-> probability distribution (positive, summing to 1):
-> $\text{Softmax}(z_i) = e^{z_i} / \sum_j e^{z_j}$. Three reasons to
-> pick $e^x$: (1) *Positivity*: $e^x > 0$ for all real $x$, so there is
-> no "negative probability" problem. (2) *Monotone increasing*: if
-> $z_i > z_j$ then $e^{z_i} > e^{z_j}$, so score ordering is preserved.
-> (3) *Ease of differentiation*: $\frac{d}{dx} e^x = e^x$, so gradient
-> computation stays clean. *Concrete calculation*: a score vector
-> $\mathbf{z} = [2.0, 1.0, 0.1]$ gives $e^{\mathbf{z}} = [7.39, 2.72, 1.11]$,
-> with sum $= 11.22$ and $\text{Softmax} = [0.659, 0.242, 0.099]$ —
-> score gaps have been translated into probability gaps. The larger the
-> gap, the more sharply the probabilities diverge, thanks to the
-> exponential growth of $e^x$. You could use another positive function
-> (e.g. $x^2$), but the ordering breaks for negative inputs
-> ($(-3)^2 > (-1)^2$) and the gradient vanishes near zero, so $e^x$ is
-> the optimal choice.
+### PLE as a mixture-density model
 
-## Mathematical Considerations — What the Equations Are Actually Saying
-
-### The link between gating and attention
-
-The Softmax weighted sum of a CGC gate has the exact same structure as
-the Attention mechanism of the Transformer.
-
-$$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{Softmax}\left(\frac{\mathbf{Q} \mathbf{K}^T}{\sqrt{d_k}}\right) \mathbf{V}$$
-
-In CGC:
-
-- **Query**: task $k$'s gate weight $\mathbf{W}_k$ (what this task wants to know).
-- **Key**: the shared representation $\mathbf{h}_{shared}$ (each Expert's relevance to the current input).
-- **Value**: each Expert's output block $\mathbf{h}_i^{expert}$ (the actual information).
-
-The difference is that a Transformer computes attention between tokens
-in a sequence, while CGC computes *attention between Experts*. The
-underlying mathematical principle is identical — "combine information
-selectively in proportion to relevance" — applied to a different unit
-(token vs. Expert).
-
-### The function-approximation meaning of a weighted sum of Experts
-
-Why is a weighted sum of Expert outputs so powerful? You can understand
-it from the perspective of function approximation.
+Why is a weighted sum of expert outputs so strong? From a
+function-approximation angle, each expert is a *basis function*
+specialized for a region of input space.
 
 $$\mathbf{h}_k = \sum_{i=1}^N g_{k,i} \cdot \mathbf{e}_i(\mathbf{x})$$
 
-Each Expert $\mathbf{e}_i$ can be viewed as a *basis function* specialized
-for a particular region of the input space. The Gate $g_{k,i}$ is the
-*mixing coefficient* of those basis functions. This is exactly what the
-name Mixture of Experts carries — it is a *Mixture of Experts model*.
-
-It has precisely the same structure as a statistical *mixture density
-model*.
+The gate plays the role of mixing coefficient — the same structure
+as a statistical *mixture density model*:
 
 $$p(\mathbf{y} \mid \mathbf{x}) = \sum_{i=1}^N \pi_i(\mathbf{x}) \cdot p_i(\mathbf{y} \mid \mathbf{x})$$
 
 Here $\pi_i(\mathbf{x})$ corresponds to the gate and $p_i$ to the
-Expert. Because each Expert covers a different region of input space,
-the overall model can *efficiently approximate much more complex
-functions* than a single network could.
+expert. Because each expert covers a different region of input space,
+the overall model can *efficiently approximate more complex functions*
+than a single network could. Using a heterogeneous pool makes that
+"different regions" argument structural: the basis functions already
+live in genuinely different mathematical spaces.
 
-> **Undergraduate math — the function-approximation meaning of weighted
-> sums.** In mathematics, expressing an arbitrary function as a linear
-> combination (weighted sum) of basis functions is the core of
-> approximation theory. A classical example is Fourier series
-> $f(x) = \sum a_n \cos(nx) + b_n \sin(nx)$, where a weighted sum over
-> the trigonometric basis can approximate *any periodic function*. The
-> Expert weighted sum $\mathbf{h} = \sum g_i \cdot \mathbf{e}_i(\mathbf{x})$
-> runs on the same principle. Each Expert $\mathbf{e}_i$ is a "basis
-> function" specialized to a particular pattern in input space, and the
-> gate $g_i$ plays the role of mixing coefficient. The difference is
-> that the basis itself is learned too. *Concrete example*: if the input
-> $\mathbf{x}$ is a customer with strong temporal patterns,
-> $g_{\text{temporal}} = 0.4$ grows larger; if graph relations matter,
-> $g_{\text{lightgcn}} = 0.3$ grows larger. The resulting representation
-> $\mathbf{h}$ is a mix of specialist opinions tuned to this particular
-> customer.
+> **Recent trends.** Mixture of Experts (MoE) has emerged as a core
+> architecture in 2024–2025 LLMs. Mistral's *Mixtral 8x7B* (2023),
+> Google's *Switch Transformer* (Fedus et al., 2022), DeepSeek's
+> *DeepSeek-MoE* (2024) are representative. They use Sparse MoE
+> (top-k selection) to cut compute sharply vs. parameter count. This
+> system's CGC is Dense MoE (all experts active) — acceptable because
+> with only seven experts the compute saving from sparsity is small.
 
-> **Current trends.** Mixture of Experts (MoE) has emerged as a core
-> architecture in the 2024-2025 LLM space. Mistral's *Mixtral 8x7B*
-> (2023), Google's *Switch Transformer* (Fedus et al., 2022), and
-> DeepSeek's *DeepSeek-MoE* (2024) are representative examples. These
-> use Sparse MoE (top-k selection) to cut compute sharply relative to
-> parameter count. In recommenders too, Alibaba's *Star Topology
-> Adaptive Recommender* (STAR, CIKM 2021) and Kuaishou's *PEPNet* (KDD
-> 2023) adopt MoE structures that select Experts depending on the input
-> condition. This system's CGC gating belongs to the Dense MoE family
-> (all Experts are used), and since the Expert count is small (7),
-> compute efficiency holds even without sparse selection.
+## But this design introduces still more problems
 
-### How a Progressive structure affects information flow
+With the three decisions — explicit separation, heterogeneous pool,
+softmax gate — MMoE's collapse is prevented. But new problems appear.
 
-The original PLE paper stacks multiple Extraction Layers. The task $k$
-output of the $l$-th layer is:
+**One: heterogeneous output dims.** unified_hgcn is 128D; the other
+six are 64D. Equal gate weights produce unequal L2 contributions, so
+a subtle form of collapse — leaning toward the bigger expert — is
+still available. PLE-4 fixes this with `dim_normalize`.
+
+**Two: the Shared concat needs per-task recoloring.** The original
+CGCLayer mixes Shared + Task experts along one axis, but our setup
+also needs to let each task *repaint* the 512D Shared concat
+differently. So a second stage — CGCAttention — is layered
+orthogonally on top of the paper's CGCLayer. Also a PLE-4 subject.
+
+**Three: the initial gate knows nothing.** From random init, if one
+expert lucks into slightly better early gradients, we can converge
+back into collapse. So we combine `domain_experts`-based bias
+initialization (CTR → PersLay + Temporal + UHGCN, Brand_prediction
+→ UHGCN) with **entropy regularization** as a second line of defense
+— also PLE-4.
+
+**Four: task dependencies are not yet expressed in the gate.** CTR
+should inform CVR, Churn should inform Retention, but the CGC gate
+only handles "how to mix experts." Cross-task signal passing goes
+through a separate path — Logit Transfer — in PLE-5.
+
+**Five: customers live at multiple time scales simultaneously.**
+Clicks are daily. Churn risk is monthly. Lifestyle is yearly.
+Handling all three inside one Shared pool is hard. HMM Triple-Mode
+routing — also PLE-4.
+
+## Where did "Progressive" go
+
+The original PLE paper stacks multiple Extraction Layers
+*progressively*. The task $k$ output at the $l$-th layer is:
 
 $$\mathbf{h}_k^{(l)} = \text{Gate}_k^{(l)}\left(\mathbf{E}^{s,(l)}(\mathbf{h}^{(l-1)}), \mathbf{E}^{k,(l)}(\mathbf{h}_k^{(l-1)})\right)$$
 
-As you pass through each layer:
+Each layer the Shared representation refines "information useful to
+every task" progressively, and the Task representation sharpens its
+specialization. It is the same progression as a CNN refining edges
+→ textures → objects → semantics.
 
-1. The **Shared representation** *progressively refines* information that is useful to every task.
-2. The **Task representation** becomes increasingly *specialized* to the task.
-3. Gates are trained independently per layer, so *different combination strategies per abstraction level* are possible.
+This implementation uses a single Extraction Layer. Instead, the
+four-stage pipeline — *CGC → GroupTaskExpertBasket → Logit Transfer
+→ Task Tower* — splits the progressive-refinement role across
+stages. CGC recolors the shared representation; GroupTaskExpertBasket
+does task-private refinement; Logit Transfer carries explicit
+task-to-task dependencies; Task Tower compresses to final output. We
+spread depth across the pipeline rather than stacking it inside one
+layer.
 
-This is the same principle as a CNN refining information from low-level
-(edges, textures) to high-level (objects, semantics).
+## Summary of PLE-1 → PLE-2, and what's next
 
-This implementation uses a single Extraction Layer, but the three-stage
-pipeline of *CGC → GroupTaskExpertBasket → Logit Transfer* effectively
-performs the same role of Progressive information refinement.
-
-## An Intuitive Reading of the Core Equations
-
-This section interprets what each of the main equations in this document
-actually means — "why is this equation needed here?" — from a
-practitioner's viewpoint.
-
-### PLE gating combination
-
-$$\mathbf{h}_k = \sum_{i=1}^{|\mathcal{E}^s|} g_{k,i}^s \cdot \mathbf{e}_i^s + \sum_{j=1}^{|\mathcal{E}^k|} g_{k,j}^k \cdot \mathbf{e}_j^k$$
-
-**Reading**: "Task $k$'s representation is the weighted sum of the
-shared specialists' opinions plus the weighted sum of its own private
-specialist's opinions."
-
-The first sum $\sum g_{k,i}^s \cdot \mathbf{e}_i^s$ selects only the
-parts of *shared knowledge* that are useful to task $k$, and the second
-sum $\sum g_{k,j}^k \cdot \mathbf{e}_j^k$ fetches specialized information
-from *private knowledge*. The larger the gate value $g$, the louder the
-corresponding Expert's voice.
-
-### CGC Attention weights
-
-$$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^7$$
-
-**Reading**: "Look at the current input ($\mathbf{h}_{shared}$), score
-the relevance of each of the 7 Experts, then normalize them with
-Softmax. Since the Softmax output sums to 1, this is exactly 'the
-attention distribution that task $k$ assigns to the Experts for the
-current input'."
-
-The role of the initial bias ($\mathbf{b}_k$) matters. Experts listed as
-`domain_experts` get `bias_high=1.0`, the rest get `bias_low=-1.0`, so
-that early in training attention concentrates on the Experts that
-already match domain knowledge. As training proceeds, $\mathbf{W}_k$
-updates and the distribution adjusts to fit the data.
-
-### Entropy regularization
-
-$$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left(-\frac{1}{|\mathcal{T}|}\right) \sum_{k \in \mathcal{T}} H(\mathbf{w}_k), \quad H(\mathbf{w}_k) = -\sum_{i=1}^{7} w_{k,i} \cdot \log(w_{k,i})$$
-
-**Reading**: "If the gate distribution has low entropy (concentrated on
-one Expert), penalize it — at the very least, encourage the task to make
-balanced use of multiple Experts."
-
-Why is this needed? Without entropy regularization, the gate quickly
-converges onto the single Expert with the largest gradient signal, and
-the other Experts stop training — *Expert Collapse*. This loss term is
-the constraint "at least consult every specialist."
-
-### Focal Loss
-
-$$\text{FL}(p_t) = -\alpha_t \cdot (1 - p_t)^\gamma \cdot \log(p_t)$$
-
-**Reading**: "Shrink the loss of easy examples that are already well
-predicted ($p_t \approx 1$) almost to zero, and concentrate the learning
-budget on hard examples that are still wrong ($p_t \approx 0$)."
-
-The $(1 - p_t)^\gamma$ term is the heart of it. For $p_t = 0.9$ (well
-predicted) we get $(1 - 0.9)^2 = 0.01$, a 100× down-weighting. For
-$p_t = 0.1$ (wrong), $(1 - 0.1)^2 = 0.81$, i.e. essentially full weight.
-Larger $\gamma$ attenuates easy examples more aggressively.
-
-$\alpha_t$ corrects class imbalance. The Churn task's $\alpha = 0.6$
-encodes the business judgement "missing a churner costs more than
-misclassifying a non-churner, so give positive (churn) examples more
-weight."
-
-> **Undergraduate math — the attenuation effect of $(1-p_t)^\gamma$.**
-> Raising a number in $[0, 1]$ to a higher power drives the value toward
-> zero more quickly. That is the central mechanism of Focal Loss. For
-> $\gamma = 0$, $(1-p_t)^0 = 1$ and Focal Loss $=$ standard
-> cross-entropy (no attenuation). For $\gamma = 1$, linear attenuation:
-> $p_t = 0.9 \to 0.1$, $p_t = 0.5 \to 0.5$. For $\gamma = 2$, quadratic
-> attenuation: $p_t = 0.9 \to 0.01$, $p_t = 0.5 \to 0.25$. For
-> $\gamma = 5$, aggressive attenuation: $p_t = 0.9 \to 0.00001$,
-> $p_t = 0.5 \to 0.03$. So larger $\gamma$ means "ignore easy (high
-> $p_t$) examples more strongly" and focus on the hard ones. In
-> practice $\gamma = 2$ is by far the most common — a moderate setting
-> that reduces the contribution of well-predicted examples by roughly
-> 100×.
-
-### Uncertainty Weighting
-
-$$\mathcal{L}_k^{uw} = w_k \cdot (\exp(-s_k) \cdot \mathcal{L}_k + s_k)$$
-
-**Reading**: "Automatically lower the weight of intrinsically hard
-tasks (high uncertainty) and raise the weight of easy ones. The model
-learns this balance on its own."
-
-$s_k = \log(\sigma_k^2)$ is the *learnable uncertainty* of task $k$.
-
-- Large $s_k$ (high uncertainty): $\exp(-s_k)$ shrinks and the loss
-  contribution shrinks with it. At the same time $+s_k$ grows, which
-  prevents $s_k$ from running off to infinity.
-- Small $s_k$ (low uncertainty): $\exp(-s_k)$ grows and the loss is
-  reflected strongly.
-
-This mechanism reduces the need to hand-tune per-task weights. Tuning
-the weights of 16 tasks one by one is combinatorially explosive;
-Uncertainty Weighting replaces that with *automatic balancing*.
-
-> **Undergraduate math — why $\exp$ and $\log$ always come as a pair.**
-> $\exp(x) = e^x$ and $\log(x) = \ln(x)$ are inverses of each other:
-> $\exp(\log(x)) = x$, $\log(\exp(x)) = x$. In Uncertainty Weighting,
-> defining $s_k = \log(\sigma_k^2)$ and using $\exp(-s_k)$ gives two
-> benefits: (1) $\sigma_k^2$ (variance) must be positive, but $s_k$ is
-> an unconstrained real, so optimization is easier. (2)
-> $\exp(-s_k) = \exp(-\log(\sigma_k^2)) = 1/\sigma_k^2$ is the
-> *precision*. *Concrete calculation*: $s_k = 0$ gives
-> $\exp(-s_k) = 1$ (standard loss, unchanged). $s_k = 2$ gives
-> $\exp(-2) \approx 0.135$ (only 13.5% of the loss flows through —
-> uncertain task is attenuated). $s_k = -1$ gives $\exp(1) \approx 2.718$
-> (loss amplified 2.7× — confident task is emphasized). At the same
-> time the $+s_k$ regularizer adds $+2$ when $s_k = 2$, encoding the
-> constraint "declaring high uncertainty has a cost."
-
-### Evidential Uncertainty
-
-$$u = \frac{K}{S}, \quad S = \sum_{k=1}^{K} \alpha_k$$
-
-**Reading**: "If the model has gathered a lot of evidence, it is
-confident ($S$ large, $u$ small); if it lacks evidence, it honestly says
-'I don't know' ($S$ small, $u$ large)."
-
-A standard Softmax always outputs a probability distribution for any
-input. It will confidently predict on out-of-distribution data,
-potentially leading to dangerous decisions. The Evidential approach
-models "probability over probability" — the Dirichlet distribution —
-which quantifies the uncertainty of the prediction itself.
-
-### Soft Routing
-
-$$\mathbf{e}_{cluster} = \sum_{c=0}^{19} p_c \cdot \mathbf{E}_c \in \mathbb{R}^{32}$$
-
-**Reading**: "Customers at the boundary of GMM clusters are not
-hard-assigned to a single cluster; instead, cluster embedding vectors
-are mixed in proportion to membership probability. The mixed embedding
-is combined with the GroupEncoder output and passed through the
-TaskHead."
-
-This fixes the discontinuity problem of hard clustering. A customer at
-the boundary of cluster 0 and cluster 1, if hard-assigned to id=0,
-gets no access to cluster 1's knowledge. Soft routing mixes the
-embeddings proportionally (e.g. $p_0 = 0.6$, $p_1 = 0.4$), making
-boundary-customer representations much more stable.
-
-## The Overall Narrative — "Why PLE"
-
-### The arc of the story
-
-**Starting point**: we have to predict 16 tasks at once. Training 16
-independent models is data-inefficient and throws away the common
-patterns between them.
-
-**First attempt (Shared-Bottom)**: we built a single shared network.
-Some tasks improved, but fundamentally different tasks like CTR and
-Churn interfered with each other's training — *Negative Transfer*.
-
-**Second attempt (MMoE)**: we put multiple Experts in front of a gate
-and let the task choose. But all the gates ended up picking the same
-Expert — *Expert Collapse* — and the model degenerated back into
-something indistinguishable from Shared-Bottom.
-
-**The fix (PLE)**: *explicitly split* Experts into shared and
-task-specific ones, and let a CGC gate combine them at the optimal
-ratio. The Shared Experts carry the base knowledge useful to every
-task; the task-specific Experts carry the specialized knowledge only
-one task needs.
-
-**Extension (this project)**: on top of PLE's idea, we added 7
-heterogeneous domain Experts (GCN, TDA, DeepFM, Temporal, Graph,
-Causal, OT), a GroupEncoder $+$ ClusterEmbedding (4 groups,
-20 clusters), HMM Triple-Mode routing, the Logit Transfer chain,
-Evidential uncertainty, and SAE interpretability — completing the
-*PLE-Cluster-adaTT system specialized for AIOps recommendations*.
-
-### A summary of design principles
-
-| Principle | Implementation |
-|---|---|
-| Balance of sharing and separation | 7 Shared Experts + CGC gate + GroupTaskExpertBasket |
-| Minimizing inter-task interference | Expert separation + entropy regularization + domain_experts bias |
-| Inter-task knowledge transfer | Logit Transfer (explicit) + adaTT gradient transfer (adaptive) |
-| Per-cluster specialization | GroupEncoder + ClusterEmbedding + Soft Routing |
-| Time-scale separation | HMM Triple-Mode (daily / monthly) |
-| Uncertainty awareness | Evidential Deep Learning (Dirichlet) |
-| Automatic balancing | Uncertainty Weighting (auto task weights) |
-| Interpretability | SAE (2304D sparse latent) |
-
-## Theoretical Background of PLE
-
-### Paper reference
-
-**[RecSys 2020]** Tang, H., Liu, J., Zhao, M., & Gong, X. *"Progressive
-Layered Extraction (PLE): A Novel Multi-Task Learning (MTL) Model for
-Personalized Recommendations."*
-
-### The Negative Transfer problem
-
-The most serious problem in multi-task learning (MTL) is *Negative
-Transfer*: loosely-related tasks pollute the representation space so
-badly that joint training does *worse* than single-task training.
-
-> **⚠ What Negative Transfer actually looks like.** In an AIOps system,
-> CTR (click-through rate) and Churn (attrition) have to learn
-> fundamentally different patterns — CTR is about short-term engagement,
-> Churn is about long-term attrition signals. Under Shared-Bottom, when
-> these two tasks share the same representation, one side's gradient
-> disrupts the other's training — the *seesaw effect*.
-
-### Comparing Shared-Bottom, MMoE, and PLE
-
-| Aspect | Shared-Bottom | MMoE | PLE |
+| Stage | Problem | Fix | New problem |
 |---|---|---|---|
-| Expert structure | Single Shared trunk | N Experts all shared | Shared Expert + Task-specific Expert, explicitly split |
-| Gating | None | Per-task Softmax gate | CGC: gate combining Shared + Task Experts |
-| Negative Transfer | High (every task interferes) | Moderate (Expert Collapse possible) | Low (explicit separation minimizes interference) |
-| Expert Collapse | N/A | High (all tasks pick the same Expert) | Low (Shared/Task Experts are separated) |
-| Scalability | Limited | Handled by adding Experts | Handled by adding Extraction Layers |
+| Shared-Bottom | Gradient conflict across tasks on a shared trunk | — | — |
+| MMoE | Multiple experts + per-task gates | Expert Collapse (symmetric pool) |
+| **PLE (2020)** | **Explicit Shared / Task split + CGC** | **Collapse blocked structurally** | Narrow division-of-labor in a homogeneous pool |
+| **This project** | **7 heterogeneous experts + 2-stage CGCAttention** | **Structural division + explainability** | Heterogeneous dims, gate init, task dependencies, time scales |
 
-### The PLE gating formula
-
-In PLE, the output for task $k$ is determined by a gated combination of
-the Shared Expert set $\mathcal{E}^s$ and the Task-specific Expert set
-$\mathcal{E}^k$.
-
-$$\mathbf{h}_k = \sum_{i=1}^{|\mathcal{E}^s|} g_{k,i}^s \cdot \mathbf{e}_i^s + \sum_{j=1}^{|\mathcal{E}^k|} g_{k,j}^k \cdot \mathbf{e}_j^k$$
-
-- $\mathbf{e}_i^s$: the $i$-th Shared Expert's output; $\mathbf{e}_j^k$: task $k$'s $j$-th Task Expert output.
-- $g_{k,i}^s, g_{k,j}^k$: CGC gate weights (Softmax-normalized).
-
-> **This project's PLE variant.** The original PLE paper implements
-> Task-specific Experts as independent per-task MLPs, but in this system
-> we instead have *the CGC Gate apply scale weights to the Shared Expert
-> output blocks* and pass the result into a
-> *GroupTaskExpertBasket (4 GroupEncoders + ClusterEmbedding)* — a
-> two-stage structure. The GroupTaskExpertBasket takes over the role of
-> the Task-specific Expert, achieving intra-group parameter sharing and
-> per-cluster specialization simultaneously.
+PLE-3 takes the seven experts one by one — DeepFM, LightGCN, Unified
+HGCN, Temporal, PersLay, Causal, Optimal Transport — and shows what
+mathematical lens each one uses on the same customer. How we actually
+wire them into the gate is PLE-4.

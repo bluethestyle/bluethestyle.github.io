@@ -16,24 +16,66 @@ source_label: "PLE 기술 참조서 (KO, PDF · 56 pages)"
 
 *"Study Thread" 시리즈의 PLE 서브스레드 마지막 6편. 영문/국문 병렬로
 PLE-1 → PLE-6 에 걸쳐 본 프로젝트의 PLE 아키텍처 뒤에 있는 논문과 수학
-기초를 정리해왔다. 출처는 온프렘 프로젝트 `기술참조서/PLE_기술_참조서`
-이다. 이번 6편은 Expert 해석성(Sparse Autoencoder), 불확실성
-정량화(Evidential Deep Learning), 18개 태스크 전체 사양, 논문 vs 구현
-비교, 디버깅 가이드, 부록까지 — 그리고 이 글 하단에서 전체 PDF 를
-다운로드 받을 수 있다. adaTT 는 다음 ADATT-1 부터 별도 서브스레드로
-다룬다.*
+기초를 정리해왔다. PLE-5 에서 시스템이 구조적으로 완성됐다. 학습이 되고
+예측이 나온다. 그러나 두 가지 질문이 남는다 — "Expert 가 실제로 무엇을
+학습했는지 볼 수 있는가", 그리고 "예측 신뢰도를 정량화할 수 있는가".
+이번 6편은 그 두 질문에 대한 응답이고, 이어서 전체 사양을 reference 로
+정리하고, 마지막으로 PDF 다운로드로 시리즈를 마무리한다.*
 
-## SAE (Sparse Autoencoder) — Expert 해석성
+## PLE-5 가 남긴 두 질문
 
-### 목적
+구조는 끝났다. CGC 가 Expert 를 안정적으로 고른다. GroupTaskExpertBasket
+이 클러스터별 특성화를 다룬다. Logit Transfer 가 순차 의존성을 전달한다.
+Uncertainty Weighting 이 16개 손실 스케일을 자동 균형한다. 모델이 돌고,
+예측이 나오고, 서빙에 올릴 수 있다.
 
-Shared Expert 결합 표현(512D)에서 해석 가능한 sparse feature를
-추출한다. Anthropic의 Sparse Autoencoder 접근법에서 영감을 받아,
-신경망 내부 표현을 *인간이 해석 가능한 단위* 로 분해하는 것이 목적이다.
+그런데 여기서 두 가지가 찜찜하게 남는다.
 
-### 아키텍처
+**첫째, Expert 가 뭘 학습했는지 정말 아는가.** PLE 의 핵심 설계 베팅은
+"이종 Expert 가 서로 보완적인 것을 학습할 것이다" 였다. gate 가중치가
+분산되어 있는 것 (entropy 정규화 덕분에) 은 확인 가능하지만, 그게 각
+Expert 가 *의미 있게 다른* 것을 학습했음을 보증하지는 않는다. 7개가
+비슷한 패턴을 다른 좌표계로 재표현하고 있을 수도 있다. 512D concat
+벡터는 인간이 읽기 어렵고, 단순 활성화 패턴 분석으로는 "이 뉴런이 뭘
+의미하는가" 에 답이 안 나온다.
 
-`_build_sae()` (라인 877~896)에서 `SparseAutoencoder`를 생성한다.
+**둘째, 예측을 얼마나 믿을 수 있는지 모른다.** Softmax 는 어떤 입력이든
+항상 확률 분포를 출력한다. 학습 분포에서 벗어난 out-of-distribution
+데이터에도 자신 있게 "70% 이탈 확률" 을 내놓는다. 금융 의사결정 — 여신,
+리스크, 신용 조치 — 에서 overconfidence 는 법적·재무적 부담이다. 최소한
+"이 예측을 믿지 말고 fallback 규칙으로 가라" 는 신호를 낼 수 있어야
+한다.
+
+두 질문에 순서대로 답한다. 중요한 건 두 답변이 모두 *메인 예측 경로에
+영향을 주지 않는 방식* 으로 붙는다는 점이다. 해석성과 불확실성은 분석
+도구지 예측 도구가 아니다.
+
+## 결정 1 — Expert 해석성을 위한 Sparse Autoencoder
+
+### 문제 — 512D concat 을 어떻게 읽는가
+
+7개 Expert 의 출력을 concat 한 512D 표현이 학습 이후 무엇을 담고 있는지
+직접 보기는 어렵다. 차원 하나하나는 보통 여러 개념의 섞인 활성이다 ("이
+뉴런은 50% 는 고가치 고객 신호, 30% 는 계절성, 20% 는 브랜드 선호" 같은
+뒤섞임이 흔하다 — polysemantic representation).
+
+어떻게 풀 것인가 — 몇 가지 대안:
+
+- **PCA / ICA.** 선형 방법이라 비선형 뉴럴넷 표현에서 의미 있는 분해가
+  잘 안 나온다.
+- **Attention heat-map 해석.** 이미 CGC gate 가중치가 있으니 "태스크
+  $k$ 가 Expert $i$ 에 얼마나 주의를 주는가" 는 읽힌다. 하지만 Expert
+  *내부* 에서 어떤 개념이 활성화되는지는 여전히 불투명.
+- **Sparse Autoencoder (SAE).** 표현을 과완전 (overcomplete) latent
+  공간으로 확장한 뒤 L1 제약으로 sparse 하게 분해하면, 각 latent
+  unit 이 하나의 개념에 대응하는 monosemantic 표현을 얻을 수 있다.
+  Anthropic 의 *Towards Monosemanticity* (Bricken et al., 2023) 가
+  LLM 에서 이 접근의 실제 효용을 보였다.
+
+세 번째를 택했다. 512D 를 2048D overcomplete latent 로 올리고 L1
+정규화로 희소성을 유도한다.
+
+### SAE 구조
 
 $$\mathbf{z} = \text{ReLU}(\mathbf{W}_{enc} \cdot \mathbf{h}_{shared} + \mathbf{b}_{enc}) \in \mathbb{R}^{2048}$$
 
@@ -47,77 +89,69 @@ $$\mathcal{L}_{SAE} = \|\mathbf{h}_{shared} - \hat{\mathbf{h}}\|_2^2 + \lambda_1
 - `loss_weight=0.01`: 총 손실에 기여하는 비율
 
 > **수식 직관.** 첫째 식은 인코딩 — 512D 공유 표현을 4배 확장한 2048D
-> 희소 벡터 $\mathbf{z}$ 로 변환한다. ReLU 덕분에 대부분의 원소가 0이
+> 희소 벡터 $\mathbf{z}$ 로 변환한다. ReLU 덕분에 대부분의 원소가 0 이
 > 되어, 활성화된 소수의 원소만이 "이 고객의 표현에서 어떤 개념이 켜져
-> 있는가"를 나타낸다. 둘째 식은 디코딩 — 희소 벡터에서 원래 512D를
-> 복원하여 정보 손실을 최소화한다. 셋째 식의 손실은 복원 오차($L_2$)와
-> 희소성 제약($L_1$)의 합이다. 직관적으로, "가능한 적은 수의 개념으로
-> 전문가 표현을 설명하되, 원래 정보를 잃지 말라"는 두 목표의 균형이다.
+> 있는가" 를 나타낸다. 둘째 식은 디코딩 — 희소 벡터에서 원래 512D 를
+> 복원하여 정보 손실을 최소화한다. 셋째 식의 손실은 복원 오차 ($L_2$) 와
+> 희소성 제약 ($L_1$) 의 합. 직관적으로 "가능한 적은 수의 개념으로
+> 전문가 표현을 설명하되, 원래 정보를 잃지 말라" 의 균형이다.
 
-> **학부 수학 — L1 노름과 L2 노름의 차이.**
-> $\|\mathbf{z}\|_1 = \sum_i |z_i|$ 는 각 원소의 절댓값 합이고,
-> $\|\mathbf{h} - \hat{\mathbf{h}}\|_2^2 = \sum_i (h_i - \hat{h}_i)^2$
-> 는 차이의 제곱합이다. L1 노름을 최소화하면 많은 원소가 *정확히 0*
-> 이 되는 희소(sparse) 해를 유도한다. 이는 L1의 기하학적 성질
-> 때문인데, L1 공의 꼭짓점이 축 위에 있어서 제약 하 최적화 시 해가 축
-> 위(= 나머지 좌표 0)에 놓이기 쉽다. 반면 L2 노름은 원(구)의 형태로
-> 해가 고르게 분산되어 0이 잘 나오지 않는다. 구체적 예시로
-> $\mathbf{z} = [3, 0, 0, 2, 0]$ 이면 $\|\mathbf{z}\|_1 = 5$, 0이 아닌
-> 원소가 2개뿐이다. 이렇게 희소한 $\mathbf{z}$ 는 "5개 개념 중 2개만
-> 활성"이라는 해석이 가능하다.
+> **학부 수학 — L1 vs L2 왜 L1 이 sparse 를 만드는가.** $\|\mathbf{z}\|_1
+> = \sum_i |z_i|$ 를 최소화하면 많은 원소가 *정확히 0* 이 되는 sparse
+> 해가 나온다. 기하학적으로 L1 ball 의 꼭짓점이 축 위에 있어서 제약
+> 최적화 시 해가 축에 놓이기 쉽기 때문이다. L2 ball 은 구 모양이라
+> 해가 고르게 퍼져서 0 이 잘 안 나온다. $\mathbf{z} = [3, 0, 0, 2, 0]$
+> 같이 5개 개념 중 2개만 활성된 벡터는 L1 에서 자연스럽게 유도된다.
 
-> **역사적 배경 — 오토인코더의 역사: 차원 축소에서 해석성까지.**
-> 오토인코더의 개념은 *Rumelhart, Hinton & Williams (1986)* 의 역전파
-> 논문에서 "자기 자신을 복원하도록 학습하면 중간 은닉층에 유용한
-> 표현이 형성된다"는 관찰로 시작되었다. 이후 *Vincent et al. (ICML
-> 2008)* 의 Denoising Autoencoder, *Kingma & Welling (ICLR 2014)* 의
-> Variational Autoencoder(VAE)로 발전하였다. *Sparse Autoencoder* 는
-> 은닉 표현에 L1 페널티를 부여하여 소수의 뉴런만 활성화되도록 강제하는
-> 변형으로, *Andrew Ng* 이 2011년 Stanford 강의에서 체계화하였다. 핵심
-> 아이디어는 PCA(주성분 분석)와 유사하게 차원을 축소하되, 비선형
-> 변환을 허용하고, *과완전(overcomplete)* 표현
-> ($\dim(\mathbf{z}) > \dim(\mathbf{x})$)에서도 L1 희소성으로 의미
-> 있는 특징을 추출할 수 있다는 점이다. 본 시스템의 SAE는 512D → 2048D
-> 과완전 인코딩을 사용하여, 512차원에 뒤섞여 있는 Expert 정보를
-> 2048개의 해석 가능한 단위로 "풀어헤치는" 역할을 한다.
+### 메인 경로 gradient 차단
 
-> **최신 동향.** Sparse Autoencoder를 신경망 해석에 적용하는
-> *기계적 해석성(Mechanistic Interpretability)* 은 2023년 Anthropic의
-> 연구("Towards Monosemanticity", Bricken et al., 2023)에서 대규모
-> 언어 모델의 잔차 스트림에 SAE를 적용하여 해석 가능한 특징(feature)을
-> 추출한 것이 기폭제가 되었다. 2024-2025년에는 OpenAI, DeepMind,
-> EleutherAI 등에서도 SAE 기반 해석을 활발히 연구 중이며, Templeton
-> et al. (Anthropic, 2024)은 Claude 3 Sonnet에서 수백만 개의 해석
-> 가능한 특징을 추출했다. 추천 시스템 분야에서도 모델의 내부 표현을
-> SAE로 분해하여 "왜 이 상품을 추천했는가"를 설명하는 연구가 증가하고
-> 있으며, EU AI Act(2024 발효)의 설명 가능성 요건이 이러한 추세를
-> 가속화하고 있다.
-
-### Main Path Gradient 차단
-
-`forward()` (라인 1216)에서 `shared_concat.detach()`로 SAE 입력을
-분리한다. SAE 손실은 SAE 자체 가중치만 업데이트하며, Shared Expert의
-학습에 영향을 주지 않는다.
-
-```python
-# ple_cluster_adatt.py:1216
-_, sae_latent, sae_loss = self.sae(shared_concat.detach())
-```
+SAE 는 분석 도구지 예측 경로의 일부가 아니다. 그래서 입력에
+`shared_concat.detach()` 를 걸어서 SAE gradient 가 Shared Expert 를
+업데이트하지 않게 한다. SAE 손실은 SAE 자체 파라미터만 학습하고, 메인
+학습 dynamics 에는 관여하지 않는다. `loss_weight=0.01` 은 이 관성의
+크기를 제한하는 추가 안전장치.
 
 > **SAE latent 활용.** `PLEClusterOutput.sae_latent` (2048D sparse
-> vector)는 추론 후 *Expert Neuron Dashboard* 에서 활성화 패턴 분석에
-> 사용된다. 예를 들어 "자주 활성화되는 latent #147은 '카드론 이용
-> 패턴'에 대응"과 같은 해석이 가능하다.
+> vector) 는 추론 후 *Expert Neuron Dashboard* 에서 활성화 패턴 분석에
+> 사용된다. 예를 들어 "자주 활성화되는 latent #147 은 '카드론 이용
+> 패턴' 에 대응" 과 같은 해석이 가능하다. EU AI Act 같은 설명 가능성
+> 요건이 강화되는 맥락에서 이런 분해 가능한 표현을 유지하는 것 자체가
+> 가치.
 
-## Evidential Deep Learning — 불확실성 정량화
+> **역사적 배경 — 오토인코더의 역사.** 오토인코더는 *Rumelhart, Hinton
+> & Williams (1986)* 역전파 논문에서 "자기 복원을 학습하면 중간 은닉층에
+> 유용한 표현이 형성된다" 는 관찰로 시작되었다. Denoising Autoencoder
+> (Vincent et al., ICML 2008), VAE (Kingma & Welling, ICLR 2014) 로
+> 발전. Sparse Autoencoder 는 *Andrew Ng* 이 2011 년 Stanford 강의에서
+> 체계화하였고, Anthropic ("Towards Monosemanticity", Bricken et al.,
+> 2023) 이 LLM 의 residual stream 에 적용하여 해석 가능한 특징을
+> 추출하면서 재조명받았다.
 
-### 목적
+## 결정 2 — Evidential Deep Learning 으로 epistemic uncertainty
 
-태스크 예측의 *epistemic uncertainty* (모델이 "얼마나 모르는지")를
-정량화하여 추천 신뢰도를 평가한다. 높은 불확실성을 가진 예측은 서빙 시
-*fallback 로직* 으로 전환된다.
+### 문제 — Softmax 는 "모른다" 고 말 못 한다
 
-### 원리 (Sensoy et al., NeurIPS 2018)
+Softmax 분류기는 어떤 입력이든 항상 확률 분포를 출력한다. Out-of-distribution
+고객 — 학습 데이터 분포에서 벗어난 패턴 — 에도 자신 있게 "70% 이탈
+확률" 을 내놓는다. 서빙 시 fallback 규칙으로 넘어가야 하는 경계 케이스를
+감지할 신호가 없다.
+
+대안들:
+
+- **Monte Carlo Dropout (Gal & Ghahramani 2016).** 추론 시 dropout 을
+  켜둔 채로 여러 번 돌려 예측 분산을 본다. 간단하지만 추론 비용이
+  $N$ 배로 늘어나고 서빙 지연이 악화된다.
+- **Deep Ensemble (Lakshminarayanan et al., 2017).** $N$ 개 모델을
+  독립 학습하고 예측 분산을 본다. 가장 신뢰성 높지만 학습 비용이
+  $N$ 배.
+- **Evidential Deep Learning (Sensoy et al., NeurIPS 2018).** 확률
+  자체를 Dirichlet 분포의 파라미터로 예측한다. 한 번의 forward pass
+  로 "예측 + 그 예측의 불확실성" 을 동시에 얻는다.
+
+세 번째를 택했다. 추론 비용이 표준 softmax 와 거의 같고, 불확실성
+신호를 자연스럽게 내놓는다.
+
+### 원리
 
 분류 태스크에서 Softmax 출력 대신 *Dirichlet 분포의 파라미터* 를
 예측한다.
@@ -131,95 +165,59 @@ $$\hat{p}_k = \alpha_k / S \quad (\text{expected probability})$$
 $$u = K / S \quad (\text{epistemic uncertainty})$$
 
 - $K$: 클래스 수, $S$ 클수록 확신, $u$ 클수록 불확실
-- evidence가 0이면 $\boldsymbol{\alpha} = \mathbf{1}$ → 균등 분포 → 최대 불확실
+- evidence 가 0 이면 $\boldsymbol{\alpha} = \mathbf{1}$ → 균등 분포 → 최대 불확실
 
 > **수식 직관.** 기존 Softmax 분류기는 "어떤 입력이든 항상 하나의 확률
-> 분포를 출력"하여, 학습 데이터에 없던 패턴에도 자신 있게 예측하는
-> 위험이 있다. Evidential 접근은 "확률 분포의 분포"(Dirichlet)를
-> 모델링한다. $\boldsymbol{\alpha}$ 는 Dirichlet 분포의 농도
-> 파라미터로, evidence(증거)가 많을수록 $S = \sum \alpha_k$ 가 커져
-> 분포가 뾰족해지고(확신), 불확실성 $u = K/S$ 가 줄어든다. 직관적으로,
-> "증거가 충분히 쌓이면 확신하고, 증거가 없으면 솔직하게 모르겠다고
-> 말한다"는 인식론적 불확실성의 정량화다.
+> 분포를 출력" 하여, 학습 데이터에 없던 패턴에도 자신 있게 예측하는
+> 위험이 있다. Evidential 접근은 "확률 분포의 분포" (Dirichlet) 를
+> 모델링한다. $\boldsymbol{\alpha}$ 는 Dirichlet 의 농도 파라미터로,
+> 증거 (evidence) 가 많을수록 $S = \sum \alpha_k$ 가 커져 분포가
+> 뾰족해지고 (확신), 불확실성 $u = K/S$ 가 줄어든다. "증거가 충분하면
+> 확신하고, 증거가 없으면 솔직하게 모르겠다" 의 인식론적 불확실성
+> 정량화.
 
-> **학부 수학 — Dirichlet 분포: "확률의 확률"을 모델링하는 분포.**
-> Dirichlet 분포 $\text{Dir}(\mathbf{p} | \boldsymbol{\alpha})$ 는
-> 확률 심플렉스(simplex) 위의 분포다. $K$-차원 확률 벡터
-> $\mathbf{p} = (p_1, \dots, p_K)$ ($\sum p_k = 1$, $p_k \geq 0$)를
-> 생성하며, 확률 밀도 함수는
-> $f(\mathbf{p} | \boldsymbol{\alpha}) = \frac{\Gamma(\sum \alpha_k)}{\prod \Gamma(\alpha_k)} \prod_{k=1}^K p_k^{\alpha_k - 1}$
-> 이다. $\Gamma(n)$ 은 감마 함수로, 자연수에서는 $\Gamma(n) = (n-1)!$
-> (팩토리얼의 연속 확장)이다. 직관적 이해로는 $\alpha_k$ 가 모두 1이면
-> 균등 분포(어떤 $\mathbf{p}$ 든 동등), $\alpha_k$ 가 모두 크면 중심
-> $(1/K, \dots, 1/K)$ 근처에 집중(확신), 특정 $\alpha_k$ 만 크면 해당
-> 클래스 쪽으로 치우침. 구체적 예시 ($K = 3$) 로
-> $\boldsymbol{\alpha} = (1, 1, 1)$ 이면 삼각형 위에 균일하게
-> 분포한다. $\boldsymbol{\alpha} = (10, 10, 10)$ 이면
-> $(1/3, 1/3, 1/3)$ 근처에 집중 — "세 클래스 확률이 비슷하다고 확신".
-> $\boldsymbol{\alpha} = (100, 1, 1)$ 이면 $(1, 0, 0)$ 근처에 집중 —
-> "클래스 1이 거의 확실하다고 확신". 이처럼 Dirichlet 분포의
-> $\boldsymbol{\alpha}$ 를 신경망이 예측하면, "예측 확률 자체의
-> 분산"까지 정량화하여 불확실성을 표현할 수 있다.
+> **학부 수학 — Dirichlet 분포.** $\text{Dir}(\mathbf{p} | \boldsymbol{\alpha})$
+> 는 확률 심플렉스 위의 분포다. $\alpha_k$ 가 모두 1 이면 균등 분포,
+> 모두 크면 중심 $(1/K, \dots, 1/K)$ 에 집중, 특정 $\alpha_k$ 만 크면
+> 해당 클래스로 치우침. 예를 들어 $\boldsymbol{\alpha} = (10, 10, 10)$
+> 이면 "세 클래스가 비슷하다고 확신", $\boldsymbol{\alpha} = (100, 1, 1)$
+> 이면 "클래스 1 이 거의 확실하다고 확신". 신경망이 $\boldsymbol{\alpha}$
+> 를 예측하면 "예측 확률의 분산" 까지 정량화된다.
 
-> **역사적 배경.** Evidential Deep Learning은 *Sensoy, Kaplan &
-> Kandemir (NeurIPS 2018)* 이 제안하였다. 이들은 Dempster-Shafer 증거
-> 이론(1968, 1976)과 주관적 논리(Subjective Logic, Jøsang 2016)를
-> 신경망에 접목하여, Softmax 출력의 과신(overconfidence) 문제를
-> 해결하고자 했다. 핵심 아이디어는 "확률의 확률"을 모델링하는 것으로,
-> 베이지안 통계에서 사후 분포(posterior)에 Dirichlet prior를 놓는
-> 전통(Ferguson, 1973)에서 영감을 받았다. 이후 Amini et al. (NeurIPS
-> 2020)이 회귀 문제로 확장한 *Evidential Regression* 을 제안하여
-> Normal-Inverse-Gamma(NIG) 분포로 연속값 예측의 불확실성을
-> 정량화하였다.
+> **역사적 배경.** Evidential Deep Learning 은 *Sensoy, Kaplan &
+> Kandemir (NeurIPS 2018)* 이 Dempster-Shafer 증거 이론 (1968, 1976)
+> 과 주관적 논리 (Subjective Logic, Jøsang 2016) 를 신경망에 접목하여
+> 제안. 2020 년에는 Amini et al. 이 회귀 문제로 확장한 *Evidential
+> Regression* 을 Normal-Inverse-Gamma (NIG) 분포로 제시. 2024-2025
+> 년 현재 자율주행, 의료 진단, 금융 리스크 평가에서 불확실성 정량화가
+> 규제 요건으로 부상하며 실무 채택이 가속.
 
-> **최신 동향.** 2024-2025년 Evidential DL 분야는 *교정(calibration)
-> 개선* 과 *OOD(Out-of-Distribution) 탐지 성능 향상* 에 집중되고
-> 있다. Pandey & Yu (AAAI 2023)의 Posterior Network과 Charpentier
-> et al.의 Natural Posterior Network이 Normalizing Flow를 결합하여
-> 증거 추정의 정확도를 높였다. 산업적으로는 자율주행(Waymo, 2024),
-> 의료 진단(Google Health), 금융 리스크 평가에서 모델 불확실성
-> 정량화가 규제 요건으로 부상하면서 실무 채택이 가속화되고 있다. 특히
-> LLM의 hallucination 감지에 evidential 접근을 적용하는 연구(Ren
-> et al., 2024)도 주목받고 있다.
+### 구현 및 보조 손실
 
-### 구현
-
-`_build_evidential_layers()` (라인 898~931)에서 태스크별
-`EvidentialLayer`를 생성한다.
-
-```python
-# ple_cluster_adatt.py:921-927
-self.evidential_layers[task_name] = EvidentialLayer(
-    input_dim=self.task_expert_output_dim,  # 32D
-    task_type=task_type,
-    output_dim=output_dim,
-    kl_lambda=0.01,
-    annealing_epochs=10,
-)
-```
-
-Forward (라인 1253~1260)에서 Task Expert 출력(32D)에 병렬로 적용되며,
-`compute_evidential_loss()` (라인 1838~1841)로 보조 KL 손실을 가산한다.
+`_build_evidential_layers()` 에서 태스크별 `EvidentialLayer` 가
+생성된다. Task Expert 출력 (32D) 에 병렬로 붙어서 $\boldsymbol{\alpha}$
+를 예측하고, `compute_evidential_loss()` 가 보조 KL 손실을 가산한다.
 
 $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoch}/\text{anneal}) \cdot \text{KL}(\text{Dir}(\boldsymbol{\alpha}) \,\|\, \text{Dir}(\mathbf{1}))$$
 
 - `kl_lambda=0.01`, `annealing_epochs=10`: 초기에는 KL 기여 작게 시작
-- 학습 초반 KL이 너무 강하면 모든 예측이 균등 분포로 수렴하는 문제 방지
+- 학습 초반 KL 이 너무 강하면 모든 예측이 균등 분포로 수렴하는 문제 방지
 
-> **수식 직관.** 이 손실은 두 부분으로 구성된다. 첫째, 원래 태스크
-> 손실($\mathcal{L}_{task}$)은 예측 정확도를 높인다. 둘째, KL 항은
-> "증거가 없는 클래스의 $\alpha$ 를 1(무정보 상태)로 되돌리라"는
-> 압력이다. annealing 계수 $\min(1, \text{epoch}/\text{anneal})$ 은
-> 학습 초반에 KL 기여를 약하게 시작하여 모델이 먼저 기본적인 분류
-> 능력을 갖춘 후에 불확실성 교정에 집중하도록 한다. 직관적으로,
-> "처음에는 정답 맞추기에 집중하고, 어느 정도 실력이 쌓이면 자신의
-> 확신도를 정직하게 표현하는 법을 배워라"이다.
+> **수식 직관.** 이 손실은 두 부분이다. $\mathcal{L}_{task}$ 는 예측
+> 정확도를 올리고, KL 항은 "증거가 없는 클래스의 $\alpha$ 를 1 (무정보
+> 상태) 로 되돌리라" 는 압력이다. annealing 계수는 학습 초반에 KL
+> 기여를 약하게 시작해서, 모델이 먼저 기본 분류 능력을 갖춘 후 불확실성
+> 교정에 집중하게 한다 — "처음에는 정답 맞추기, 어느 정도 실력이
+> 쌓이면 자신의 확신도를 정직하게 표현하는 법" 순서.
 
-## 18 태스크 전체 사양
+## 18 태스크 전체 사양 — reference
 
-아래는 시스템에 정의된 전체 18개 태스크의 완전한 사양이다. 현재
-16개가 활성화되어 있으며, uplift과 category\_uplift이 비활성화
-상태이다.
+해석성과 불확실성까지 정리됐으면, 남은 것은 *이 모든 결정이 실제로
+어떻게 세팅되어 있는가* 의 회계다. 아래는 operator 가 참조할 수 있는
+reference 로, 새로운 결정이 아니라 앞 5편에서 내린 결정들의 결과값이다.
+
+시스템에 정의된 전체 18개 태스크의 완전한 사양. 현재 16개가 활성화되어
+있으며, uplift 와 category_uplift 은 비활성화 상태.
 
 | 태스크 | 그룹 | Loss | dim | HMM 모드 | Weight | 활성화 |
 |---|---|---|---|---|---|---|
@@ -251,34 +249,11 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 | Value | Balance\_util, Channel, Timing | 0.6 | 0.3 |
 | Consumption | NBA, Spending\_category, Consumption\_cycle, Spending\_bucket, Merchant\_affinity, Brand\_prediction | 0.7 | 0.3 |
 
-> **학부 수학 — intra/inter 전이 강도의 의미.** adaTT의 *intra 강도*
-> ($= 0.6 \sim 0.8$)는 같은 그룹 내 태스크 간 gradient 전이 비율이고,
-> *inter 강도* ($= 0.3$)는 다른 그룹 태스크 간 전이 비율이다.
-> 수학적으로 태스크 $i$ 의 gradient가 태스크 $j$ 에 전이되는 양은:
-> $\mathbf{g}_j^{transferred} = \mathbf{g}_j + \alpha_{ij} \cdot \text{proj}(\mathbf{g}_i, \mathbf{g}_j)$
-> 여기서
-> $\text{proj}(\mathbf{g}_i, \mathbf{g}_j) = \frac{\mathbf{g}_i \cdot \mathbf{g}_j}{\|\mathbf{g}_j\|^2} \cdot \mathbf{g}_j$
-> 는 $\mathbf{g}_i$ 를 $\mathbf{g}_j$ 방향으로 사영(projection)한
-> 것이다. *사영(projection)* 은 "벡터 $\mathbf{a}$ 에서 벡터
-> $\mathbf{b}$ 방향 성분만 추출"하는 연산으로,
-> $\text{proj}_{\mathbf{b}}(\mathbf{a}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{b}\|^2} \mathbf{b}$
-> 로 정의된다. 직관적으로, 같은 그룹(예: CTR과 CVR)은 gradient 방향이
-> 유사하여 큰 전이($\alpha = 0.8$)가 유익하고, 다른 그룹(예: CTR과
-> Churn)은 gradient가 충돌할 수 있어 작은 전이($\alpha = 0.3$)가
-> 안전하다.
-
-> **최신 동향 — Gradient 기반 멀티태스크 최적화의 최전선.** adaTT의
-> gradient 기반 전이는 *PCGrad (Yu et al., NeurIPS 2020)* 에서 시작된
-> 연구 흐름의 연장이다. PCGrad는 충돌하는 gradient를 서로의
-> 법선(normal) 방향으로 사영하여 충돌을 제거하고, *CAGrad (Liu et al.,
-> NeurIPS 2021)* 는 모든 태스크의 최소 개선을 보장하는 방향을 찾는다.
-> *Nash-MTL (Navon et al., ICML 2022)* 은 이를 Nash 협상 게임으로
-> 정식화하여 Pareto 최적 해를 유도하였다. 2024-2025년에는 *Aligned-MTL
-> (Senushkin et al., CVPR 2023)* 이 gradient 행렬의 SVD를 이용해 정렬된
-> 업데이트 방향을 찾고, *FairGrad (Mahapatra & Rajan, 2024)* 가 태스크
-> 간 공정성까지 고려하는 방법을 제안하였다. 본 시스템의 adaTT는 이 중
-> *그룹 구조* 를 명시적으로 활용하는 점이 차별적이며, intra/inter
-> 강도를 별도로 설정하여 도메인 지식(예: CTR-CVR 관계)을 반영한다.
+> **intra / inter 의미.** adaTT 의 *intra 강도* ($= 0.6 \sim 0.8$) 는
+> 같은 그룹 내 태스크 간 gradient 전이 비율, *inter 강도* ($= 0.3$) 는
+> 그룹 간 전이 비율. 같은 그룹 (예: CTR, CVR) 은 gradient 방향이 유사해
+> 큰 전이가 유익하고, 다른 그룹 (예: CTR, Churn) 은 충돌 가능성이 있어
+> 작은 전이가 안전하다. 상세 adaTT 수식은 별도 ADATT 서브스레드에서.
 
 ## 논문 vs 구현 비교
 
@@ -309,14 +284,14 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 
 ### 주요 아키텍처 혁신
 
-본 프로젝트만의 고유한 설계 요소:
+본 프로젝트만의 고유한 설계 요소 — 앞 5편의 결정들을 한 줄씩 요약:
 
-1. *이종 Expert 결합*: 단일 구조 Expert 대신 GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT 등 7개 이종 도메인 Expert를 결합
-2. *CGC 차원 정규화*: Expert 출력 차원 비대칭(128D vs 64D) 보정
-3. *HMM Triple-Mode 라우팅*: 태스크별 시간 스케일에 맞는 HMM 모드 선택적 주입
-4. *GroupTaskExpertBasket*: GroupEncoder + ClusterEmbedding 으로 88% 파라미터 감소
-5. *Logit Transfer 체인*: 위상 정렬 기반 자동 실행 순서 도출
-6. *Evidential + SAE*: 예측 불확실성 정량화 + Expert 표현 해석성
+1. *이종 Expert 결합* (PLE-2, PLE-3): 단일 구조 대신 7개 이종 도메인 Expert
+2. *CGC 차원 정규화* (PLE-4): Expert 출력 차원 비대칭 (128D vs 64D) 보정
+3. *HMM Triple-Mode 라우팅* (PLE-4): 태스크별 시간 스케일 맞춤 주입
+4. *GroupTaskExpertBasket* (PLE-5): GroupEncoder + ClusterEmbedding 으로 88% 파라미터 감소
+5. *Logit Transfer 체인* (PLE-5): 위상 정렬 기반 자동 실행 순서 도출
+6. *Evidential + SAE* (PLE-6): 예측 불확실성 정량화 + Expert 표현 해석성
 
 ## 디버깅 가이드
 
@@ -414,10 +389,9 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 | **총계 (SAE 제외)** | **~1.65M** | 학습 대상 파라미터 |
 | **총계 (SAE 포함)** | **~3.75M** | SAE는 detach (분석 전용) |
 
-> **파라미터 카운트 확인 방법.** `model.summary()` 메서드 (라인
-> 1967~2073)가 모듈별 파라미터 수를 출력한다. 위 수치는 추정값이며,
-> 실제 값은 config 설정에 따라 달라질 수 있다. 정확한 수치는 모델
-> 초기화 후 `summary()` 출력으로 확인한다.
+> **파라미터 카운트 확인 방법.** `model.summary()` 메서드가 모듈별
+> 파라미터 수를 출력한다. 위 수치는 추정값이며 실제 값은 config 설정에
+> 따라 달라질 수 있다.
 
 ### 학습 설정 요약
 
@@ -436,44 +410,9 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 | adaTT Freeze | 1 epoch (프로덕션: 28) |
 | CGC Freeze | adaTT freeze\_epoch과 동기화 |
 
-> **학부 수학 — AdamW 옵티마이저의 수학적 구조.** AdamW는 *Loshchilov
-> & Hutter (ICLR 2019)* 이 제안한 옵티마이저로, Adam에 *분리된 가중치
-> 감쇠(decoupled weight decay)* 를 적용한 것이다. 기본 Adam의 파라미터
-> 업데이트 규칙은:
-> $\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1 - \beta_1) \mathbf{g}_t$
-> (1차 모멘트 = gradient 이동평균),
-> $\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2$
-> (2차 모멘트 = gradient 제곱 이동평균),
-> $\hat{\mathbf{m}}_t = \mathbf{m}_t / (1 - \beta_1^t)$,
-> $\hat{\mathbf{v}}_t = \mathbf{v}_t / (1 - \beta_2^t)$ (편향 보정),
-> $\boldsymbol{\theta}_t = \boldsymbol{\theta}_{t-1} - \eta \cdot \hat{\mathbf{m}}_t / (\sqrt{\hat{\mathbf{v}}_t} + \epsilon)$.
-> 여기서 $\eta$ 는 학습률, $\beta_1 = 0.9$, $\beta_2 = 0.999$ 가
-> 일반적이다. 직관은 $\hat{\mathbf{m}}_t$ 가 "어느 방향으로 가야
-> 하는가"(1차 모멘트 = 관성), $\sqrt{\hat{\mathbf{v}}_t}$ 가 "이
-> 방향의 gradient가 얼마나 변동하는가"(2차 모멘트 = 적응적 학습률).
-> 변동이 큰 파라미터는 학습률을 자동으로 줄여 안정화한다. AdamW의 핵심
-> 차이는 가중치 감쇠를 gradient가 아닌 파라미터 자체에 직접 적용하여
-> $\boldsymbol{\theta}_t = \boldsymbol{\theta}_{t-1}(1 - \eta \lambda) - \eta \cdot \hat{\mathbf{m}}_t / (\sqrt{\hat{\mathbf{v}}_t} + \epsilon)$
-> ($\lambda = 0.01$ = `weight_decay`)로 L2 정규화를 올바르게 구현하는
-> 것이다.
-
-> **역사적 배경 — Cosine Annealing 학습률 스케줄러.** Cosine Annealing
-> 은 *Loshchilov & Hutter (ICLR 2017)* 이 SGDR(Warm Restarts) 논문에서
-> 제안하였다. 학습률을 코사인 함수로 감소시킨다:
-> $\eta_t = \eta_{min} + \frac{1}{2} (\eta_{max} - \eta_{min})(1 + \cos(\pi t / T_0))$.
-> 학습률이 주기적으로 최댓값으로 복원(warm restart)되어, 국소
-> 최솟값(local minimum)에서 탈출할 기회를 반복적으로 제공한다.
-> $T_0 = 10$ 은 첫 주기 길이, $T_{mult} = 2$ 는 주기가 매번 2배씩
-> 늘어남을 의미한다 (10→20→40 에포크). 이 방식은 StepLR(계단식 감소)
-> 보다 부드러운 전이를 제공하고, Exponential Decay보다 warm restart
-> 덕분에 더 넓은 손실 경관을 탐색한다. 2020년 이후 대부분의 대규모
-> 모델 학습에서 cosine 스케줄러가 표준으로 자리잡았으며, GPT-3, PaLM
-> 등 LLM 학습에서도 warm-up + cosine decay 조합이 사용된다.
-
 ### Config 핵심 경로
 
-모델의 진실의 원천(Single Source of Truth)은
-`configs/model_config.yaml` 이다. 주요 섹션과 모델 메서드의 매핑:
+모델의 진실의 원천은 `configs/model_config.yaml` 이다.
 
 | Config 섹션 | 설명 | 읽는 메서드 |
 |---|---|---|
@@ -493,8 +432,9 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 ## 전체 PLE 기술 참조서 다운로드
 
 여기까지 PLE-1 부터 PLE-6 까지 온프렘 `기술참조서/PLE_기술_참조서` 를
-블로그 형식으로 관통했다. 수식 설명, 역사적 배경, 구현 디테일까지 —
-원본 PDF 는 조판·색인·페이지 번호가 모두 살아있는 긴 참조 문서다.
+블로그 형식으로 관통했다. 각 편이 이전 편의 해결책이 남긴 문제에서
+출발해 다음 결정으로 이어지는 사슬이었다. 원본 PDF 는 조판 · 색인 ·
+페이지 번호가 살아있는 긴 참조 문서다.
 
 > **📄 [PLE 기술 참조서 전체 PDF 다운로드](/PLE_기술_참조서.pdf)** · KO · 약 56 페이지
 >
@@ -504,18 +444,18 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 
 ## PLE 서브스레드 종료, adaTT 로
 
-여기까지가 PLE 서브스레드의 끝이다. PLE-1 에서 Shared-Bottom 과 MMoE
-의 한계에서 출발해, PLE-2 의 명시적 Shared/Task Expert 분리와 수학적
-직관, PLE-3 의 입력 구조(PLEClusterInput · 734D)와 7개 이종 Shared
-Expert Pool, PLE-4 의 CGC 게이팅 두 단계(1단계 CGCLayer가 Shared+Task
-가중합, 2단계 CGCAttention이 Shared concat 블록 스케일링)와 HMM
-Triple-Mode 라우팅, PLE-5 의 GroupTaskExpertBasket · Logit
-Transfer · Task Tower 까지 — 그리고 이번 6편에서 해석성(SAE),
-불확실성(Evidential), 18 태스크 사양, 논문 대비 구현의 혁신, 디버깅
-가이드, 부록까지 — 본 프로젝트 PLE 계열 아키텍처의 모든 주요 구성
-요소를 블로그 형식으로 정리했다.
+여기까지가 PLE 서브스레드의 끝이다. 각 편이 이전 편의 결정이 남긴
+문제에서 출발한 사슬로 읽힌다.
 
-다음 **ADATT-1** 부터는 별도의 adaTT 서브스레드가 시작된다. 고정
-타워의 한계에서 출발하는 "적응형 타워"의 동기, Transformer Attention
-이 왜 태스크 적응에 적합한 메커니즘인지, 그리고 조건부 계산 ·
-Hypernetwork 계보에서 adaTT 가 어디에 위치하는지를 다룬다.
+- **PLE-1**: Shared-Bottom → MMoE — gradient 충돌에서 Expert Collapse 로.
+- **PLE-2**: 명시적 Shared/Task 분리 + 이종 Expert + Softmax gate — MMoE Collapse 의 3중 해답.
+- **PLE-3**: 7명의 전문가를 하나씩 — 각자가 메우는 빈틈과 환원 불가능성.
+- **PLE-4**: Dim-asymmetry 와 시간 스케일 분리 — CGC 2단계 + HMM Triple-Mode.
+- **PLE-5**: 메모리, 태스크 의존성, 손실 균형 — GroupTaskExpertBasket, Logit Transfer, Uncertainty Weighting.
+- **PLE-6**: 해석성과 불확실성 — SAE 와 Evidential DL, 그리고 전체 사양 reference.
+
+다음 **ADATT-1** 부터는 별도의 adaTT 서브스레드가 시작된다. 고정 타워의
+한계에서 출발하는 "적응형 타워" 의 동기, Transformer Attention 이 왜
+태스크 적응에 적합한 메커니즘인지, 그리고 조건부 계산 · Hypernetwork
+계보에서 adaTT 가 어디에 위치하는지 — 이번에도 같은 형식으로, 이전
+결정이 남긴 문제에서 다음 결정으로 이어지는 사슬을 따라간다.

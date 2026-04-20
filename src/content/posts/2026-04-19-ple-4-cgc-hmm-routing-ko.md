@@ -13,21 +13,64 @@ next_status: published
 ---
 
 *"Study Thread" 시리즈의 PLE 서브스레드 4편. PLE-1 → PLE-6 에 걸쳐 본
-프로젝트의 PLE 아키텍처 뒤에 있는 논문과 수학 기초를 정리한다. 이번
-4편은 PLE 의 심장인 CGC 게이트를 두 단계로 구성한다 — 1단계: 원본
-논문의 CGCLayer 가 Shared + Task Expert 를 함께 가중합으로 섞고, 2단계:
-CGCAttention 이 그 뒤 Shared Expert concat 에 태스크별 블록 스케일링을
-얹는다 — 의 수식과 Expert Collapse 를 막는 정규화, 그리고 HMM 기반
-Triple-Mode 라우팅을 다룬다.*
+프로젝트의 PLE 아키텍처 뒤에 있는 논문과 수학 기초를 정리한다. PLE-2
+에서 이종 Shared Expert pool 과 Softmax gate 를 결정했고, PLE-3 에서
+7명의 전문가를 하나씩 소개했다. 이제 그들을 실제로 작동시키려 하면
+두 가지 문제가 동시에 고개를 든다 — 게이트가 128D 전문가에게 쏠리는
+*dim-asymmetry collapse*, 그리고 고객이 한 시간 스케일에서 살지 않는다는
+것. 이번 4편은 그 두 문제에 대한 응답이다.*
 
-## CGC — 태스크별 Expert 게이팅
+## PLE-3 이 남긴 두 문제
 
-CGC 는 MMoE(Ma et al., KDD 2018)의 게이팅을 PLE 논문(Tang et al.,
-RecSys 2020)이 확장한 것으로, 태스크별 독립 gate 가 Shared Expert 와
-Task-specific Expert 를 구분하여 친화도를 학습한다. 본 구현은 이
-아이디어를 두 단계로 나눈다 — **CGCLayer** 가 논문 원형대로 Shared ∪
-Task Expert 를 한 축 위에서 가중합하고, **CGCAttention** 이 Shared
-concat 에 태스크별 블록 스케일링을 얹는다.
+7개 이종 Shared Expert 를 배치했다. CGC 게이트가 태스크별로 Expert 를
+얼마나 쓸지 학습한다는 원칙도 세웠다. 그런데 실제로 학습을 돌려보면
+두 가지가 동시에 터진다.
+
+**첫째, 게이트가 무너진다.** 7개 Expert 의 출력 차원이 동일하지 않다 —
+unified_hgcn 은 128D, 나머지 6개는 64D 다. 이 비대칭이 있는 상태에서는
+gate 가중치가 모두 균등해도 큰 Expert 의 L2 기여가 2배다. 학습이 시작되면
+gradient 가 큰 Expert 쪽으로 쏠리고, 작은 Expert 들은 학습이 정체된다.
+MMoE 의 Expert Collapse 보다 미묘하지만 같은 양의 피드백 루프다. 게다가
+랜덤 초기화는 "어느 Expert 가 어느 태스크에 유용한지" 에 대한 사전 지식이
+전혀 없다 — 랜덤이 잘못된 방향으로 자리잡으면 그대로 수렴한다.
+
+**둘째, 고객 시간은 여러 속도로 흐른다.** 클릭 패턴은 일 단위, 이탈
+위험은 월 단위, 라이프스타일 변화는 연 단위. 하나의 HMM 을 전체
+활동에 맞추면 일일 신호와 연간 신호가 서로 간섭한다. "어떤 태스크는
+일별 여정이 중요하고, 어떤 태스크는 월별 생애주기가 중요하다" 는 것을
+gate 가 알아서 학습하기를 바라는 것도 비현실적이다 — gate 는 Expert 를
+선택하지 시간 스케일을 선택하지 못한다.
+
+PLE-4 는 이 두 문제에 각각 두 층의 방어선을 친다. 첫 문제에는 CGC 를
+두 단계로 쪼개고 (CGCLayer + CGCAttention), dim-normalize 를 얹고, 도메인
+prior 로 초기화하고, entropy 정규화로 묶는다. 두 번째 문제에는 시간
+스케일별로 별도 HMM 3개와 프로젝터 3개를 둔다.
+
+## 첫 번째 문제: 게이트가 한 전문가로 쏠린다
+
+### 결정 — CGC 를 두 단계로 나눈다
+
+원 PLE 논문의 CGCLayer 는 Shared + Task Expert 를 concat 축 위에서
+가중합한다. 이 방식은 homogeneous pool 에서는 잘 작동하지만, 우리 pool
+은 이종 차원이다. 단일 축에서 128D 와 64D 를 합치면, 학습 동역학이 큰
+블록 쪽으로 편향된다.
+
+어떻게 할 것인가 — 세 가지 대안을 놓고 고민했다.
+
+- **모두 128D 로 맞춘다.** 64D Expert 에 Projection 을 붙여 128D 로
+  올린다. 단순하지만 capacity 낭비 — 64D 가 자연스러운 Expert 에 강제로
+  64D 의 잉여를 만든다.
+- **모두 64D 로 맞춘다.** unified_hgcn 을 128D → 64D 로 압축한다. 쌍곡
+  공간의 표현 여유를 포기하는 것이라 HGCN 의 설계 의도가 깨진다.
+- **이종을 유지하고 attention 에서 scale 한다.** 각 Expert 는 자연 차원을
+  유지한 채, attention 시점에 dim-normalize 로 L2 기여를 균등화한다.
+
+세 번째를 골랐다. 자연 차원을 유지하는 게 capacity 관점에서 이득이고,
+attention 한 점에서 보정하는 것이 다른 부작용이 적다. 이 결정이 CGC 를
+두 단계로 쪼개는 이유다.
+
+- **1단계 CGCLayer** (논문 원형): Shared + Task Expert 를 한 축에서 Softmax 가중합. 태스크당 고정 차원 벡터 출력.
+- **2단계 CGCAttention**: Shared concat (512D) 만 따로 보고, Expert 블록별로 태스크별 스케일링. 이 자리가 dim-normalize 를 포함한다.
 
 ```mermaid
 flowchart TB
@@ -77,10 +120,9 @@ Shared 와 Task 풀이 같은 Softmax 축 위에 놓이므로 태스크마다 "A
 
 ### 2단계 — CGCAttention: Shared concat 위의 per-task 블록 어텐션
 
-2단계는 1단계와 직교적으로 붙는다. Shared Expert 풀은 출력 차원이
-이종(unified_hgcn 128D, 나머지 64D)이어서 이미 concat 된 Shared 표현을
-태스크별로 다르게 재조합하는 별도 경로가 필요하다 — 이게
-CGCAttention 이다.
+2단계는 1단계와 직교적으로 붙는다. 이 자리의 임무는 *같은 512D 벡터가
+흘러가면서도 태스크마다 Expert 별 기여 비중이 다르게 재조합되게* 하는
+것이다.
 
 $$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf{b}_k) \in \mathbb{R}^7$$
 
@@ -98,12 +140,37 @@ gate 가중치, $\mathbf{h}_i^{expert}$ 는 $i$ 번째 Expert 출력 블록(64D
 > 보존되고, 가중치 합이 1(Softmax)이라 출력 스케일도 보존된다. 기존
 > 파이프라인과 하위 호환.
 
-### Domain prior 로 gate bias 초기화
+### 이종 차원 보정 — Dim Normalize
 
-각 태스크의 config `domain_experts` 를 읽어 초기 bias 를 설정한다.
-weight 는 0 으로 두고, 태스크가 "선호"하는 Expert 에는
-`bias_high = 1.0`, 나머지에는 `bias_low = -1.0`. 학습 초기 Softmax
-출력이 도메인 지식에 부합하는 분포에서 출발하게 만드는 소프트 프라이어다.
+그런데 attention 가중치만 Softmax 로 정리해도 이종 차원 문제는 완전히
+사라지지 않는다. $w_{k,i} \approx 1/7$ 로 완전히 균등해도 128D Expert
+의 L2 기여는 여전히 64D Expert 의 2배다. 이걸 보정하지 않으면 gradient
+가 큰 블록으로 편향된다.
+
+$$\text{scale}_i = \sqrt{\frac{\text{mean\_dim}}{\text{dim}_i}}, \quad \text{mean\_dim} = \frac{128 + 64 \times 6}{7} \approx 73.14$$
+
+- unified_hgcn (128D): scale $\approx 0.756$ (감쇠)
+- 나머지 (64D): scale $\approx 1.069$ (증폭)
+- 동일 attention ⇒ 동일 L2 기여
+
+`dim_normalize=true` 일 때 이 스케일이 자동 적용된다.
+
+> **직관.** 차원이 큰 Expert 는 줄이고 작은 Expert 는 키워서
+> $w_{k,i} \approx 1/7$ 일 때 모든 Expert 의 실질 기여가 동등하도록
+> 보정한다. dim asymmetry 가 collapse 로 이어지지 않게 하는 기하학적
+> 1차 방어선이다.
+
+### Domain prior 로 gate bias 초기화 — 2차 방어선
+
+dim-normalize 는 기하적 보정이지만, "어느 Expert 가 어느 태스크에 도움이
+되는가" 에 대한 사전 지식은 담지 못한다. 랜덤 초기화에서 gate 가 우연히
+잘못된 Expert 로 가면 수십 스텝 안에 그쪽으로 수렴할 수 있다. 그래서
+도메인 지식을 bias 초기값에 직접 집어넣는다.
+
+각 태스크의 config `domain_experts` 를 읽는다. Weight 는 0 으로 두고,
+태스크가 "선호" 하는 Expert 에는 `bias_high = 1.0`, 나머지에는
+`bias_low = -1.0`. 학습 초기 Softmax 출력이 이미 도메인 지식에 부합하는
+분포에서 출발한다.
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 560" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <defs><style>
@@ -175,16 +242,19 @@ weight 는 0 으로 두고, 태스크가 "선호"하는 Expert 에는
 > 0 에서 출발하므로 이 prior 는 *학습이 시작될 때의 편향* 이고, gate 는
 > 실 데이터를 보며 얼마든 자유롭게 이동할 수 있다.
 
-### Expert Collapse 방지 — Entropy 정규화
+### 3차 방어선 — Entropy 정규화
 
-특정 Expert(특히 128D unified_hgcn)에 attention 이 쏠리면 나머지
-Expert 의 gradient 가 말라붙는 *Expert Collapse* 가 발생한다. 이를 막기
-위해 CGC attention 분포의 엔트로피를 최대화한다.
+dim-normalize 로 기하적 편향을 없애고 domain prior 로 시작점을 잡아도
+아직 랜덤의 장난이 남는다. 특정 Expert 에 attention 이 쏠리는 순간
+gradient 가 커지고 더 쏠리는 positive feedback 이 생긴다. 이걸 구조적으로
+막는 게 entropy 정규화 — 분포가 한 Expert 에 집중되면 손실을 주는 거다.
 
 $$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left( -\frac{1}{|\mathcal{T}|} \right) \sum_{k \in \mathcal{T}} H(\mathbf{w}_k), \quad H(\mathbf{w}_k) = -\sum_{i=1}^{7} w_{k,i} \log w_{k,i}$$
 
 음의 엔트로피를 *최소화* 하면 엔트로피가 *증가* 하여 분산이 유도된다.
-$\lambda_{ent} = 0.01$ 이 기본, 안정 범위 0.005~0.02.
+$\lambda_{ent}$ 는 튜닝 포인트다 — 0 으로 두면 collapse, 0.1 이면 모든
+태스크가 완전 균등해져 특화 자체가 사라진다. 안정 범위는 0.005~0.02,
+기본값 0.01.
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <g font-size="10" fill="#141414">
@@ -220,38 +290,37 @@ $\lambda_{ent} = 0.01$ 이 기본, 안정 범위 0.005~0.02.
 > $H \in [0, \log 7]$ — 한 Expert 독점이면 0, 완전 균등이면 최대
 > $\log 7 \approx 1.95$. 이 항은 분포를 오른쪽 그림 쪽으로 민다.
 
-### 이종 차원 보정 — Dim Normalize
-
-Expert 출력 차원이 이종(unified_hgcn 128D, 나머지 64D)이면 동일
-attention 에서도 L2 기여가 2배 차이 난다. `dim_normalize=true` 일 때
-스케일링으로 보정한다.
-
-$$\text{scale}_i = \sqrt{\frac{\text{mean\_dim}}{\text{dim}_i}}, \quad \text{mean\_dim} = \frac{128 + 64 \times 6}{7} \approx 73.14$$
-
-- unified_hgcn (128D): scale $\approx 0.756$ (감쇠)
-- 나머지 (64D): scale $\approx 1.069$ (증폭)
-- 동일 attention ⇒ 동일 L2 기여
-
-> **직관.** 차원이 큰 Expert 는 줄이고 작은 Expert 는 키워서
-> $w_{k,i} \approx 1/7$ 일 때 모든 Expert 의 실질 기여가 동등하도록
-> 보정한다.
+dim-normalize + domain prior + entropy 세 층이 모이면, 7명 중 한 명에게
+학습이 쏠리는 실패 모드가 구조적으로 막힌다. 각각 혼자로는 약하지만
+세 층이 서로를 보완한다.
 
 ### CGC Freeze 동기화
 
 adaTT 가 전이 가중치를 고정한 뒤에도 CGC 가 계속 학습하면, 두
 메커니즘이 상충 방향으로 진화할 수 있다. `on_epoch_end()` 에서
 adaTT `freeze_epoch` 에 도달하면 CGC attention 파라미터도 함께
-`requires_grad=False` 로 내려, 학습 후반부의 안정성을 보장한다.
+`requires_grad=False` 로 내려, 학습 후반부의 안정성을 보장한다. 후반부
+재학습으로 인한 드리프트를 막는 작은 안전장치.
 
-## HMM Triple-Mode 라우팅
+## 두 번째 문제: 고객 시간이 여러 속도로 흐른다
 
-HMM(Hidden Markov Model)은 *Baum & Petrie (1966)* 이 통계적 언어
-모델링을 위해 정식화하였고, 1970년대 *Rabiner & Juang* 이 음성 인식에
-적용하며 대중화되었다. 본 시스템은 고객의 관측 가능한 행동(거래,
-로그인) 뒤에 숨겨진 여정/생애주기/행동 상태를 HMM 으로 추정하고, 각
-태스크에 가장 적합한 시간 스케일의 상태 정보를 주입한다. ODE dynamics
-bridge 는 *Neural ODE (Chen et al., NeurIPS 2018)* 에서 영감을 받아
-이산 HMM 상태를 연속 시간으로 보간하는 확장이다.
+### 결정 — HMM 하나가 아니라 셋을 둔다
+
+Shared Expert 는 고객의 "현재 상태" 를 여러 관점으로 본다. 하지만 고객의
+*숨겨진 상태 전이* — 여정 단계, 생애주기 단계, 소비 행동 체제 — 는 시간
+스케일이 서로 다르다.
+
+단일 HMM 하나로 모든 신호를 인코딩하려 하면 일별 신호와 연간 신호가
+서로 간섭한다. 고객이 오늘 앱을 연 횟수 (journey) 와 고객이 이번 달에
+생애주기 단계를 바꿨는지 (lifecycle) 는 본질적으로 다른 state dynamics
+를 요구한다 — 같은 HMM 이 두 스케일을 동시에 학습하려면 공유 emission
+matrix 가 두 신호 사이에서 방향을 못 잡는다.
+
+그래서 시간 스케일별로 HMM 을 3개 — journey (일별), lifecycle (월별),
+behavior (월별 행동) — 돌리고, 각 HMM 의 상태를 해당 스케일이 잘 맞는
+태스크 그룹에만 주입한다. 16D HMM 상태 (10D state probability + 6D ODE
+dynamics bridge) 를 모드별 독립 프로젝터로 32D 로 올려, HMM 데이터가
+없는 샘플에는 학습 가능한 default embedding 을 사용한다.
 
 ```mermaid
 flowchart TB
@@ -276,6 +345,11 @@ flowchart TB
 > 태스크 그룹에만 주입된다. 데이터 없는 샘플에는 학습 가능한 default
 > embedding 을 사용한다.
 
+> **역사 — Baum & Petrie (1966) 이 HMM 을 정식화했고, 1970년대 Rabiner &
+> Juang 이 음성 인식에 적용하며 대중화.** ODE dynamics bridge 는 *Neural
+> ODE (Chen et al., NeurIPS 2018)* 에서 영감을 받아 이산 HMM 상태를
+> 연속 시간으로 보간하는 확장.
+
 ### HMM 프로젝터
 
 각 모드는 10D base 상태 확률 + 6D ODE dynamics bridge 로 구성된
@@ -285,7 +359,8 @@ $$\mathbf{h}_{hmm}^m = \text{SiLU}(\text{LayerNorm}(\text{Linear}_{16 \to 32}(\m
 
 Linear 로 차원을 키운 뒤, LayerNorm 으로 스케일을 안정화하고, SiLU 로
 비선형성을 부여한다. 세 모드가 독립 프로젝터를 가지므로 "일별 여정
-패턴"과 "월별 생애주기 패턴"이 서로 다른 변환을 학습한다.
+패턴" 과 "월별 생애주기 패턴" 이 서로 다른 변환을 학습한다 — 이게 핵심이다.
+공유 프로젝터를 쓰면 결국 단일 HMM 으로 돌아가는 것과 같다.
 
 > **SiLU.** $\text{SiLU}(x) = x \cdot \sigma(x)$. Linear 만 쌓으면
 > $\mathbf{W}_2 \mathbf{W}_1 \mathbf{x}$ 로 하나의 Linear 와 동치라,
@@ -294,17 +369,24 @@ Linear 로 차원을 키운 뒤, LayerNorm 으로 스케일을 안정화하고, 
 
 ### 학습 가능한 Default Embedding
 
-HMM 피처가 없는 샘플(all-zero row)에는 zero 대신 *학습 가능한 default
-embedding* 을 사용한다. 모드별로 `nn.Parameter(torch.zeros(32))` 을
-하나씩 두고, 샘플별 마스킹으로 유효 샘플만 프로젝션하고 무효 샘플은
-이 default 로 대체한다.
+HMM 피처가 없는 샘플 (all-zero row) 에 대해 zero 를 그대로 쓰면, 그
+샘플은 프로젝션을 지나 dead signal 을 만든다. 모델이 "데이터 없음" 을
+"모든 상태 확률 0" 으로 잘못 해석한다. 그래서 모드별로
+`nn.Parameter(torch.zeros(32))` 하나씩을 두고, 샘플별 마스킹으로 유효
+샘플만 프로젝션하고 무효 샘플은 이 default 로 대체한다. default 는
+학습되므로 "HMM 데이터가 없는 고객의 평균적 시간 스케일 표현" 을
+학습한다. 결측과 상태를 모델이 구별할 수 있게 해주는 작은 설계.
 
 ## 다음 단계
 
-CGCAttention 은 "공유 표현에서 태스크별로 다른 혼합을 뽑는" 장치이고,
-HMM Triple-Mode 는 "시간 스케일이 다른 행동 신호를 태스크 그룹별로
-라우팅"하는 장치다. 두 경로 모두 *공유된 Expert 풀* 위에서 움직인다.
+PLE-4 는 Shared Expert pool 위에서 두 가지 라우팅을 정리한 셈이다. CGC
+두 단계 + 3중 방어선 (dim-normalize, domain prior, entropy) 으로 expert
+간 선택을 안정화하고, HMM Triple-Mode 로 시간 스케일별 신호를 올바른
+태스크 그룹에 주입한다. 두 경로 모두 *공유된* Expert 풀 위에서 움직인다.
+
 다음 **PLE-5** 에서는 반대 방향 — 태스크별로 아예 *전용 Expert 바구니*
-를 만드는 GroupTaskExpertBasket (GroupEncoder + ClusterEmbedding),
-그리고 태스크 타워들 사이에서 정보를 명시적으로 흘려주는 Logit Transfer
-의 3가지 모드, 마지막 Task Tower 구조를 다룬다.
+를 만드는 GroupTaskExpertBasket, 태스크 타워 사이에서 정보를 명시적으로
+흘려주는 Logit Transfer, 그리고 마지막 Task Tower 구조 — 를 다룬다.
+거기서 또 세 가지 새로운 결정이 나온다: 파라미터 88% 줄이는 Group 공유
+방법, 순차적 태스크 의존성을 명시적으로 전달하는 방법, 그리고 16개
+태스크 가중치를 자동 균형하는 Uncertainty Weighting.

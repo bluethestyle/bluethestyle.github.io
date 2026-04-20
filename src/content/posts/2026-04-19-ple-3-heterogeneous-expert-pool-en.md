@@ -12,15 +12,23 @@ next_desc: "Two CGC stages — Stage 1 CGCLayer (paper-exact Shared+Task weighte
 next_status: published
 ---
 
-*PLE-3 of the "Study Thread" series — a parallel English/Korean sub-thread running PLE-1 → PLE-6 that summarizes the papers and math foundations behind the PLE architecture used in this project. Source: the on-prem `기술참조서/PLE_기술_참조서` document. PLE-2 declared that this project assembles its Shared Expert Pool from heterogeneous members. This third post tours those seven members one by one — the goal is a single-pass overview of which mathematical lens each Expert uses to read the same customer differently. The deeper mathematical background of each individual Expert is handled in dedicated later sub-threads (DeepFM-\*, HGCN-\*, TDA-\*, Temporal-\*, Causal-\*, OT-\*, and so on).*
+*PLE-3 of the "Study Thread" series — a parallel English/Korean sub-thread running PLE-1 → PLE-6 that summarizes the papers and math foundations behind the PLE architecture used in this project. Source: the on-prem `기술참조서/PLE_기술_참조서` document. PLE-2 landed on the decision to use a heterogeneous Shared Expert Pool. But why seven? Why these seven, not another seven? Why not GAT or DIN or SASRec? This third post answers those questions concretely — for each seat, what gap it fills, what alternatives we considered, and why this specific one won.*
 
-The seven Experts are one idea structured in concrete code: **the same customer data is read through seven completely different mathematical viewpoints.** PLE-2 argued the *why* of heterogeneity — parameter efficiency vs expressive power, interpretability, natural role specialization across tasks. This post is the *who*. A single customer arrives as a 644-dimensional feature vector plus auxiliary inputs (graph neighborhoods, sequences, persistence diagrams). Seven specialists analyze the same person with their own methodology — symmetric pairwise crosses, neighbor preferences, hyperbolic hierarchy, temporal dynamics, topological shape, causal structure, distributional distance — and each files a 64- or 128-dimensional opinion.
+## Why seven, and why these seven
+
+PLE-2's decision was to make the Shared Expert pool heterogeneous. But the scale and the roster were still open. Wouldn't five do? Wouldn't ten be better? Why isn't GAT here? DIN? SASRec?
+
+The number and the members resolve into one principle: **the minimum set that extracts mathematically irreducible structures from the same customer data.** Six leaves a gap; eight would introduce redundancy — what follows is, seat by seat, why this specific seat went to this specific expert.
+
+A single customer arrives as a 644-dimensional normalized feature vector plus auxiliary inputs (graph neighborhoods, sequences, persistence diagrams). Seven specialists analyze the same person with their own methodology — symmetric pairwise crosses, neighbor preferences, hyperbolic hierarchy, temporal dynamics, topological shape, causal structure, distributional distance — and each files a 64- or 128-dimensional opinion.
 
 ## 1. DeepFM — Symmetric Pairwise Feature Crosses
 
-In classical ML, feature crosses like "income × age" or "visit-frequency × recency" were hand-crafted by domain experts and fed into the model as engineered features. Factorization Machines (Rendle, 2010) removed the manual step: every pairwise interaction is learned automatically, but instead of one parameter per pair, each feature carries a $k$-dimensional latent vector $\mathbf{v}_i$, and the pair strength is parameterized as the inner product $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$, scaling as $O(nk)$ instead of $O(n^2)$.
+**Gap to fill.** A symmetric representation of 2nd-order feature interactions. "Income × age" or "visit-frequency × recency" routinely outperforms either feature alone — what we needed was a way to *learn* these crosses rather than hand-craft them, and keep combination count from blowing up as $O(n^2)$.
 
-DeepFM (Guo et al., 2017) adds a Deep tower on top. The FM part models second-order crosses symmetrically while the deep MLP captures higher-order nonlinearities. In our project this Expert ingests the normalized 644D feature vector and learns the invisible "combination switches" — the hidden AND-gates between pairs of features that predict specific customer behavior. It is also the only Expert in the pool that keeps per-feature-name interpretability at any level.
+**Alternatives considered.** Wide & Deep (Cheng et al., 2016) requires you to write the cross features manually on the wide side. xDeepFM stacks CIN on top of FM for explicit higher-order crosses, but doubles the parameter load. GDCN (2023) is newer but has no benchmark at our scale (644D normalized input).
+
+**Why DeepFM.** The FM part scales stably at $O(nk)$ (Rendle 2010) and the Deep part stacks cheap nonlinear higher-order interactions on top. More importantly, the FM crosses retain interpretability — "the pair $\langle v_A, v_B \rangle$ is large" is a sanity-checkable learned interaction. DeepFM is the *only* expert in the heterogeneous pool where feature-name-level interpretability survives.
 
 ```mermaid
 flowchart LR
@@ -50,9 +58,11 @@ $$\hat{y}_{FM} = w_0 + \sum_{i=1}^{n} w_i x_i + \sum_{i=1}^{n} \sum_{j=i+1}^{n} 
 
 ## 2. LightGCN — Customer–Merchant Bipartite Graph Collaborative Signal
 
-LightGCN reframes collaborative filtering as graph convolution. It strips the standard GCN down by removing the feature-transformation matrix and nonlinearity, leaving only "normalized weighted aggregation of neighbor embeddings." What remains is lightweight, fast to train, and less prone to overfitting than NGCF or its descendants.
+**Gap to fill.** A *community-level* signal that cannot be reconstructed from individual features. What merchants do customers with similar spending patterns prefer? No amount of a customer's own 644D feature vector gives this — the signal lives in the bipartite graph, not the node.
 
-We pre-train LightGCN offline on the customer–merchant bipartite graph, producing a 64-dimensional embedding per customer, which is then fed directly to the PLE Expert as input. The information carried here is genuinely community-level — "what do people with similar spending patterns end up preferring?" — and cannot be reconstructed from any individual feature. While other Experts look at the customer's internal state, LightGCN looks at the taste of the neighborhood they belong to.
+**Alternatives considered.** Standard GCN (Kipf & Welling 2017) carries feature transformations and nonlinearities that tend to overfit for recommendation — which is exactly what NGCF (He et al., SIGIR 2019) ran into. GraphSAGE and GAT add neighbor sampling and attention on top, but in our bipartite collaborative setup the added complexity costs more than it buys.
+
+**Why LightGCN.** He et al. (SIGIR 2020) stripped GCN of feature transformation and nonlinearity — a radical simplification — and it beat NGCF, the textbook case for "deeper is not always better." It pre-trains offline (batch-friendly), converges fast, overfits less. For the single role of "extract bipartite collaborative signal," the right tool is the minimally decorated one.
 
 ```mermaid
 flowchart LR
@@ -92,9 +102,11 @@ $$\mathbf{e}_u^{(k+1)} = \sum_{i \in \mathcal{N}_u} \frac{1}{\sqrt{|\mathcal{N}_
 
 ## 3. Unified HGCN — Merchant Hierarchy in Hyperbolic Space
 
-Structures like MCC codes, product taxonomies, and regional hierarchies are fundamentally **trees** — the number of nodes grows exponentially with depth. The problem is that embedding a deep tree into Euclidean space is essentially hopeless: no matter how many dimensions you add, there is never enough room at large radius to preserve the exponential fan-out of tree distances. As Krioukov et al. (2010) pointed out, **hyperbolic space is precisely the geometry whose sphere area grows exponentially with radius**, which makes trees fit naturally.
+**Gap to fill.** Structures like MCC codes, product taxonomies, and regional hierarchies are fundamentally trees — the number of nodes grows exponentially with depth. Fitting that into Euclidean space is hopeless: no matter how many dimensions you add, there is never enough room at large radius to preserve tree distances. A separate representation space that can absorb a deep hierarchy without distortion was required.
 
-HGCN (Chami et al., NeurIPS 2019) carried this idea into graph convolutions: node embeddings live on the Poincaré disk, aggregation happens in the tangent space, and the exponential map brings the result back onto the manifold. Our implementation extends it with merchant co-visit signals, producing a **unified** variant that consumes a 47D input (20D hierarchy coordinates + 27D merchant slice) and outputs 128D. Unified HGCN is the only 128D Expert — the extra capacity pays for the learnable curvature parameter and the richer hyperbolic operations.
+**Alternatives considered.** Vanilla GCN suffers from increasing distortion as the hierarchy deepens. Tree-LSTM handles hierarchy well but struggles to mix in co-visit graph information. Knowledge graph embeddings (TransE and kin) handle relation types but lack smooth distance semantics.
+
+**Why Unified HGCN.** Krioukov et al. (2010) noted that hyperbolic space has exponentially growing sphere area in radius, so trees fit naturally. HGCN (Chami et al., NeurIPS 2019) ported the idea into GCNs — node embeddings on the Poincaré disk, aggregation in the tangent space, exponential map back. We extended it with merchant-to-merchant co-visit signal to produce a **unified** variant that fuses HGCN and Merchant-HGCN. This is the only 128D expert in the pool — the extra capacity pays for the learnable curvature parameter and the heavier manifold operations. (That heterogeneous dim is the problem PLE-4 fixes with `dim_normalize`.)
 
 <img src="/poincare-hyperbolic.webp" alt="Poincaré disk model — (a) high-density triangle cell tessellation mesh, (b) geodesic paths: diameter geodesic (straight) and circular arc geodesics (curved, meeting boundary orthogonally)" style="max-width:520px;width:100%;margin:24px auto;display:block;" loading="lazy" />
 
@@ -108,9 +120,11 @@ $$d_{\mathcal{P}}(\mathbf{x}, \mathbf{y}) = \cosh^{-1}\!\left(1 + 2 \frac{\|\mat
 
 ## 4. Temporal — Sequence Dynamics (Mamba + LNN + Transformer)
 
-Customer time flows at multiple speeds simultaneously — intraday transaction patterns, weekly habits, monthly lifecycle shifts, yearly life-stage transitions. No single sequence model captures all scales well. This Expert is therefore an ensemble of three.
+**Gap to fill.** Customer time flows at multiple speeds simultaneously — intraday patterns, weekly habits, monthly lifecycle, yearly life-stage transitions. No single sequence model captures all scales well. A seat dedicated to time-series representation was required.
 
-Mamba (Gu & Dao, 2023) is a selective state-space model that captures long-range dependencies in linear time. LNN (Liquid Neural Networks, Hasani et al., 2021) is a continuous-time ODE-based recurrent model robust to irregular sampling intervals. The Transformer branch uses attention for explicit long-range interactions. The three consume `txn_seq` (180 days × 16 features) and `session_seq` (90 days × 8 features) in parallel and their outputs are fused into a 64D summary — ensemble diversity, pulled inside a single Expert.
+**Alternatives considered.** A pure Transformer pays $O(T^2)$ attention cost on 180-day sequences — heavy. Mamba alone is strong on long-range but weak on explicit pairwise comparisons. LNN alone is robust to irregular sampling but lacks representational capacity. Picking one sacrifices the other two axes.
+
+**Why a 3-way ensemble.** The three paradigms — SSM (linear recurrence), ODE (continuous-time dynamics), Attention (explicit pairwise) — each capture a different face of customer time. We pulled ensemble diversity *inside* one Expert rather than *outside* it, so the CGC gate sees a single "Temporal" seat while that seat is internally a fusion of three time-series models. Individual submodels are kept small and a fusion layer projects to 64D.
 
 ```mermaid
 flowchart LR
@@ -138,9 +152,11 @@ $$\mathbf{h}_t = \bar{\mathbf{A}}_t \mathbf{h}_{t-1} + \bar{\mathbf{B}}_t \mathb
 
 ## 5. PersLay — The Topological Shape of Transaction Patterns
 
-If you plot a customer's transactions as a point cloud in time-amount space, an entire class of information emerges that statistical features cannot see: **topological features** like "how many loops live here", "how many clusters merge at what threshold", "how persistent are the empty regions". Persistent Homology (Edelsbrunner / Letscher / Zomorodian, 2002) quantifies exactly this — as a filtration threshold sweeps, it records when homology features (connected components, holes) are born and when they die, producing a **barcode**, also known as a persistence diagram.
+**Gap to fill.** Statistical features — means, variances, autocorrelations — cannot see the *shape* of spending patterns. Does the customer cycle between categories (loops)? Are there concentrated bursts (clusters)? Sudden branches in lifestyle? These are topological properties of a time × amount point cloud, not moments of a distribution. A seat for extracting them was required.
 
-The trouble is that barcodes are variable-length point sets and cannot be fed to a neural network directly. PersLay (Carrière et al., AISTATS 2020) solves this with a differentiable parameterized pooling: each point $(b, d)$ is mapped through a position embedding $\phi(b, d)$ and weighted by a persistence function $\psi(d - b)$, then summed to a fixed-dimensional vector. Our system feeds it two diagrams — short (90-day app logs) and long (12-month financial transactions).
+**Alternatives considered.** The TDA primitive — persistence diagrams — is a variable-length point set, unusable as a neural input. Persistence images and persistence landscapes give fixed vectors but are either non-differentiable or force resolution to be fixed ahead of time. Wasserstein-kernel methods are differentiable but scale badly.
+
+**Why PersLay.** Carrière et al. (AISTATS 2020) converts a persistence diagram to a fixed-dimensional vector through *differentiable parameterized pooling* — each point $(b, d)$ is mapped through a position embedding $\phi(b, d)$ and a persistence weighting $\psi(d - b)$, then summed. It is the almost-unique path for letting TDA's shape information flow through a deep-learning stack. Our system feeds it short (90-day app logs) and long (12-month financial transactions) diagrams.
 
 <img src="/persistence-barcode.webp" alt="Persistence barcode — horizontal bars at varying heights show the lifespan of each topological feature across the filtration scale; longer bars indicate robust features, shorter bars are noise" style="max-width:520px;width:100%;margin:24px auto;display:block;" loading="lazy" />
 
@@ -154,9 +170,11 @@ $$\text{PersLay}(D) = \sum_{(b, d) \in D} \phi(b, d) \cdot \psi(d - b)$$
 
 ## 6. Causal — Directional Causal Structure Between Features
 
-Correlation is symmetric: $\text{corr}(X, Y) = \text{corr}(Y, X)$. But "rising income causes rising spending" and "rising spending causes rising income" are entirely different claims, and in finance and policy the direction is decisive. Pearl's do-calculus made this distinction mathematically rigorous — in general, the observational conditional $P(Y \mid X = x)$ and the interventional $P(Y \mid do(X = x))$ are not equal.
+**Gap to fill.** Correlation is symmetric: $\text{corr}(X, Y) = \text{corr}(Y, X)$. "Rising income causes rising spending" and "rising spending causes rising income" are entirely different claims, and in finance or policy intervention the direction is decisive. A dedicated seat for modeling directionality and confounder removal was required.
 
-This Expert learns a differentiable DAG structure (NOTEARS-style, Zheng et al., NeurIPS 2018) over the 644D input and extracts a **causal representation that has been de-confounded** along estimated directional edges. Where other Experts describe "what this customer looks like", the Causal Expert supplies the raw material to simulate "how this customer's outcome would shift if we intervened on a specific feature." The downstream CGC gate learns to weight this view higher for intervention-oriented tasks (e.g. next-best-action, treatment effect).
+**Alternatives considered.** SHAP and LIME are post-hoc and decompose correlations, not causal structure. Bayesian networks learn DAGs via combinatorial optimization ($2^{n^2}$) — not GPU-friendly. Instrumental variables require actual intervention instruments, which we do not have.
+
+**Why NOTEARS-style Causal.** Zheng et al. (NeurIPS 2018) reframed DAG learning from combinatorial to *continuous* optimization — they wrote the acyclicity constraint as a differentiable trace($e^W$) expression, turning it into a GPU-solvable problem. That foundation lets us learn a causal DAG on the 644D input and extract a *de-confounded* causal representation. While other experts describe "what this customer looks like," the Causal expert supplies the raw material to simulate "how this customer's outcome would shift if we intervened on a specific feature."
 
 ```mermaid
 flowchart LR
@@ -181,9 +199,11 @@ $$P(Y = y \mid do(X = x)) \neq P(Y = y \mid X = x) \quad \text{(in general)}$$
 
 ## 7. Optimal Transport — Distances Between Distributions
 
-Suppose a customer's monthly spending distribution (share of spend across categories) is compared to a set of prototype distributions — "loyal", "churn-risk", "value-growth" personas. L2 distance ignores distributional shape; KL divergence explodes on zero-support regions. **Wasserstein distance** is defined as the minimum transport cost to reshape one distribution into the other, and therefore respects the underlying geometry between distributions.
+**Gap to fill.** Comparing a customer's monthly spending distribution to prototype distributions — "loyal", "churn-risk", "value-growth" personas — breaks L2 and KL. L2 discards distributional shape; KL explodes on zero-support regions. A geometric distance between distributions was required.
 
-Monge's original problem (1781) sat dormant as an impractical computational object for two centuries. Cuturi's Sinkhorn approximation (NeurIPS 2013) added entropic regularization, collapsing transport computation to something you can call millions of times per epoch on a GPU. This Expert reinterprets the 644D input as a distribution, computes Wasserstein distances against learned prototype distributions, and summarizes the pattern of these distances in 64D. Its answer is "geometrically, which persona is this customer closest to?"
+**Alternatives considered.** The Wasserstein distance has existed since Monge (1781), but the raw LP form was computationally intractable for two centuries. Sliced Wasserstein is fast but loses information in high dimensions. MMD is sensitive to kernel choice and tends to miss distributional geometry.
+
+**Why Sinkhorn OT.** Cuturi (NeurIPS 2013) added entropic regularization, collapsing Wasserstein computation to something you can call millions of times per epoch on a GPU. It is differentiable and respects both shape and location of the two distributions. This expert reinterprets the 644D input as a distribution, computes Wasserstein distances against learned prototype distributions, and summarizes the distance pattern in 64D — "geometrically, which persona is this customer closest to?"
 
 <img src="/optimal-transport.webp" alt="Optimal Transport — source distribution μ (blue cluster) and target distribution ν (red cluster) connected by transport plan γ showing pair-wise sample matchings" style="max-width:520px;width:100%;margin:24px auto;display:block;" loading="lazy" />
 
@@ -195,9 +215,17 @@ $$W_1(\mu, \nu) = \inf_{\gamma \in \Pi(\mu, \nu)} \int \|x - y\|_1 \, d\gamma(x,
 
 **Output: 64D**
 
-## Why All Seven — Cross-Fertilization, Not Redundancy
+## Why all seven — cross-fertilization, not redundancy
 
-PLE-2 already argued the *why* of a heterogeneous pool — parameter efficiency, interpretability, and natural specialization across tasks. One extra point remains worth making here: of the seven, **DeepFM, Causal, and Optimal Transport all consume the same 644D normalized input**, and yet they extract three irreducibly different structures from it — symmetric pairwise crosses, directional causal edges, and distributional geometry. None of the three can be derived from the others. The remaining four (LightGCN, Unified HGCN, Temporal, PersLay) each receive domain-specific inputs — graph neighborhoods, hyperbolic coordinates, raw sequences, persistence diagrams — and expose yet another slice of the same customer. The CGC gate then learns, per task, *which lens this task needs*. The math of that gating follows in **PLE-4**, split across its two stages (CGCLayer + CGCAttention).
+PLE-2 already argued the *why* of a heterogeneous pool — parameter efficiency, interpretability, natural specialization across tasks. One sentence to add here: **these seven do not reduce to one another.** The cleanest evidence is the same-input experiment. Three of the seven — DeepFM, Causal, Optimal Transport — take **the exact same 644D normalized feature vector** as input, and still extract three irreducibly different structures:
+
+- DeepFM extracts **symmetric crosses** — $\langle v_i, v_j \rangle = \langle v_j, v_i \rangle$.
+- Causal extracts **asymmetric directionality** — $X \to Y$ is not $Y \to X$.
+- OT extracts **distributional geometry** — Wasserstein distance pattern against prototype distributions.
+
+Three mathematically non-commutable structures from the same feature set — none of the three can be reduced to a function of the others. That is the core justification for the heterogeneous pool. The remaining four (LightGCN, Unified HGCN, Temporal, PersLay) each take domain-specific inputs — graph neighborhoods, hyperbolic coordinates, raw sequences, persistence diagrams — and expose yet another slice of the same customer that the feature vector alone cannot reveal.
+
+The CGC gate then learns, per task, *which lens this task needs*. The math of that gating follows in **PLE-4**, split across its two stages (CGCLayer + CGCAttention). And the new problems the heterogeneous output opens up — 64D vs 128D asymmetry, random-init collapse risk, time-scale separation — are each solved there.
 
 | # | Expert | One-line role | Output |
 |---|---|---|---|

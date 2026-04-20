@@ -15,13 +15,55 @@ next_status: published
 *PLE-5 of the "Study Thread" series — a parallel English/Korean
 sub-thread running PLE-1 → PLE-6 that summarizes the papers and math
 foundations behind the PLE architecture used in this project. Source:
-the on-prem `기술참조서/PLE_기술_참조서` document. This fifth post cuts
-through the back half of the PLE data flow — GroupTaskExpertBasket
-(group-scoped expert encoders with cluster-conditioned embeddings),
-Logit Transfer (explicit predictions passed between tasks along a DAG),
-and the Task Tower that produces the final output.*
+the on-prem `기술참조서/PLE_기술_참조서` document. PLE-4 handled the
+routing on top of the Shared Expert pool (CGC + HMM Triple-Mode).
+Three decisions are still open — memory, explicit task dependency,
+and loss balance. This fifth post is the response.*
 
-## GroupTaskExpertBasket — GroupEncoder + ClusterEmbedding
+## From PLE-4 to PLE-5 — three decisions left
+
+The gate is stable. None of the seven experts is eating the training.
+The HMM is routing time-scale signal into the right task group.
+That much is done. But when the pipeline crosses over into the
+*task-private* side, three decisions are still on the table.
+
+**Memory.** The legacy implementation kept an independent MLP for
+every task × cluster pair — 16 tasks × 20 clusters × a small MLP each,
+around 3M parameters. Most of that capacity was duplicated across
+clusters. The observation behind the waste: cluster-level signal
+mostly affects the *input distribution*, not the *decision function*.
+
+**Task dependencies are not in the architecture yet.** CTR feeds CVR,
+Churn feeds Retention — these are obvious from the business side. But
+the CGC gate only handles "how to mix experts." Waiting for the
+network to discover "customers with high CTR score also have high
+CVR score" on its own is wasteful — we already know it.
+
+**Loss scale balance across 16 tasks.** CTR's Focal Loss, Engagement's
+MSE, and Brand_prediction's InfoNCE are all backpropagated at once,
+with scales that differ by more than 100×. Hand-tuning 16 weights is
+a combinatorial headache, and even one good tune breaks when the data
+shifts.
+
+PLE-5 solves these three in order.
+
+## Decision 1 — GroupTaskExpertBasket: 88% parameter cut
+
+### The problem — per-cluster MLPs are redundant
+
+The legacy `ClusterTaskExpertBasket` kept an independent MLP for each
+of the 20 clusters, per task. The intuition was "clusters behave
+differently, so each cluster deserves its own network." In practice,
+the learned MLPs converged to very similar directions — cluster
+signal was not strong enough to warrant a wholesale different
+decision function. Most customer-behavior patterns are shared across
+clusters.
+
+So we inverted the design. Tasks in the same group **share one
+GroupEncoder MLP**, and cluster identity is *injected* through a 32D
+Embedding. The Embedding enters as part of the input (not a gate), so
+the network automatically learns how to respond differently by
+cluster.
 
 ```mermaid
 flowchart TB
@@ -40,16 +82,20 @@ flowchart TB
 ```
 
 Setting `use_group_encoder=true` (the default) switches to
-`GroupTaskExpertBasket`, which achieves an *88% parameter reduction*
+`GroupTaskExpertBasket`, which achieves an **88% parameter reduction**
 (~362K) over the legacy `ClusterTaskExpertBasket` (independent MLP per
 task × cluster, ~3.0M parameters). Tasks inside the same group share
-the GroupEncoder; groups themselves remain independent.
+the GroupEncoder; groups themselves remain independent. The shared
+MLP carries the decision function; the Embedding carries the
+cluster-level input-distribution shift.
 
-### Soft routing
+### Soft routing — continuity for boundary customers
 
-For samples that sit on a cluster boundary (where `cluster_probs` are
-spread across multiple clusters), *soft routing* uses a weighted
-average of several cluster embeddings.
+GMM cluster assignment is a posterior distribution, but the old design
+argmax-ed to a single cluster_id. This breaks continuity for boundary
+customers — a customer straddling clusters 3 and 7, forced into
+cluster 3, gets zero access to cluster 7's learned knowledge. So we
+use the posterior directly.
 
 $$\mathbf{e}_{cluster} = \sum_{c=0}^{19} p_c \cdot \mathbf{E}_c \in \mathbb{R}^{32}$$
 
@@ -75,7 +121,33 @@ In implementation this is a single matrix product
 > Parameters $\pi_c, \boldsymbol{\mu}_c, \boldsymbol{\Sigma}_c$ are
 > precomputed offline with EM.
 
-## Logit Transfer — Explicit Information Passing Between Tasks
+## Decision 2 — Logit Transfer: explicit cross-task dependency
+
+### The problem — don't make the network rediscover what we know
+
+CTR → CVR → LTV is a business funnel. A click is a prerequisite for
+a conversion, and LTV aggregates conversions over time. Churn → Retention
+is a simple inversion. NBA → Spending_category → Brand_prediction is a
+drill-down chain (next-best-action → which category → which brand).
+Waiting for the network to autodiscover any of this from data alone
+wastes capacity the model could spend on harder signals.
+
+Three alternatives for passing the dependency:
+
+- **Concat the source logit to the downstream feature.** Simple, but
+  changes feature dim, and it's hard to turn off when the transfer
+  turns out unhelpful.
+- **Gate the downstream by the source activation (post-sigmoid
+  probability).** Useful, but if the gate goes to zero, the transfer
+  vanishes entirely — all-or-nothing.
+- **Project the source prediction and add as residual to the
+  downstream input.** If useless, the projection weights converge to
+  zero and the transfer turns off naturally — a safe default.
+
+Option three. Same principle as He et al.'s ResNet residual skip
+(CVPR 2016) — "default to identity mapping if nothing useful to add."
+
+### The transfer DAG
 
 ```mermaid
 flowchart TB
@@ -116,7 +188,7 @@ $$\mathbf{h}_{tower}^t = \mathbf{h}_{expert}^t + \alpha \cdot \text{SiLU}(\text{
 $\alpha = 0.5$ (`transfer_strength`); `Linear` projects source
 output_dim → 32D. Because the transfer is a residual, when the source
 information is not useful the projection weights converge to 0 — a
-natural *safe default* (He et al., ResNet, CVPR 2016).
+natural *safe default*.
 
 > **Intuition.** When the CTR model outputs "this customer has a high
 > click probability," that signal passes through the projection and is
@@ -141,9 +213,15 @@ natural *safe default* (He et al., ResNet, CVPR 2016).
 > pair. They are complementary and operate at the same time. See the
 > separate *adaTT tech reference* for the full mechanism.
 
-## Task Tower — Final Prediction
+## Decision 3 — Task Tower and per-type loss differentiation
 
-`TaskTower` uses a common shallow MLP across all tasks.
+Once the Task Expert output (32D) is in hand, it still has to become
+a final prediction. But CTR (binary classification), LTV (regression),
+and Brand_prediction (contrastive over 128 brands) cannot share one
+head. The Task Tower handles this with a common shallow MLP + a
+per-task-type output head.
+
+### Task Tower structure
 
 $$\mathbf{y} = \text{Linear}_{32 \to out} \circ \text{Block}_{64 \to 32} \circ \text{Block}_{32 \to 64}(\mathbf{h}_{expert})$$
 
@@ -288,10 +366,19 @@ weight.
 > - Churn (positive 5–15%, very high FN cost): $\alpha = 0.60$ (avoid missing churners, maximize recall)
 > - Retention (positive 85–95%, moderate FN cost): $\alpha = 0.20$ (detect the minority early-churn signal)
 
-### Uncertainty Weighting (Kendall et al.)
+## Decision 3' — Uncertainty Weighting: 16 weights, automatically
 
-When `loss_weighting.strategy: "uncertainty"` is set, each task's
-*homoscedastic uncertainty* is modeled with a trainable log-variance.
+Tasks differ in loss type *and* scale. CTR's Focal Loss sits in
+0.01–0.5; LTV's Huber Loss sits in 1–100 depending on customer value
+units. Simply summing them lets the largest-scale task dominate
+gradients. Hand-tuning 16 weights is a pain, and even a good tune
+breaks when the data shifts.
+
+### Decision — let the model learn the balance via log-variance
+
+Kendall, Gal & Cipolla (CVPR 2018): assume each task's likelihood is
+Gaussian, take the MLE of homoscedastic uncertainty, and this form
+falls out naturally:
 
 $$\mathcal{L}_k^{\text{uw}} = w_k \cdot (\exp(-s_k) \cdot \mathcal{L}_k + s_k)$$
 
@@ -300,6 +387,10 @@ $s_k = \log(\sigma_k^2)$ is the trainable log-variance
 ⇒ smaller weight); the $s_k$ term is a regularizer that keeps
 uncertainty from growing without bound. $s_k$ is clamped to
 $[-4.0, 4.0]$.
+
+The $+s_k$ term is the crucial piece. Without it, the model can
+declare every task "extremely uncertain" to drive $\exp(-s_k) \to 0$,
+zeroing out every loss. $+s_k$ is the cost that prevents that exit.
 
 > **Intuition.** A task that is intrinsically hard to predict gets its
 > weight automatically lowered so its loss does not dominate training.
@@ -321,21 +412,31 @@ Inside `forward()`, the following losses are summed.
 3. **Causal Expert DAG regularization**: acyclicity + sparsity
 4. **SAE loss**: reconstruction + L1 sparsity (weight = 0.01, detached)
 
-## Where this leaves us
+## Summary
 
-GroupTaskExpertBasket replaces the per-cluster × per-task
-independent MLP with a shared GroupEncoder + ClusterEmbedding, cutting
-parameters by 88% while preserving cluster-level specialization; soft
-routing uses GMM posteriors to handle boundary customers smoothly.
-Logit Transfer declares business-order sequences like CTR→CVR→LTV as
-a DAG, derives the execution order automatically via Kahn's
-algorithm, and — because it adds a residual projection — lets the
-transfer naturally converge to 0 when the source information is not
-useful. The Task Tower produces predictions through a shared
-32→64→32→out MLP while applying per-task-type losses (Focal, Huber,
-NLL, InfoNCE) differentially, and Uncertainty Weighting balances 16
-task weights automatically through trainable log-variances. The next
-post, **PLE-6**, closes out the series with Sparse Autoencoder
-interpretability, Evidential Deep Learning uncertainty, and the full
-18-task spec — accompanied by a downloadable PDF of the complete PLE
-tech reference.
+Three decisions define PLE-5.
+
+1. **GroupTaskExpertBasket** — switch from per-cluster × per-task
+   independent MLPs to a shared GroupEncoder + ClusterEmbedding,
+   cutting parameters by 88% (3M → 362K). Grounded in the observation
+   that cluster signal shifts *input distribution*, not the decision
+   function.
+2. **Logit Transfer** — declare business-order chains like CTR→CVR→LTV
+   as a DAG and derive the execution order via Kahn's algorithm.
+   Residual-form projection makes the transfer a safe default — if
+   useless, the projection weights go to zero. A shortcut for
+   dependencies we already know, rather than making the network
+   rediscover them.
+3. **Uncertainty Weighting** — auto-balance the 16 task weights
+   through trainable log-variances. The form
+   $\exp(-s_k) \cdot \mathcal{L}_k + s_k$ falls out of the MLE of a
+   Gaussian likelihood with homoscedastic uncertainty (Kendall et al.,
+   2018). The $+s_k$ regularizer blocks the degenerate "declare every
+   task uncertain" exit.
+
+The next post, **PLE-6**, closes out the series with the two
+remaining questions once the system is running — "can we see what
+each expert actually learned? (SAE)", "can we quantify prediction
+confidence? (Evidential Deep Learning)" — and presents the 18-task
+full spec as a reference appendix, plus a downloadable PDF of the
+complete tech reference.
