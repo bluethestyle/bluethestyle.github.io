@@ -233,34 +233,70 @@ Suppose a customer's monthly spending distribution (share of spend across catego
 
 Monge's original problem (1781) sat dormant as an impractical computational object for two centuries. Cuturi's Sinkhorn approximation (NeurIPS 2013) added entropic regularization, collapsing transport computation to something you can call millions of times per epoch on a GPU. This Expert reinterprets the 644D input as a distribution, computes Wasserstein distances against learned prototype distributions, and summarizes the pattern of these distances in 64D. Its answer is "geometrically, which persona is this customer closest to?"
 
-<svg viewBox="0 0 480 200" width="100%" style="max-width:520px;margin:16px auto;display:block;">
+<svg viewBox="0 0 540 280" width="100%" style="max-width:560px;margin:20px auto;display:block;" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <marker id="ot-ar-en" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-      <path d="M0,0 L8,4 L0,8 z" fill="#141414" opacity="0.6"/>
-    </marker>
+    <pattern id="ot-grid-en" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M 26 0 L 0 0 0 26" stroke="#1A1A1A0A" fill="none" stroke-width="1"/>
+    </pattern>
   </defs>
-  <g transform="translate(30,160)">
-    <rect x="0" y="-30" width="24" height="30" fill="#D8E0FF" stroke="#2E5BFF"/>
-    <rect x="26" y="-70" width="24" height="70" fill="#D8E0FF" stroke="#2E5BFF"/>
-    <rect x="52" y="-100" width="24" height="100" fill="#D8E0FF" stroke="#2E5BFF"/>
-    <rect x="78" y="-55" width="24" height="55" fill="#D8E0FF" stroke="#2E5BFF"/>
-    <rect x="104" y="-20" width="24" height="20" fill="#D8E0FF" stroke="#2E5BFF"/>
-    <text x="60" y="20" text-anchor="middle" font-size="11" font-family="JetBrains Mono, monospace" fill="#6B7280">μ (source)</text>
+  <rect x="30" y="20" width="480" height="210" fill="url(#ot-grid-en)" stroke="#1A1A1A14" stroke-width="1" rx="4"/>
+  <g stroke="#141414" stroke-width="0.6" fill="none" opacity="0.35">
+    <line x1="80" y1="100" x2="360" y2="85"/>
+    <line x1="95" y1="130" x2="390" y2="130"/>
+    <line x1="110" y1="160" x2="420" y2="115"/>
+    <line x1="125" y1="110" x2="370" y2="155"/>
+    <line x1="140" y1="85" x2="400" y2="95"/>
+    <line x1="155" y1="140" x2="440" y2="130"/>
+    <line x1="85" y1="170" x2="355" y2="165"/>
+    <line x1="135" y1="180" x2="415" y2="185"/>
+    <line x1="170" y1="120" x2="455" y2="170"/>
+    <line x1="100" y1="95" x2="380" y2="110"/>
+    <line x1="165" y1="90" x2="470" y2="145"/>
+    <line x1="145" y1="200" x2="430" y2="205"/>
+    <line x1="180" y1="155" x2="460" y2="115"/>
+    <line x1="75" y1="145" x2="345" y2="135"/>
+    <line x1="120" y1="145" x2="395" y2="90"/>
   </g>
-  <g transform="translate(330,160)">
-    <rect x="0" y="-40" width="24" height="40" fill="#FDD8D1" stroke="#E14F3A"/>
-    <rect x="26" y="-90" width="24" height="90" fill="#FDD8D1" stroke="#E14F3A"/>
-    <rect x="52" y="-60" width="24" height="60" fill="#FDD8D1" stroke="#E14F3A"/>
-    <rect x="78" y="-35" width="24" height="35" fill="#FDD8D1" stroke="#E14F3A"/>
-    <rect x="104" y="-15" width="24" height="15" fill="#FDD8D1" stroke="#E14F3A"/>
-    <text x="60" y="20" text-anchor="middle" font-size="11" font-family="JetBrains Mono, monospace" fill="#6B7280">ν (target)</text>
+  <g fill="#D8E0FF" stroke="#2E5BFF" stroke-width="1.4">
+    <circle cx="80" cy="100" r="5"/>
+    <circle cx="95" cy="130" r="5"/>
+    <circle cx="110" cy="160" r="5"/>
+    <circle cx="125" cy="110" r="5"/>
+    <circle cx="140" cy="85" r="5"/>
+    <circle cx="155" cy="140" r="5"/>
+    <circle cx="85" cy="170" r="5"/>
+    <circle cx="135" cy="180" r="5"/>
+    <circle cx="170" cy="120" r="5"/>
+    <circle cx="100" cy="95" r="5"/>
+    <circle cx="165" cy="90" r="5"/>
+    <circle cx="145" cy="200" r="5"/>
+    <circle cx="180" cy="155" r="5"/>
+    <circle cx="75" cy="145" r="5"/>
+    <circle cx="120" cy="145" r="5"/>
   </g>
-  <path d="M 90 100 Q 240 40 370 100" stroke="#141414" stroke-width="1.5" fill="none" opacity="0.6" marker-end="url(#ot-ar-en)"/>
-  <path d="M 115 80 Q 250 20 395 80" stroke="#141414" stroke-width="1.5" fill="none" opacity="0.5" marker-end="url(#ot-ar-en)"/>
-  <path d="M 60 130 Q 220 80 355 140" stroke="#141414" stroke-width="1.5" fill="none" opacity="0.5" marker-end="url(#ot-ar-en)"/>
+  <g fill="#FDD8D1" stroke="#E14F3A" stroke-width="1.4">
+    <circle cx="360" cy="85" r="5"/>
+    <circle cx="390" cy="130" r="5"/>
+    <circle cx="420" cy="115" r="5"/>
+    <circle cx="370" cy="155" r="5"/>
+    <circle cx="400" cy="95" r="5"/>
+    <circle cx="440" cy="130" r="5"/>
+    <circle cx="355" cy="165" r="5"/>
+    <circle cx="415" cy="185" r="5"/>
+    <circle cx="455" cy="170" r="5"/>
+    <circle cx="380" cy="110" r="5"/>
+    <circle cx="470" cy="145" r="5"/>
+    <circle cx="430" cy="205" r="5"/>
+    <circle cx="460" cy="115" r="5"/>
+    <circle cx="345" cy="135" r="5"/>
+    <circle cx="395" cy="90" r="5"/>
+  </g>
+  <text x="130" y="255" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#2E5BFF" font-weight="500">μ (source)</text>
+  <text x="410" y="255" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#E14F3A" font-weight="500">ν (target)</text>
+  <text x="270" y="255" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B7280">transport plan γ</text>
 </svg>
 
-> **A transport plan.** Each sand pile in μ is shipped to its matching location in ν according to a plan γ. The total (mass × travel distance) of the cheapest such plan is the Wasserstein distance between the two distributions.
+> **Transport plan γ.** Each matching line pairs a blue (source) sample with a red (target) sample. The sum of (distance × mass) across all pairs is the *cost*, and the plan γ that minimises this total cost defines the Wasserstein distance — a geometric distance that respects both shape and location of the two distributions.
 
 $$W_1(\mu, \nu) = \inf_{\gamma \in \Pi(\mu, \nu)} \int \|x - y\|_1 \, d\gamma(x, y)$$
 
