@@ -38,14 +38,14 @@ flowchart TB
   input --> stage1
   input --> stage2
   subgraph stage1 [Stage 1 — CGCLayer]
-    direction LR
+    direction TB
     s1a[task-k gate<br/>Softmax W · h_shared]
     s1b[Shared ∪ Task-k<br/>weighted sum]
     s1c((h_k<br/>one fixed-dim vector per task))
     s1a --> s1b --> s1c
   end
   subgraph stage2 [Stage 2 — CGCAttention]
-    direction LR
+    direction TB
     s2a[per-task 7-way softmax<br/>over expert blocks]
     s2b[block scale<br/>64D / 128D × w_k,i]
     s2c((h_k^cgc<br/>512D per-task recoloring))

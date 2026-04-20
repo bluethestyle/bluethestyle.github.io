@@ -35,14 +35,14 @@ flowchart TB
   input --> stage1
   input --> stage2
   subgraph stage1 [Stage 1 — CGCLayer]
-    direction LR
+    direction TB
     s1a[task-k gate<br/>Softmax W · h_shared]
     s1b[Shared ∪ Task-k<br/>가중합]
     s1c((h_k<br/>태스크당 고정 차원 벡터))
     s1a --> s1b --> s1c
   end
   subgraph stage2 [Stage 2 — CGCAttention]
-    direction LR
+    direction TB
     s2a[태스크별 7-way<br/>Softmax over experts]
     s2b[블록 스케일링<br/>64D / 128D × w_k,i]
     s2c((h_k^cgc<br/>512D per-task 재조합))
