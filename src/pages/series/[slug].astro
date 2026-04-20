@@ -69,7 +69,7 @@ const enriched = entries.map((entry) => {
   <section class="block">
     <div class="sec-head">
       <div class="sec-head-l">
-        <div class="title">{isKo ? "에피소드 목록" : "Episodes"}</div>
+        <div class={"title" + (isKo ? " kr" : "")}>{isKo ? "에피소드 목록" : "Episodes"}</div>
         <div class="count">{entries.length}{series.total ? ` / ${series.total}` : ""}</div>
       </div>
     </div>
