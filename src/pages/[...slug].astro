@@ -97,6 +97,12 @@ const T = isKo
         {catName && <span class="cat">{catName}</span>}
         <span class="d"></span>
         <span class="lang">{post.data.lang.toUpperCase()}</span>
+        <span class="d"></span>
+        <span class="views" data-views-path={Astro.url.pathname}>
+          <span class="views-icon">●</span>
+          <span class="views-count">—</span>
+          <span class="views-label">{isKo ? "조회" : "views"}</span>
+        </span>
       </div>
       <h1 class={isKo ? "kr" : ""}>{post.data.title}</h1>
       {post.data.tags && (
@@ -188,6 +194,45 @@ const T = isKo
         <a href="/archives/">← {T.archives}</a>
         <a href="/categories/">{T.all_categories} →</a>
       </nav>
+
+      <script is:inline>
+        (async () => {
+          const el = document.querySelector(".views[data-views-path]");
+          if (!el) return;
+          const path = el.getAttribute("data-views-path");
+          try {
+            const r = await fetch(`https://bluethestyle.goatcounter.com/counter/${encodeURIComponent(path)}.json`);
+            if (!r.ok) return;
+            const j = await r.json();
+            const count = j.count_unique || j.count || 0;
+            el.querySelector(".views-count").textContent = count.toLocaleString();
+          } catch (_) { /* no-op if GC not configured yet */ }
+        })();
+      </script>
+
+      <section class="comments">
+        <div class="comments-head">
+          <h3>{isKo ? "댓글" : "Comments"}</h3>
+          <span class="hint">{isKo ? "GitHub 계정으로 작성 · Discussions 에 저장" : "Post with GitHub · stored in Discussions"}</span>
+        </div>
+        <script
+          src="https://giscus.app/client.js"
+          data-repo="bluethestyle/bluethestyle.github.io"
+          data-repo-id="__GISCUS_REPO_ID__"
+          data-category="General"
+          data-category-id="__GISCUS_CATEGORY_ID__"
+          data-mapping="pathname"
+          data-strict="1"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="top"
+          data-theme="light"
+          data-lang={isKo ? "ko" : "en"}
+          data-loading="lazy"
+          crossorigin="anonymous"
+          async
+        ></script>
+      </section>
     </aside>
   </article>
 </Base>
@@ -208,6 +253,14 @@ const T = isKo
   .post-head .meta-line .lang {
     padding: 1px 6px; border: 1px solid var(--hair); border-radius: 3px;
   }
+  .post-head .meta-line .views {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--muted);
+  }
+  .post-head .meta-line .views-icon {
+    color: var(--accent); font-size: 6px;
+  }
+  .post-head .meta-line .views-count { font-weight: 500; color: var(--ink-2); }
   .post-head h1 {
     font-family: var(--display);
     font-weight: 400; font-size: 44px; line-height: 1.08;
@@ -529,4 +582,30 @@ const T = isKo
   }
   .foot-nav a { transition: color .12s; }
   .foot-nav a:hover { color: var(--ink); }
+
+  .comments {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--hair);
+  }
+  .comments-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .comments-head h3 {
+    font-family: var(--display);
+    font-size: 22px; font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0;
+  }
+  .comments-head .hint {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .giscus, .giscus-frame { width: 100%; }
+  .giscus-frame { border: 0; }
 </style>
