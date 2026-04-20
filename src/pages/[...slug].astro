@@ -374,7 +374,7 @@ const T = isKo
     vertical-align: middle;
     line-height: 1.3;
     word-break: keep-all;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
   .post-body table td {
     font-size: 13.5px;
@@ -384,8 +384,14 @@ const T = isKo
     color: var(--ink-2);
     vertical-align: top;
     word-break: keep-all;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     transition: background .12s;
+  }
+  /* First column: keep short labels on one line (prevents char-wrapping) */
+  .post-body table td:first-child,
+  .post-body table th:first-child {
+    min-width: 7em;
+    white-space: nowrap;
   }
   /* Zebra striping */
   .post-body table tbody tr:nth-child(even) td {
