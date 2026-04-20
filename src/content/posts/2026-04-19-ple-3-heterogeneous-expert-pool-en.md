@@ -96,45 +96,9 @@ Structures like MCC codes, product taxonomies, and regional hierarchies are fund
 
 HGCN (Chami et al., NeurIPS 2019) carried this idea into graph convolutions: node embeddings live on the Poincaré disk, aggregation happens in the tangent space, and the exponential map brings the result back onto the manifold. Our implementation extends it with merchant co-visit signals, producing a **unified** variant that consumes a 47D input (20D hierarchy coordinates + 27D merchant slice) and outputs 128D. Unified HGCN is the only 128D Expert — the extra capacity pays for the learnable curvature parameter and the richer hyperbolic operations.
 
-<svg viewBox="0 0 540 290" width="100%" style="max-width:560px;margin:20px auto;display:block;" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(20,15)">
-    <circle cx="130" cy="130" r="110" fill="var(--surface)" stroke="#141414" stroke-width="1.8"/>
-    <circle cx="130" cy="130" r="3" fill="#141414"/>
-    <text x="137" y="127" font-family="JetBrains Mono, monospace" font-size="11" fill="#141414">O</text>
-    <circle cx="170" cy="85" r="3" fill="#2E5BFF"/>
-    <text x="176" y="83" font-family="JetBrains Mono, monospace" font-size="11" fill="#2E5BFF">P</text>
-    <text x="175" y="45" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B7280">∂𝔻 (boundary)</text>
-    <path d="M 168 55 L 172 42" stroke="#6B7280" stroke-width="0.8"/>
-    <text x="60" y="150" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B7280" font-style="italic">𝔻</text>
-    <text x="130" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#141414" font-weight="500">(a) Poincaré disk model</text>
-  </g>
-  <g transform="translate(300,15)">
-    <circle cx="130" cy="130" r="110" fill="var(--surface)" stroke="#141414" stroke-width="1.8"/>
-    <line x1="20" y1="130" x2="240" y2="130" stroke="#2E5BFF" stroke-width="1.6" opacity="0.9"/>
-    <line x1="130" y1="20" x2="130" y2="240" stroke="#2E5BFF" stroke-width="1.6" opacity="0.9"/>
-    <path d="M 52.2 52.2 A 110 110 0 0 1 207.8 52.2" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
-    <path d="M 52.2 207.8 A 110 110 0 0 0 207.8 207.8" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
-    <path d="M 52.2 52.2 A 110 110 0 0 1 52.2 207.8" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
-    <path d="M 207.8 52.2 A 110 110 0 0 0 207.8 207.8" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
-    <path d="M 26.6 92.4 A 302.2 302.2 0 0 1 233.4 92.4" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.7"/>
-    <path d="M 75 225.3 A 63.5 63.5 0 0 0 185 225.3" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.7"/>
-    <circle cx="52.2" cy="52.2" r="2.5" fill="#141414"/>
-    <circle cx="207.8" cy="52.2" r="2.5" fill="#141414"/>
-    <circle cx="52.2" cy="207.8" r="2.5" fill="#141414"/>
-    <circle cx="207.8" cy="207.8" r="2.5" fill="#141414"/>
-    <circle cx="20" cy="130" r="2.5" fill="#141414"/>
-    <circle cx="240" cy="130" r="2.5" fill="#141414"/>
-    <circle cx="130" cy="20" r="2.5" fill="#141414"/>
-    <circle cx="130" cy="240" r="2.5" fill="#141414"/>
-    <circle cx="26.6" cy="92.4" r="2.5" fill="#141414"/>
-    <circle cx="233.4" cy="92.4" r="2.5" fill="#141414"/>
-    <circle cx="75" cy="225.3" r="2.5" fill="#141414"/>
-    <circle cx="185" cy="225.3" r="2.5" fill="#141414"/>
-    <text x="130" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#141414" font-weight="500">(b) geodesics in 𝔻</text>
-  </g>
-</svg>
+<img src="/poincare-hyperbolic.webp" alt="Poincaré disk model — (a) high-density triangle cell tessellation mesh, (b) geodesic paths: diameter geodesic (straight) and circular arc geodesics (curved, meeting boundary orthogonally)" style="max-width:720px;width:100%;margin:20px auto;display:block;" loading="lazy" />
 
-> **Hyperbolic geometry schematic — (a) Poincaré disk model + (b) example geodesics.** (a) The interior of the unit disk $\mathbb{D}$ *is* an entire infinite hyperbolic plane; the boundary $\partial\mathbb{D}$ represents "points at infinity". (b) Hyperbolic *straight lines* (geodesics) take two forms — diameters passing through the origin, or circular arcs meeting the boundary at a **right angle**. In the Euclidean plane, a radius-$r$ circle has circumference $2\pi r$; in the hyperbolic plane it grows **exponentially** as $\sinh(r)$, which is exactly why tree-structured data (with child counts growing geometrically per depth) fits without running out of room. *Layout redrawn after Shi et al. (Medical Image Analysis 2016, PMC5099092) Figure 1.*
+> **Hyperbolic geometry schematic — (a) tessellation mesh + (b) example geodesics.** (a) The Poincaré disk is tiled with a high-density triangle cell network. Cells further from the center appear visually smaller because the disk is a conformal projection — in the underlying hyperbolic metric every cell has the same size. (b) Hyperbolic *straight lines* (geodesics) come in two shapes: a **diameter geodesic** (straight orange line through the origin), and **circular arc geodesics** (curved orange arcs) which intersect the boundary **orthogonally**. In the Euclidean plane a radius-$r$ circle has circumference $2\pi r$; in the hyperbolic plane it grows **exponentially** as $\sinh(r)$, which is exactly why tree-structured data (child counts growing geometrically per depth) fits here without running out of room.
 
 $$d_{\mathcal{P}}(\mathbf{x}, \mathbf{y}) = \cosh^{-1}\!\left(1 + 2 \frac{\|\mathbf{x} - \mathbf{y}\|^2}{(1-\|\mathbf{x}\|^2)(1-\|\mathbf{y}\|^2)}\right)$$
 
@@ -178,23 +142,9 @@ If you plot a customer's transactions as a point cloud in time-amount space, an 
 
 The trouble is that barcodes are variable-length point sets and cannot be fed to a neural network directly. PersLay (Carrière et al., AISTATS 2020) solves this with a differentiable parameterized pooling: each point $(b, d)$ is mapped through a position embedding $\phi(b, d)$ and weighted by a persistence function $\psi(d - b)$, then summed to a fixed-dimensional vector. Our system feeds it two diagrams — short (90-day app logs) and long (12-month financial transactions).
 
-<svg viewBox="0 0 400 180" width="100%" style="max-width:480px;margin:16px auto;display:block;">
-  <line x1="40" y1="150" x2="380" y2="150" stroke="#6B7280" stroke-width="1"/>
-  <line x1="40" y1="20" x2="40" y2="150" stroke="#6B7280" stroke-width="1"/>
-  <text x="42" y="15" font-size="10" font-family="JetBrains Mono, monospace" fill="#6B7280">lifespan</text>
-  <text x="320" y="165" font-size="10" font-family="JetBrains Mono, monospace" fill="#6B7280">filtration →</text>
-  <line x1="60" y1="40" x2="200" y2="40" stroke="#2E5BFF" stroke-width="4" stroke-linecap="round"/>
-  <line x1="80" y1="58" x2="350" y2="58" stroke="#2E5BFF" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
-  <line x1="110" y1="76" x2="180" y2="76" stroke="#2E5BFF" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
-  <line x1="140" y1="94" x2="260" y2="94" stroke="#2E5BFF" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
-  <line x1="170" y1="112" x2="220" y2="112" stroke="#2E5BFF" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
-  <line x1="70" y1="130" x2="330" y2="130" stroke="#E14F3A" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
-  <text x="205" y="44" font-size="9" font-family="JetBrains Mono, monospace" fill="#6B7280">short</text>
-  <text x="355" y="62" font-size="9" font-family="JetBrains Mono, monospace" fill="#6B7280">persistent</text>
-  <text x="335" y="132" font-size="9" font-family="JetBrains Mono, monospace" fill="#6B7280">robust</text>
-</svg>
+<img src="/persistence-barcode.webp" alt="Persistence barcode — horizontal bars at varying heights show the lifespan of each topological feature across the filtration scale; longer bars indicate robust features, shorter bars are noise" style="max-width:720px;width:100%;margin:20px auto;display:block;" loading="lazy" />
 
-> **Persistence barcode.** Each horizontal line is the lifespan of one topological feature (a connected component, loop, or void). Longer bars correspond to genuine structural features; shorter bars are closer to noise.
+> **Persistence barcode.** The horizontal axis is the filtration scale — as ε grows the simplicial complex expands — and each horizontal bar is the **lifespan** of one topological feature (connected component, loop, or void) from birth to death. Long bars indicate genuine structural features; short bars are noise. PersLay converts this barcode directly into a fixed-dimensional vector via differentiable parameterized pooling.
 
 $$\text{PersLay}(D) = \sum_{(b, d) \in D} \phi(b, d) \cdot \psi(d - b)$$
 
