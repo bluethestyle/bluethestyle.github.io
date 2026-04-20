@@ -96,9 +96,38 @@ Structures like MCC codes, product taxonomies, and regional hierarchies are fund
 
 HGCN (Chami et al., NeurIPS 2019) carried this idea into graph convolutions: node embeddings live on the Poincaré disk, aggregation happens in the tangent space, and the exponential map brings the result back onto the manifold. Our implementation extends it with merchant co-visit signals, producing a **unified** variant that consumes a 47D input (20D hierarchy coordinates + 27D merchant slice) and outputs 128D. Unified HGCN is the only 128D Expert — the extra capacity pays for the learnable curvature parameter and the richer hyperbolic operations.
 
-<img src="/poincare-tile-7-3.svg" alt="Poincaré disk {7,3} uniform hyperbolic tiling — regular heptagons, three meeting at each vertex, with edges as geodesic arcs" style="max-width:360px;margin:20px auto;display:block;width:100%" />
+<svg viewBox="0 0 540 290" width="100%" style="max-width:560px;margin:20px auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(20,15)">
+    <circle cx="130" cy="130" r="110" fill="var(--surface)" stroke="#141414" stroke-width="1.8"/>
+    <circle cx="130" cy="130" r="3" fill="#141414"/>
+    <text x="137" y="127" font-family="JetBrains Mono, monospace" font-size="11" fill="#141414">O</text>
+    <circle cx="170" cy="85" r="3" fill="#2E5BFF"/>
+    <text x="176" y="83" font-family="JetBrains Mono, monospace" font-size="11" fill="#2E5BFF">P</text>
+    <text x="175" y="45" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B7280">∂𝔻 (boundary)</text>
+    <path d="M 168 55 L 172 42" stroke="#6B7280" stroke-width="0.8"/>
+    <text x="60" y="150" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B7280" font-style="italic">𝔻</text>
+    <text x="130" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#141414" font-weight="500">(a) Poincaré disk model</text>
+  </g>
+  <g transform="translate(300,15)">
+    <circle cx="130" cy="130" r="110" fill="var(--surface)" stroke="#141414" stroke-width="1.8"/>
+    <line x1="20" y1="130" x2="240" y2="130" stroke="#2E5BFF" stroke-width="1.6" opacity="0.9"/>
+    <line x1="130" y1="20" x2="130" y2="240" stroke="#2E5BFF" stroke-width="1.6" opacity="0.9"/>
+    <path d="M 52 52 A 155 155 0 0 0 208 52" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
+    <path d="M 52 208 A 155 155 0 0 1 208 208" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
+    <path d="M 75 40 A 95 95 0 0 1 220 105" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.7"/>
+    <circle cx="52" cy="52" r="2.5" fill="#141414"/>
+    <circle cx="208" cy="52" r="2.5" fill="#141414"/>
+    <circle cx="52" cy="208" r="2.5" fill="#141414"/>
+    <circle cx="208" cy="208" r="2.5" fill="#141414"/>
+    <circle cx="20" cy="130" r="2.5" fill="#141414"/>
+    <circle cx="240" cy="130" r="2.5" fill="#141414"/>
+    <circle cx="130" cy="20" r="2.5" fill="#141414"/>
+    <circle cx="130" cy="240" r="2.5" fill="#141414"/>
+    <text x="130" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#141414" font-weight="500">(b) geodesics in 𝔻</text>
+  </g>
+</svg>
 
-> **Why hyperbolic — a {7,3} uniform tiling on the Poincaré disk.** The figure shows regular heptagons meeting three-per-vertex — a tiling that *only exists in the hyperbolic plane* (it cannot close up on a flat plane, where you can only fit six triangles or three hexagons around a vertex). Each edge is a geodesic arc (a "hyperbolic straight line") meeting the boundary at a right angle. In Euclidean space, the circumference of a radius-$r$ circle grows as $2\pi r$; in the hyperbolic plane it grows **exponentially** as $\sinh(r)$ — which is why tiles near the boundary appear tiny but are actually all the same hyperbolic size. Trees follow the same logic, which is why deep trees never run out of room. *Image: [cduck/hyperbolic](https://github.com/cduck/hyperbolic) (MIT) polyTile7-3.svg*
+> **Hyperbolic geometry schematic — (a) Poincaré disk model + (b) example geodesics.** (a) The interior of the unit disk $\mathbb{D}$ *is* an entire infinite hyperbolic plane; the boundary $\partial\mathbb{D}$ represents "points at infinity". (b) Hyperbolic *straight lines* (geodesics) take two forms — diameters passing through the origin, or circular arcs meeting the boundary at a **right angle**. In the Euclidean plane, a radius-$r$ circle has circumference $2\pi r$; in the hyperbolic plane it grows **exponentially** as $\sinh(r)$, which is exactly why tree-structured data (with child counts growing geometrically per depth) fits without running out of room. *Layout redrawn after Shi et al. (Medical Image Analysis 2016, PMC5099092) Figure 1.*
 
 $$d_{\mathcal{P}}(\mathbf{x}, \mathbf{y}) = \cosh^{-1}\!\left(1 + 2 \frac{\|\mathbf{x} - \mathbf{y}\|^2}{(1-\|\mathbf{x}\|^2)(1-\|\mathbf{y}\|^2)}\right)$$
 
