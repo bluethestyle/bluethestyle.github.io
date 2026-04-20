@@ -314,7 +314,7 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 1. *이종 Expert 결합*: 단일 구조 Expert 대신 GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT 등 7개 이종 도메인 Expert를 결합
 2. *CGC 차원 정규화*: Expert 출력 차원 비대칭(128D vs 64D) 보정
 3. *HMM Triple-Mode 라우팅*: 태스크별 시간 스케일에 맞는 HMM 모드 선택적 주입
-4. *GroupTaskExpertBasket*: GroupEncoder + ClusterEmbedding으로 88% 파라미터 감소 (v3.2)
+4. *GroupTaskExpertBasket*: GroupEncoder + ClusterEmbedding 으로 88% 파라미터 감소
 5. *Logit Transfer 체인*: 위상 정렬 기반 자동 실행 순서 도출
 6. *Evidential + SAE*: 예측 불확실성 정량화 + Expert 표현 해석성
 
@@ -398,7 +398,7 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 |---|---|---|
 | Unified H-GCN | ~200K | 128D output, merchant 계층 구조 |
 | PersLay | ~50K | Raw diagram + global stats |
-| DeepFM | ~169K | v3.11: 필드별 독립 임베딩 |
+| DeepFM | ~169K | 필드별 독립 임베딩 |
 | Temporal Ensemble | ~500K | Mamba + LNN + Transformer |
 | LightGCN | ~20K | 사전 계산 임베딩 → 경량 |
 | Causal | ~100K | NOTEARS DAG + 인과 인코더 |

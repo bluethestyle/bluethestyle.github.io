@@ -15,11 +15,11 @@ next_status: published
 *"Study Thread" 시리즈의 PLE 서브스레드 5편. 영문/국문 병렬로 PLE-1 →
 PLE-6 에 걸쳐 본 프로젝트의 PLE 아키텍처 뒤에 있는 논문과 수학 기초를
 정리한다. 출처는 온프렘 프로젝트 `기술참조서/PLE_기술_참조서` 이다.
-이번 5편은 태스크 그룹 단위로 전용 Expert 를 만드는 GroupTaskExpertBasket
-v3.2, 태스크 간 명시적 정보 전달을 수행하는 Logit Transfer, 그리고
+이번 5편은 태스크 그룹 단위로 전용 Expert 를 만드는 GroupTaskExpertBasket,
+태스크 간 명시적 정보 전달을 수행하는 Logit Transfer, 그리고
 최종 예측을 만드는 Task Tower — PLE 데이터 흐름의 후반부를 관통한다.*
 
-## GroupTaskExpertBasket — GroupEncoder + ClusterEmbedding (v3.2)
+## GroupTaskExpertBasket — GroupEncoder + ClusterEmbedding
 
 ```mermaid
 flowchart TB
@@ -37,8 +37,8 @@ flowchart TB
   style out fill:#FFFFFF,stroke:#141414,stroke-width:2px
 ```
 
-v3.2 에서 `use_group_encoder=true` (기본값) 설정 시
-`GroupTaskExpertBasket` 을 사용하며, 레거시 `ClusterTaskExpertBasket`
+`use_group_encoder=true` (기본값) 설정 시 `GroupTaskExpertBasket` 을
+사용하며, 레거시 `ClusterTaskExpertBasket`
 (태스크×클러스터 독립 MLP, ~3.0M 파라미터) 대비 *88% 파라미터 감소*
 (~362K) 를 달성한다. 같은 그룹 내 태스크는 GroupEncoder 를 공유하고,
 그룹 간은 독립이다.
@@ -87,6 +87,8 @@ flowchart TB
     nba[NBA] -->|feature<br/>α=0.5| scat[Spending_category]
     scat -->|feature<br/>α=0.5| brand[Brand_prediction]
   end
+  eng ~~~ ret
+  ret ~~~ cons
   style eng fill:#D8E0FF,stroke:#2E5BFF
   style ret fill:#FDD8D1,stroke:#E14F3A
   style cons fill:#C9ECD9,stroke:#1C8C5A
@@ -151,7 +153,7 @@ activation=None, Binary 는 sigmoid, Multiclass 는 softmax.
 
 ### 태스크별 손실 유형
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 410" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 450" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <defs><style>
     .grp-lbl { font-size: 13px; font-weight: 600; fill: #141414; }
     .grp-meta { font-size: 11px; fill: #6B6A63; }
@@ -223,9 +225,9 @@ activation=None, Binary 는 sigmoid, Multiclass 는 softmax.
   <!-- Contrastive -->
   <g transform="translate(20,376)">
     <text class="grp-lbl" x="0" y="14">Contrastive · InfoNCE (τ=0.07)</text>
-    <g transform="translate(0,22)">
-      <rect class="contra" x="0" y="0" width="240" height="14" rx="4"/>
-      <text class="task-chip" x="120" y="11" text-anchor="middle">Brand_prediction (128)  2.0w</text>
+    <g transform="translate(0,28)">
+      <rect class="contra" x="0" y="0" width="240" height="28" rx="4"/>
+      <text class="task-chip" x="120" y="18" text-anchor="middle">Brand_prediction (128)  2.0w</text>
     </g>
   </g>
 </svg>
@@ -302,7 +304,7 @@ $[-4.0, 4.0]$ 으로 clamp.
 
 ## 정리하자면
 
-GroupTaskExpertBasket v3.2 는 클러스터×태스크 독립 MLP 를 GroupEncoder
+GroupTaskExpertBasket 은 클러스터×태스크 독립 MLP 를 GroupEncoder
 공유 + ClusterEmbedding 구조로 치환하여 88% 파라미터를 줄이면서도
 클러스터별 특성화를 유지한다. soft routing 은 GMM 사후 확률로 경계
 고객을 부드럽게 다룬다. Logit Transfer 는 CTR→CVR→LTV 같은 비즈니스

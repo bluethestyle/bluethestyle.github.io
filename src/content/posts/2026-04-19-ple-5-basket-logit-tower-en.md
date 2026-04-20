@@ -16,12 +16,12 @@ next_status: published
 sub-thread running PLE-1 → PLE-6 that summarizes the papers and math
 foundations behind the PLE architecture used in this project. Source:
 the on-prem `기술참조서/PLE_기술_참조서` document. This fifth post cuts
-through the back half of the PLE data flow — GroupTaskExpertBasket v3.2
+through the back half of the PLE data flow — GroupTaskExpertBasket
 (group-scoped expert encoders with cluster-conditioned embeddings),
 Logit Transfer (explicit predictions passed between tasks along a DAG),
 and the Task Tower that produces the final output.*
 
-## GroupTaskExpertBasket — GroupEncoder + ClusterEmbedding (v3.2)
+## GroupTaskExpertBasket — GroupEncoder + ClusterEmbedding
 
 ```mermaid
 flowchart TB
@@ -39,7 +39,7 @@ flowchart TB
   style out fill:#FFFFFF,stroke:#141414,stroke-width:2px
 ```
 
-In v3.2, setting `use_group_encoder=true` (the default) switches to
+Setting `use_group_encoder=true` (the default) switches to
 `GroupTaskExpertBasket`, which achieves an *88% parameter reduction*
 (~362K) over the legacy `ClusterTaskExpertBasket` (independent MLP per
 task × cluster, ~3.0M parameters). Tasks inside the same group share
@@ -93,6 +93,8 @@ flowchart TB
     nba[NBA] -->|feature<br/>α=0.5| scat[Spending_category]
     scat -->|feature<br/>α=0.5| brand[Brand_prediction]
   end
+  eng ~~~ ret
+  ret ~~~ cons
   style eng fill:#D8E0FF,stroke:#2E5BFF
   style ret fill:#FDD8D1,stroke:#E14F3A
   style cons fill:#C9ECD9,stroke:#1C8C5A
@@ -162,7 +164,7 @@ use activation=None, binary uses sigmoid, multiclass uses softmax.
 
 ### Per-task loss types
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 410" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 450" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">
   <defs><style>
     .grp-lbl { font-size: 13px; font-weight: 600; fill: #141414; }
     .grp-meta { font-size: 11px; fill: #6B6A63; }
@@ -234,9 +236,9 @@ use activation=None, binary uses sigmoid, multiclass uses softmax.
   <!-- Contrastive -->
   <g transform="translate(20,376)">
     <text class="grp-lbl" x="0" y="14">Contrastive · InfoNCE (τ=0.07)</text>
-    <g transform="translate(0,22)">
-      <rect class="contra" x="0" y="0" width="240" height="14" rx="4"/>
-      <text class="task-chip" x="120" y="11" text-anchor="middle">Brand_prediction (128)  2.0w</text>
+    <g transform="translate(0,28)">
+      <rect class="contra" x="0" y="0" width="240" height="28" rx="4"/>
+      <text class="task-chip" x="120" y="18" text-anchor="middle">Brand_prediction (128)  2.0w</text>
     </g>
   </g>
 </svg>
@@ -321,7 +323,7 @@ Inside `forward()`, the following losses are summed.
 
 ## Where this leaves us
 
-GroupTaskExpertBasket v3.2 replaces the per-cluster × per-task
+GroupTaskExpertBasket replaces the per-cluster × per-task
 independent MLP with a shared GroupEncoder + ClusterEmbedding, cutting
 parameters by 88% while preserving cluster-level specialization; soft
 routing uses GMM posteriors to handle boundary customers smoothly.

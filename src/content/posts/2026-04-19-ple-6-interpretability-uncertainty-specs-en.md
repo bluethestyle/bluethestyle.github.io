@@ -349,7 +349,7 @@ Design elements unique to this project:
 1. *Heterogeneous Expert combination*: instead of single-structure experts, combine 7 heterogeneous domain experts — GCN, PersLay, DeepFM, Temporal, LightGCN, Causal, OT.
 2. *CGC dimension normalisation*: corrects asymmetric expert output dimensions (128D vs 64D)
 3. *HMM Triple-Mode routing*: selectively injects an HMM mode matched to each task's time scale
-4. *GroupTaskExpertBasket*: GroupEncoder + ClusterEmbedding yields 88% parameter reduction (v3.2)
+4. *GroupTaskExpertBasket*: GroupEncoder + ClusterEmbedding yields 88% parameter reduction
 5. *Logit Transfer chain*: execution order is derived automatically from topological sort
 6. *Evidential + SAE*: uncertainty quantification plus expert-representation interpretability
 
@@ -433,7 +433,7 @@ Design elements unique to this project:
 |---|---|---|
 | Unified H-GCN | ~200K | 128D output, merchant hierarchy |
 | PersLay | ~50K | Raw diagram + global stats |
-| DeepFM | ~169K | v3.11: independent per-field embeddings |
+| DeepFM | ~169K | independent per-field embeddings |
 | Temporal Ensemble | ~500K | Mamba + LNN + Transformer |
 | LightGCN | ~20K | Pre-computed embeddings → lightweight |
 | Causal | ~100K | NOTEARS DAG + causal encoder |

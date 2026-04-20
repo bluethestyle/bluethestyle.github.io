@@ -8,7 +8,7 @@ series: study-thread
 part: 4
 alt_lang: /2026/04/19/ple-4-cgc-hmm-routing-ko/
 next_title: "PLE-5 — GroupTaskExpertBasket, Logit Transfer, Task Tower"
-next_desc: "How GroupTaskExpertBasket v3.2 (GroupEncoder + ClusterEmbedding) produces per-task specialized experts, the three modes of Logit Transfer for explicit cross-task information flow, and the Task Tower architecture that turns it all into final predictions."
+next_desc: "How GroupTaskExpertBasket (GroupEncoder + ClusterEmbedding) produces per-task specialized experts, the three modes of Logit Transfer for explicit cross-task information flow, and the Task Tower architecture that turns it all into final predictions."
 next_status: published
 ---
 
