@@ -96,43 +96,9 @@ Structures like MCC codes, product taxonomies, and regional hierarchies are fund
 
 HGCN (Chami et al., NeurIPS 2019) carried this idea into graph convolutions: node embeddings live on the Poincaré disk, aggregation happens in the tangent space, and the exponential map brings the result back onto the manifold. Our implementation extends it with merchant co-visit signals, producing a **unified** variant that consumes a 47D input (20D hierarchy coordinates + 27D merchant slice) and outputs 128D. Unified HGCN is the only 128D Expert — the extra capacity pays for the learnable curvature parameter and the richer hyperbolic operations.
 
-<svg viewBox="0 0 300 310" width="100%" style="max-width:320px;margin:20px auto;display:block;" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="150" cy="150" r="140" fill="var(--surface)" stroke="#141414" stroke-width="2"/>
-  <path d="M 12 180 A 110 110 0 0 1 288 180" stroke="#2E5BFF" stroke-width="1" fill="none" opacity="0.45"/>
-  <path d="M 12 120 A 110 110 0 0 0 288 120" stroke="#2E5BFF" stroke-width="1" fill="none" opacity="0.45"/>
-  <path d="M 180 12 A 110 110 0 0 1 180 288" stroke="#2E5BFF" stroke-width="1" fill="none" opacity="0.45"/>
-  <path d="M 120 12 A 110 110 0 0 0 120 288" stroke="#2E5BFF" stroke-width="1" fill="none" opacity="0.45"/>
-  <path d="M 40 40 A 180 180 0 0 1 260 260" stroke="#2E5BFF" stroke-width="1" fill="none" opacity="0.3"/>
-  <path d="M 260 40 A 180 180 0 0 0 40 260" stroke="#2E5BFF" stroke-width="1" fill="none" opacity="0.3"/>
-  <line x1="150" y1="150" x2="150" y2="60" stroke="#141414" stroke-width="1.4"/>
-  <line x1="150" y1="150" x2="60" y2="150" stroke="#141414" stroke-width="1.4"/>
-  <line x1="150" y1="150" x2="150" y2="240" stroke="#141414" stroke-width="1.4"/>
-  <line x1="150" y1="150" x2="240" y2="150" stroke="#141414" stroke-width="1.4"/>
-  <line x1="150" y1="60" x2="125" y2="28" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <line x1="150" y1="60" x2="175" y2="28" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <line x1="60" y1="150" x2="28" y2="125" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <line x1="60" y1="150" x2="28" y2="175" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <line x1="150" y1="240" x2="125" y2="272" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <line x1="150" y1="240" x2="175" y2="272" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <line x1="240" y1="150" x2="272" y2="125" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <line x1="240" y1="150" x2="272" y2="175" stroke="#141414" stroke-width="1.2" opacity="0.85"/>
-  <circle cx="150" cy="150" r="3.5" fill="#141414"/>
-  <circle cx="150" cy="60" r="3" fill="#141414"/>
-  <circle cx="60" cy="150" r="3" fill="#141414"/>
-  <circle cx="150" cy="240" r="3" fill="#141414"/>
-  <circle cx="240" cy="150" r="3" fill="#141414"/>
-  <circle cx="125" cy="28" r="2.5" fill="#141414"/>
-  <circle cx="175" cy="28" r="2.5" fill="#141414"/>
-  <circle cx="28" cy="125" r="2.5" fill="#141414"/>
-  <circle cx="28" cy="175" r="2.5" fill="#141414"/>
-  <circle cx="125" cy="272" r="2.5" fill="#141414"/>
-  <circle cx="175" cy="272" r="2.5" fill="#141414"/>
-  <circle cx="272" cy="125" r="2.5" fill="#141414"/>
-  <circle cx="272" cy="175" r="2.5" fill="#141414"/>
-  <text x="150" y="305" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6B7280">Poincaré disk — the unit disk is the whole infinite hyperbolic plane</text>
-</svg>
+<img src="/poincare-tile-7-3.svg" alt="Poincaré disk {7,3} uniform hyperbolic tiling — regular heptagons, three meeting at each vertex, with edges as geodesic arcs" style="max-width:360px;margin:20px auto;display:block;width:100%" />
 
-> **Why hyperbolic.** In the Euclidean plane, the circumference of a radius-$r$ circle grows as $2\pi r$, but in the hyperbolic plane it grows **exponentially** as $\sinh(r)$. That is why deep trees never run out of room near the boundary — there is always exponentially more space for new branches. The figure shows the Poincaré disk model: the disk interior *is* the whole hyperbolic plane, the blue arcs are geodesics (hyperbolic "straight lines"), and the black tree is an example embedding.
+> **Why hyperbolic — a {7,3} uniform tiling on the Poincaré disk.** The figure shows regular heptagons meeting three-per-vertex — a tiling that *only exists in the hyperbolic plane* (it cannot close up on a flat plane, where you can only fit six triangles or three hexagons around a vertex). Each edge is a geodesic arc (a "hyperbolic straight line") meeting the boundary at a right angle. In Euclidean space, the circumference of a radius-$r$ circle grows as $2\pi r$; in the hyperbolic plane it grows **exponentially** as $\sinh(r)$ — which is why tiles near the boundary appear tiny but are actually all the same hyperbolic size. Trees follow the same logic, which is why deep trees never run out of room. *Image: [cduck/hyperbolic](https://github.com/cduck/hyperbolic) (MIT) polyTile7-3.svg*
 
 $$d_{\mathcal{P}}(\mathbf{x}, \mathbf{y}) = \cosh^{-1}\!\left(1 + 2 \frac{\|\mathbf{x} - \mathbf{y}\|^2}{(1-\|\mathbf{x}\|^2)(1-\|\mathbf{y}\|^2)}\right)$$
 
