@@ -112,17 +112,24 @@ HGCN (Chami et al., NeurIPS 2019) 은 이 아이디어를 GCN 에 이식해, 노
     <circle cx="130" cy="130" r="110" fill="var(--surface)" stroke="#141414" stroke-width="1.8"/>
     <line x1="20" y1="130" x2="240" y2="130" stroke="#2E5BFF" stroke-width="1.6" opacity="0.9"/>
     <line x1="130" y1="20" x2="130" y2="240" stroke="#2E5BFF" stroke-width="1.6" opacity="0.9"/>
-    <path d="M 52 52 A 155 155 0 0 0 208 52" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
-    <path d="M 52 208 A 155 155 0 0 1 208 208" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
-    <path d="M 75 40 A 95 95 0 0 1 220 105" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.7"/>
-    <circle cx="52" cy="52" r="2.5" fill="#141414"/>
-    <circle cx="208" cy="52" r="2.5" fill="#141414"/>
-    <circle cx="52" cy="208" r="2.5" fill="#141414"/>
-    <circle cx="208" cy="208" r="2.5" fill="#141414"/>
+    <path d="M 52.2 52.2 A 110 110 0 0 1 207.8 52.2" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
+    <path d="M 52.2 207.8 A 110 110 0 0 0 207.8 207.8" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
+    <path d="M 52.2 52.2 A 110 110 0 0 1 52.2 207.8" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
+    <path d="M 207.8 52.2 A 110 110 0 0 0 207.8 207.8" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.9"/>
+    <path d="M 26.6 92.4 A 302.2 302.2 0 0 1 233.4 92.4" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.7"/>
+    <path d="M 75 225.3 A 63.5 63.5 0 0 0 185 225.3" stroke="#2E5BFF" stroke-width="1.6" fill="none" opacity="0.7"/>
+    <circle cx="52.2" cy="52.2" r="2.5" fill="#141414"/>
+    <circle cx="207.8" cy="52.2" r="2.5" fill="#141414"/>
+    <circle cx="52.2" cy="207.8" r="2.5" fill="#141414"/>
+    <circle cx="207.8" cy="207.8" r="2.5" fill="#141414"/>
     <circle cx="20" cy="130" r="2.5" fill="#141414"/>
     <circle cx="240" cy="130" r="2.5" fill="#141414"/>
     <circle cx="130" cy="20" r="2.5" fill="#141414"/>
     <circle cx="130" cy="240" r="2.5" fill="#141414"/>
+    <circle cx="26.6" cy="92.4" r="2.5" fill="#141414"/>
+    <circle cx="233.4" cy="92.4" r="2.5" fill="#141414"/>
+    <circle cx="75" cy="225.3" r="2.5" fill="#141414"/>
+    <circle cx="185" cy="225.3" r="2.5" fill="#141414"/>
     <text x="130" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#141414" font-weight="500">(b) geodesics in 𝔻</text>
   </g>
 </svg>
