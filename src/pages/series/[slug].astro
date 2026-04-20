@@ -1,16 +1,16 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { SERIES } from "../../data.js";
+import { SERIES, POSTS } from "../../data.js";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts");
+  const collectionPosts = await getCollection("posts");
   const paths = [];
   for (const s of SERIES) {
     for (const lang of ["en", "ko"]) {
       const url = lang === "ko" ? s.ko : s.en;
       const slug = url.replace(/^\/series\//, "").replace(/\/$/, "");
-      const entries = posts
+      const entries = collectionPosts
         .filter((p) => p.data.series === s.slug && p.data.lang === lang)
         .sort((a, b) => (a.data.part ?? 0) - (b.data.part ?? 0));
       paths.push({
@@ -33,49 +33,44 @@ function entryUrl(entry) {
 
 const { series, lang, entries } = Astro.props;
 const isKo = lang === "ko";
-const T = isKo
-  ? {
-      published_n: (n) => `${n} 편 공개`,
-      total_n: (n) => `총 ${n} 편 예정`,
-      read: "읽기",
-      ep: "에피소드",
-      back: "← 시리즈 전체",
-      other_lang: "English version",
-      other_lang_label: "EN",
-    }
-  : {
-      published_n: (n) => `${n} post${n === 1 ? "" : "s"} published`,
-      total_n: (n) => `${n} planned total`,
-      read: "read",
-      ep: "Episode",
-      back: "← All series",
-      other_lang: "한국어 버전",
-      other_lang_label: "KO",
-    };
-
 const altLangUrl = isKo ? series.en : series.ko;
+const T = isKo
+  ? { published: (n) => `${n} 편 공개`, total_suffix: (t) => t ? ` · 총 ${t} 편 예정` : "", back: "← 시리즈", other_lang: "English", all_series: "시리즈 전체" }
+  : { published: (n) => `${n} post${n === 1 ? "" : "s"} published`, total_suffix: (t) => t ? ` · ${t} planned` : "", back: "← Series", other_lang: "한국어", all_series: "All series" };
+
+// Enrich each entry with excerpt from data.js POSTS (matched by URL)
+const enriched = entries.map((entry) => {
+  const url = entryUrl(entry);
+  const match = POSTS.find((p) => p.url === url);
+  return {
+    ...entry,
+    _url: url,
+    _ex: match?.ex || "",
+    _tags: entry.data.tags || [],
+  };
+});
 ---
 <Base title={`${series.tag} — ${series.title}`} tab="">
   <section class="hero" style="padding-bottom:32px; margin-bottom:32px">
     <div class="label">
       <span class="pulse"></span>
-      Series · {T.published_n(entries.length)} · {T.total_n(series.total)}
+      Series · {T.published(entries.length)}{T.total_suffix(series.total)}
     </div>
     <h1 style="font-size:48px">
-      <em>{series.tag}</em><br />
-      <span style={isKo ? "font-family:var(--kr); font-size:30px; font-style:normal; color:var(--ink-2); letter-spacing:-0.02em" : "font-size:30px; font-style:normal; color:var(--ink-2)"}>{series.title}</span>
+      <em>{series.tag}</em>
+      <span style={isKo ? "display:block; font-family:var(--kr); font-size:26px; font-style:normal; color:var(--muted); margin-top:8px; letter-spacing:-0.02em" : "display:block; font-size:26px; font-style:normal; color:var(--muted); margin-top:8px"}>{series.title}</span>
     </h1>
     <p>{series.desc}</p>
-    <div style="margin-top:14px; display:flex; gap:14px; font-family:var(--mono); font-size:11px; color:var(--muted)">
-      <a href={altLangUrl} style="color:var(--accent-ink)">{T.other_lang} ({T.other_lang_label}) ↗</a>
+    <div style="margin-top:14px; display:flex; gap:14px; font-family:var(--mono); font-size:11px;">
+      <a href={altLangUrl} style="color:var(--accent-ink)">{T.other_lang} ↗</a>
     </div>
   </section>
 
   <section class="block">
     <div class="sec-head">
       <div class="sec-head-l">
-        <div class="title">{isKo ? "에피소드" : "Episodes"}</div>
-        <div class="count">{entries.length} / {series.total}</div>
+        <div class="title">{isKo ? "에피소드 목록" : "Episodes"}</div>
+        <div class="count">{entries.length}{series.total ? ` / ${series.total}` : ""}</div>
       </div>
     </div>
 
@@ -83,29 +78,31 @@ const altLangUrl = isKo ? series.en : series.ko;
       <p style="color:var(--muted); font-style:italic">{isKo ? "아직 공개된 에피소드가 없습니다." : "No episodes published yet."}</p>
     ) : (
       <div class="post-index">
+        <div class="year">2026</div>
         <div>
-          {entries.map((p) => {
-            const url = entryUrl(p);
-            const dateStr = p.data.date.toISOString().slice(0, 10);
+          {enriched.map((p) => {
+            const dateShort = p.data.date.toISOString().slice(5, 10).replace("-", " · ");
+            const langUp = p.data.lang.toUpperCase();
             return (
-              <a class="post-row" href={url}>
+              <a class="post-row" href={p._url}>
                 <div>
                   <div class="meta-line">
-                    <span>{T.ep} {p.data.part ?? "?"}</span>
+                    <span class="cat">EP {p.data.part ?? "?"}</span>
                     <span class="d"></span>
-                    <span>{dateStr}</span>
+                    <span>{dateShort}</span>
                     <span class="d"></span>
-                    <span class="lang">{p.data.lang.toUpperCase()}</span>
+                    <span class="lang">{langUp}</span>
                   </div>
                   <h3 class={"title" + (isKo ? " kr" : "")}>{p.data.title}</h3>
-                  {p.data.tags && (
+                  {p._ex && <p class={"ex" + (isKo ? " kr" : "")}>{p._ex}</p>}
+                  {p._tags.length > 0 && (
                     <div class="tags-row">
-                      {p.data.tags.slice(0, 5).map((t) => <span class="tg">#{t}</span>)}
+                      {p._tags.slice(0, 6).map((t) => <span class="tg">#{t}</span>)}
                     </div>
                   )}
                 </div>
                 <div class="right">
-                  <span>{T.read}</span>
+                  <span>{isKo ? "읽기" : "read"}</span>
                   <span class="arr">↗</span>
                 </div>
               </a>

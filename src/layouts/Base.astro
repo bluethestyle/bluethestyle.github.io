@@ -87,12 +87,15 @@ const seriesCurrent = Object.fromEntries(
 
         <div class="nav-label">Series · active</div>
         <div class="series-mini">
-          {SERIES.map((s) => (
-            <a href={s.en} class="series-row">
-              <span class="cat">[{s.tag}]</span>
-              <span class="prog">ep {seriesCurrent[s.slug] ?? s.ep}/{s.total}</span>
-            </a>
-          ))}
+          {SERIES.map((s) => {
+            const n = seriesCurrent[s.slug] ?? s.ep;
+            return (
+              <a href={s.en} class="series-row">
+                <span class="cat">[{s.tag}]</span>
+                <span class="prog">ep {n}{s.total ? `/${s.total}` : ""}</span>
+              </a>
+            );
+          })}
         </div>
 
         <div class="kv">

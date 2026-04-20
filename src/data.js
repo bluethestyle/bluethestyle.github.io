@@ -29,7 +29,7 @@ export const COAUTHORS = [
 
 export const SERIES = [
   {
-    slug: "finai-build",
+    slug: "three-months",
     title: "Building a Financial AI in Three Months",
     tag: "FinAI Build",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.",
@@ -51,7 +51,7 @@ export const SERIES = [
     title: "Study Thread — Papers & Math Foundations",
     tag: "Study Thread",
     desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized in parallel English/Korean.",
-    ep: 10, total: 10,
+    ep: 10,
     ko: "/series/study-thread-ko/",
     en: "/series/study-thread/",
   },
