@@ -412,22 +412,18 @@ const T = isKo
   .post-body table tbody td:first-child strong {
     color: var(--accent-ink);
   }
-  /* Last column (numeric / dim / lang) stays on one line + mono */
-  .post-body table td:last-child,
-  .post-body table th:last-child {
-    white-space: nowrap;
+  /* Narrative tables: let content flow left-aligned, wrap naturally.
+     (Previously forced right-align + mono on last column — good for
+     numeric columns like dims, bad for 2-col before/after comparisons
+     where the right column is prose.) Numeric tables can explicitly
+     right-align via markdown |---:| syntax. */
+  .post-body table td,
+  .post-body table th {
+    text-align: left;
   }
-  .post-body table tbody td:last-child {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--ink);
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  /* Korean body: content in SUIT; headers inherit the mono→SUIT fallback stack
-     already defined on table th; numeric last column stays mono (ASCII only). */
+  /* Korean body content in SUIT; headers inherit the mono→SUIT stack
+     already defined on table th. */
   .post-body.kr table { font-family: var(--kr); letter-spacing: -0.005em; }
-  .post-body.kr table tbody td:last-child { font-family: var(--mono); }
   /* Inline code cells: pill style */
   .post-body table code {
     font-family: var(--mono);
