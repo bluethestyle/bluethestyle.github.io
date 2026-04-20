@@ -12,302 +12,262 @@ next_desc: "2-Phase Training Loop, Loss Weighting strategies (Uncertainty / Grad
 next_status: published
 ---
 
-*Part 3 of the adaTT sub-thread in the "Study Thread" series. Across ADATT-1 → ADATT-4, in parallel Korean and English, I unpack the adaTT mechanism used in this project. The source is the on-prem project's `기술참조서/adaTT_기술_참조서` (adaTT Tech Reference). This Part 3 covers the full formula of adaTT's core Transfer Loss term and its transfer-weight computation, the G-01 FIX Transfer Loss Clamp, masking for tasks whose targets are missing in a batch, the task-group-based Prior matrix with Prior Blend Annealing, the transition logic of the 3-Phase Schedule (Warmup → Dynamic → Frozen), and finally the Negative Transfer detection and blocking mechanism.*
+*Part 3 of the adaTT sub-thread in the "Study Thread" series. Across
+ADATT-1 → ADATT-4, in parallel Korean and English, I unpack the adaTT
+mechanism behind this project. The source is the on-prem reference
+`기술참조서/adaTT_기술_참조서`. ADATT-2 closed the *Measure* stage;
+this post answers the single question "what do we do with the measured
+affinity?" by breaking it into four decisions.*
 
-## 4. Transfer Loss Computation
+## What ADATT-2 Left on the Table
 
-`compute_transfer_loss()` is the heart of adaTT: for each task, it adds a transfer loss contributed by the other tasks on top of that task's original loss.
+We now have a live $[-1, 1]$-valued affinity matrix $\mathbf{A}$
+updated in real time. What do we do with it? Four smaller decisions
+split the question.
 
-> Source: `adatt.py:283-353` — `compute_transfer_loss()` method
+1. How do we turn affinity into a *loss signal* — Transfer Loss.
+2. How do we fill the *empty* early-training affinity — Group Prior.
+3. How do we modulate transfer strength over training — 3-Phase
+   Schedule.
+4. How do we treat negative affinity, i.e. *harmful transfer* —
+   Negative Transfer blocking.
 
-### 4.1 The Full Formula
+One at a time.
 
-The Transfer-Enhanced Loss for each task $i$ is:
+## Decision 1 — Why Transfer Loss in This Form
+
+Turning affinity into a loss signal has a few natural candidates. Let
+us compare three.
+
+- *(a) Weighted-sum distillation.* Add a weighted sum of other tasks'
+  losses to the current task. Simple and differentiable.
+- *(b) Gradient surgery (PCGrad).* Project conflicting gradients onto
+  each other's orthogonal subspace and subtract the conflict
+  component. Directly modifies gradients.
+- *(c) Transfer Loss (adaTT's choice).* An enhanced (a): combine
+  affinity with a learnable weight and apply softmax normalisation.
+
+adaTT picks (c). (b) PCGrad rewrites gradients via projection every
+step, which is expensive at 16 tasks and also discards each gradient's
+own information. (a) is simple but leaves no room for learnable
+weights. (c) keeps standard backprop, and rides the observed affinity
+$\mathbf{A}$ together with a learnable $\mathbf{W}$, mixing
+"observation + learning" in one term.
+
+The Transfer-Enhanced Loss for each task $i$:
 
 $$\mathcal{L}_i^{\text{adaTT}} = \mathcal{L}_i + \lambda \cdot \sum_{j \neq i} w_{i \rightarrow j} \cdot \mathcal{L}_j$$
 
-- $\mathcal{L}_i$: task $i$'s original loss (focal, huber, MSE, etc.)
-- $\lambda = 0.1$ (default, the `transfer_lambda` parameter)
-- $w_{i \rightarrow j}$: transfer weight from task $j$ into task $i$ (softmax-normalized)
+- $\mathcal{L}_i$: task $i$'s original loss (focal, huber, MSE, etc.).
+- $\lambda = 0.1$ (default, `transfer_lambda`).
+- $w_{i \rightarrow j}$: transfer weight from task $j$ into task $i$.
 
-> **Intuition.** This formula says "each task should not only look at its own loss, but also partially consult the losses of other tasks it is affine to." $\lambda = 0.1$ means "weight other tasks' opinions at 10%," and $w_{i \rightarrow j}$ decides "whose opinion matters more." Tasks whose gradients point in similar directions receive larger weights, so they accelerate each other's learning.
+> **Equation intuition.** "Your own loss is the baseline; listen to
+> high-affinity peers' losses only at $\lambda$ weight." $\lambda = 0.1$
+> is a conservative "10% weight on peer advice."
 
-### 4.2 Transfer Weight Computation in Detail
+$w_{i \rightarrow j}$ itself is the softmax-normalised combination of a
+learnable weight $\mathbf{W}$, the measured affinity $\mathbf{A}$, and
+a domain prior $\mathbf{P}$ — the full construction comes together in
+Decision 2.
 
-The transfer weight $w_{i \rightarrow j}$ is a composition of several terms.
+### G-01 FIX — Transfer Loss Clamp
 
-```python
-# adatt.py:355-396 — _compute_transfer_weights()
-raw_weights = self.transfer_weights + affinity  # learnable + affinity
+A ratio cap ensures the transfer loss *does not dominate* the original.
+$\lambda = 0.1$ alone is not enough. If a task's original loss
+temporarily shrinks (it's training well), the transfer term becomes
+disproportionately large and skews the learning direction. The guard:
 
-# Blend with Group Prior (annealing)
-raw_weights = raw_weights * (1 - r) + self.group_prior * r
+$$\text{transfer}_i \leftarrow \min(\lambda \cdot \text{transfer}_i,\ \text{max\_ratio} \cdot \mathcal{L}_i.\text{detach}())$$
 
-# Block negative transfer
-raw_weights = torch.where(
-    affinity > self.neg_threshold,  # -0.1
-    raw_weights,
-    torch.zeros_like(raw_weights),
-)
+`max_transfer_ratio = 0.5` — the transfer term cannot exceed 50% of
+the original. `.detach()` matters: the clamp boundary must not flow
+back as gradient and perturb the original loss.
 
-# Zero the diagonal (no self-transfer)
-raw_weights = raw_weights.masked_fill(self.diag_mask, 0.0)
+### Masking Tasks with Missing Targets
 
-# Softmax normalization
-weights = F.softmax(raw_weights / max(self.temperature, 1e-6), dim=-1)
-```
+Not every batch has targets for every task. Inserting a simple "0.0
+loss" does not zero the softmax weight for that task, so some transfer
+would still leak into a non-existent target. The fix multiplies the
+transfer weights by a `loss_mask_tensor` *after* softmax, *completely
+severing* the affected paths. Safe under production-variable target
+availability.
 
-Mathematically:
+## Decision 2 — Why a Bayesian Reading of Group Prior Fits
 
-$$\mathbf{R} = (\mathbf{W} + \mathbf{A}) \cdot (1 - r) + \mathbf{P} \cdot r$$
+Consider the very first epoch. The network has learned nothing, the
+gradients are effectively random, and affinity $\mathbf{A}$ is a
+meaningless number. Used directly as transfer weights, early training
+collapses into random transfer.
 
-$$\mathbf{R}_{i,j} \leftarrow 0 \quad \text{if } \mathbf{A}_{i,j} < \tau_{\text{neg}}$$
+The Group Prior fills that void with domain knowledge — CTR, CVR,
+engagement, uplift belong to the engagement / conversion family, so
+they should be strongly connected; churn, retention, life_stage, ltv
+form the lifecycle family. Within-group strength is `intra_strength`
+(0.6–0.8), across-group is `inter_group_strength` (0.3).
 
-$$\mathbf{R}_{i,i} = 0$$
+### Building the Prior — One Line
 
-$$w_{i \rightarrow j} = \text{softmax}(\mathbf{R}_{i,j} / T)$$
-
-- $\mathbf{W}$: learnable transfer weights (`nn.Parameter`, initialized at 0)
-- $\mathbf{A}$: EMA affinity matrix
-- $\mathbf{P}$: Group Prior matrix
-- $r$: Prior blend ratio (varies across phases)
-- $\tau_{\text{neg}} = -0.1$: negative-transfer cutoff
-- $T = 1.0$: softmax temperature
-
-> **Intuition.** This formula expresses a 4-stage pipeline for the transfer weight. First sum the learnable weight $\mathbf{W}$ and the measured affinity $\mathbf{A}$, then blend with domain knowledge (the Prior $\mathbf{P}$). Next, zero out "harmful transfers," exclude self-transfer, and finally turn everything into a probability distribution via softmax. Intuitively, it combines "task relationships observed from data + prior knowledge from domain experts," while cutting out paths that are harmful.
-
-### 4.3 G-01 FIX: Transfer Loss Clamp
-
-A ratio cap prevents the transfer loss from dominating the original loss.
-
-```python
-# adatt.py:346-351
-raw_transfer = self.transfer_lambda * transfer_loss
-if self.max_transfer_ratio > 0:
-    max_val = original_loss.detach() * self.max_transfer_ratio
-    raw_transfer = torch.clamp(raw_transfer, max=max_val)
-enhanced_losses[task_name] = original_loss + raw_transfer
-```
-
-> **⚠ max_transfer_ratio = 0.5.** The transfer loss cannot exceed *50%* of the original loss (`adatt.py:191`). Without this cap, whenever a specific task's loss happens to be tiny the transfer loss becomes disproportionately large and warps the learning direction. Using `original_loss.detach()` ensures the clamp boundary does not influence the gradient.
-
-### 4.4 Masking Tasks with Missing Targets
-
-Not every batch contains targets for every task. Tasks whose targets are missing are removed from the transfer weighting.
-
-```python
-# adatt.py:321-334
-loss_list = []
-loss_mask = []
-for name in self.task_names:
-    if name in task_losses:
-        loss_list.append(task_losses[name])
-        loss_mask.append(1.0)
-    else:
-        loss_list.append(torch.tensor(0.0, device=affinity.device, requires_grad=False))
-        loss_mask.append(0.0)
-
-# ...
-masked_transfer_w = transfer_w[i] * loss_mask_tensor
-transfer_loss = (masked_transfer_w * loss_tensor).sum()
-```
-
-> **Why a mask and not a zero loss.** Simply inserting a 0.0 loss does not make the post-softmax weight go to zero. Multiplying by `loss_mask_tensor` *completely blocks* that transfer path. This is safe in production, where the set of active targets per batch is variable (especially when some tasks are inactive).
-
-## 5. Group Prior Structure
-
-The Group Prior is a matrix that encodes domain knowledge as a mathematical prior. During early training, before inter-task affinity has been measured reliably, it supplies a reasonable direction for transfer.
-
-> Source: `adatt.py:256-281` — `_build_group_prior()` method
-
-### 5.1 Task Group Definitions
-
-`model_config.yaml:611-628` defines four groups.
+Initialise the matrix at `inter_group_strength`, overwrite same-group
+entries with `intra_strength`, zero the diagonal, and row-normalise so
+each task's incoming transfer weights sum to 1. Row normalisation
+keeps transfer intensity consistent regardless of task count.
 
 | Group | Members | Intra strength | Business meaning |
 |---|---|---|---|
-| engagement | ctr, cvr, engagement, uplift | 0.8 | Customer engagement / conversion |
+| engagement | ctr, cvr, engagement, uplift | 0.8 | Engagement / conversion |
 | lifecycle | churn, retention, life_stage, ltv | 0.7 | Customer lifecycle |
-| value | balance_util, channel, timing | 0.6 | Customer value / behavior patterns |
-| consumption | nba, spending_category, consumption_cycle, spending_bucket, merchant_affinity, brand_prediction | 0.7 | Consumption pattern analysis |
+| value | balance_util, channel, timing | 0.6 | Value / behaviour patterns |
+| consumption | nba, spending_category, consumption_cycle, spending_bucket, merchant_affinity, brand_prediction | 0.7 | Consumption patterns |
 
-`inter_group_strength: 0.3` — cross-group transfer is kept deliberately low.
+### Prior Blend Annealing
 
-### 5.2 Building the Prior Matrix
-
-```python
-# adatt.py:256-281
-def _build_group_prior(self) -> torch.Tensor:
-    # 1. Initialize with inter-group transfer strength
-    prior = torch.ones(self.n_tasks, self.n_tasks) * self.inter_group_strength  # 0.3
-
-    # 2. Set intra-group transfer strength
-    for group_name, members in self.task_groups.items():
-        strength = self.intra_group_strength.get(group_name, 0.5)
-        indices = [self.task_names.index(m) for m in members if m in self.task_names]
-        for i in indices:
-            for j in indices:
-                if i != j:
-                    prior[i, j] = strength
-
-    # 3. Diagonal = 0 (no self-transfer)
-    prior.fill_diagonal_(0.0)
-
-    # 4. Row normalization
-    row_sums = prior.sum(dim=1, keepdim=True).clamp(min=1e-8)
-    prior = prior / row_sums
-```
-
-> **What row normalization means.** Row normalization forces the sum of transfer weights that each task $i$ receives from the others to be 1. The effect is analogous to softmax: transfer intensity stays consistent regardless of how many tasks there are.
-
-### 5.3 Prior Blend Annealing
-
-The blend ratio $r$ decreases linearly as training progresses:
+How do we mix $\mathbf{A}$ and $\mathbf{P}$? A fixed ratio is not the
+answer. Early on $\mathbf{A}$ is noise, but as training progresses
+$\mathbf{A}$ becomes real observation and $\mathbf{P}$'s heuristic
+becomes a hindrance. The fix is *linear-decay* annealing.
 
 $$r(e) = r_{\text{start}} - (r_{\text{start}} - r_{\text{end}}) \cdot \min\left(\frac{e - e_{\text{warmup}}}{e_{\text{freeze}} - e_{\text{warmup}}}, 1.0\right)$$
 
-- $r_{\text{start}} = 0.5$: early-training prior weight (`prior_blend_start`, `model_config.yaml:607`)
-- $r_{\text{end}} = 0.1$: late-training prior weight (`prior_blend_end`, `model_config.yaml:608`)
-- $e_{\text{warmup}}$: end of warmup
-- $e_{\text{freeze}}$: start of freeze
+$r_{\text{start}} = 0.5$ to $r_{\text{end}} = 0.1$. Prior at 50% early,
+10% late. The final blended weight:
 
-> **Intuition.** This formula says "as training advances, depend less on the domain expert's prior ($\mathbf{P}$) and trust the observed affinity from actual data more." As $r$ drops from 0.5 to 0.1, the prior's share falls from 50% to 10% while the observed-data share rises from 50% to 90%. Intuitively, this is a new employee who initially leans on seniors' opinions (the Prior), then trusts their own judgment (observation) more as experience accumulates.
+$$\mathbf{R} = (\mathbf{W} + \mathbf{A}) \cdot (1 - r) + \mathbf{P} \cdot r$$
 
-This annealing can be read, from a *Bayesian* perspective, as a transition from prior to posterior: early on, data is scarce so we lean on domain knowledge (prior); as data accumulates, we trust the learned gradient-based affinity (likelihood).
+> **Equation intuition.** "A new hire half-listens to senior advice
+> early, then trusts their own judgement 90% as experience
+> accumulates." A pragmatic, lightweight mimic of Bayesian *prior →
+> posterior* transition via a single blend ratio $r$ — instead of a
+> full Bayesian posterior, an annealing schedule implements "as data
+> accumulates, reduce reliance on the prior."
 
-> **Historical background — Origins of the Bayesian-weight idea.** The idea of blending a prior with data goes back to Thomas Bayes (1763, posthumous) and Pierre-Simon Laplace (1812, *Theorie analytique des probabilites*). The Bayesian perspective was introduced to neural networks by pioneers like MacKay (1992, *"A Practical Bayesian Framework for Backpropagation Networks"*) and Neal (1996, *"Bayesian Learning for Neural Networks"*). In modern deep learning, Dropout has been reinterpreted as approximate Bayesian inference (Gal & Ghahramani, ICML 2016), and Weight Uncertainty (Blundell et al., ICML 2015, *"Bayes by Backprop"*) directly learns uncertainty over weights. adaTT's Prior Blend Annealing is a *pragmatic, lightweight version* of this Bayesian tradition — instead of inferring a full Bayesian posterior, it mimics the prior-to-posterior transition with a single blend ratio $r$.
+> **Historical context.** Bayesian inference traces to Bayes (1763)
+> and Laplace (1812), and was introduced to neural networks by MacKay
+> (1992) and Neal (1996). Modern deep learning continues the tradition
+> via Dropout-as-Bayesian-inference (Gal & Ghahramani, ICML 2016) and
+> Bayes by Backprop (Blundell et al., ICML 2015). adaTT compresses this
+> to a single-scalar blend.
 
-The Prior Blend Annealing schedule flows from **r = 0.5 (high Prior dependence)** → linear decrease (start of Phase 2) → **r = 0.1 (affinity trusted, Phase 3 entered)**.
+## Decision 3 — Why Three Phases in the Schedule
 
-## 6. The 3-Phase adaTT Schedule
+The *timing* of transfer also has to be decided. Is every-step
+transfer the right answer? No. Depending on training state, transfer
+plays *opposite roles*.
 
-adaTT splits training into three phases to control how affinity is measured and how transfer is applied.
+*Phase 1 — Warmup (measure only, no transfer).* At the start of
+training the network's gradients are meaningless. Accumulate the
+affinity matrix but do *not* add the transfer term to the loss. Skip
+this phase and jump straight into transfer, and random transfer wrecks
+early training.
 
-> Source: `adatt.py:298-313` — phase branching inside `compute_transfer_loss()`
+*Phase 2 — Dynamic (observe + transfer together).* After warmup,
+update affinity every step and apply the transfer loss simultaneously.
+The prior blend ratio $r$ decays linearly from 0.5 to 0.1, and the
+learnable $\mathbf{W}$ is updated inside this window as well.
 
-> **Historical background — Lineage of training schedules.** The idea of "running training in stages" was systematized in Bengio et al. (2009, *"Curriculum Learning"*) — the observation that learning becomes more effective when examples go from easy to hard. That idea was extended by (1) Pre-training + Fine-tuning (Erhan et al., 2010), (2) Layer-wise Training (Hinton et al., 2006, Deep Belief Networks), and (3) Warmup-then-Decay learning-rate schedules (Goyal et al., 2017). adaTT's 3-Phase (Warmup → Dynamic → Frozen) applies this tradition to *inter-task transfer*: Phase 1 observes task relationships (the "exploration" stage of curriculum), Phase 2 exploits them (the main body of training), Phase 3 stabilizes (the "freeze" stage of fine-tuning).
+*Phase 3 — Frozen (weights fixed).* After `freeze_epoch`, fix the
+transfer weights and stop computing gradients for them.
+`transfer_w[i].detach()` severs the gradient path and stabilises
+training. Late training also freezes CGC gating together (covered in
+ADATT-4), cleaning up convergence dynamics.
 
-### 6.1 Phase 1: Warmup (Affinity Measurement Only)
-
-```python
-# adatt.py:300-304
-if epoch < self.warmup_epochs:
-    if task_gradients is not None:
-        self.affinity_computer.compute_affinity(task_gradients)
-    return task_losses  # return original losses unchanged
+```mermaid
+flowchart LR
+  p1[Phase 1 · Warmup<br/>epoch 0 ~ warmup_epochs]
+  p2[Phase 2 · Dynamic<br/>warmup_epochs ~ freeze_epoch]
+  p3[Phase 3 · Frozen<br/>freeze_epoch ~ end]
+  p1 --> p2 --> p3
+  p1 -. measure ○ · transfer × .-> op1[accumulate affinity EMA]
+  p2 -. measure ○ · transfer ○ · W train .-> op2[transfer loss + prior blend r 0.5 → 0.1]
+  p3 -. measure × · transfer ○ · W frozen .-> op3[detach severs gradient]
+  style p1 fill:#FDD8D1,stroke:#E14F3A
+  style p2 fill:#D8E0FF,stroke:#2E5BFF
+  style p3 fill:#E7F0E8,stroke:#2F7A3F
 ```
 
-In Phase 1, we compute gradient cosine similarity and accumulate the affinity matrix, but *we do not add the transfer loss*. The original `task_losses` are returned untouched.
+Initialization validates `freeze_epoch > warmup_epochs` (the H-6
+check). A fully-skipped Phase 2 means no learned affinity is ever
+reflected in transfer, so running adaTT would be pointless.
 
-- **Period**: epoch 0 to `warmup_epochs` (10 for production, 0 for tests)
-- **Purpose**: if transfer starts before enough affinity data has accumulated, random transfer destabilizes training
-- **Config**: `model_config.yaml:598` — `warmup_epochs: 0` (test); recommended 10 in production
+> **Historical context.** Staged training was systematised by Bengio
+> et al. (2009, *Curriculum Learning*) as "easy-to-hard." The same
+> tradition appears in Pre-training + Fine-tuning (Erhan et al., 2010),
+> Layer-wise Training (Hinton et al., 2006), and Warmup-then-Decay LR
+> schedules (Goyal et al., 2017). adaTT's 3-Phase applies this
+> tradition to *inter-task transfer*.
 
-### 6.2 Phase 2: Dynamic Transfer
+## Decision 4 — Why a Threshold, Not a Blanket Block
 
-```python
-# adatt.py:311-317
-# Phase 2: dynamic transfer
-if task_gradients is not None:
-    self.affinity_computer.compute_affinity(task_gradients)
+Finally, what do we do with task pairs whose affinity is negative?
 
-affinity = self.affinity_computer.get_affinity_matrix()
-transfer_w = self._compute_transfer_weights(affinity)
-```
+The simplest choice — "block every negative value" ($\tau_{neg} = 0$)
+— is too aggressive. SGD's stochastic noise means task pairs whose
+true affinity is near zero can still show weak negatives like
+$\cos \approx -0.05$ batch-to-batch. Blocking the entire noise band
+closes most of adaTT's transfer paths and its effect disappears.
 
-In Phase 2, affinity is updated every step while the transfer loss is simultaneously applied. The Prior blend ratio $r$ decreases linearly from `prior_blend_start` to `prior_blend_end`.
+The other extreme — "do not block at all" — lets task pairs with
+obvious conflict inflate each other's losses and destabilises training.
 
-- **Period**: `warmup_epochs` to `freeze_epoch`
-- **Learnable parameters**: `self.transfer_weights` (`nn.Parameter`, `adatt.py:229-231`)
-- **Prior blend annealing**: $r$ decreases from 0.5 to 0.1 (`adatt.py:373-379`)
+The answer is a middle ground that blocks only *clear* negatives.
+$\tau_{neg} = -0.1$ is the sweet spot: tolerate noise margin, block
+real gradient conflict.
 
-### 6.3 Phase 3: Frozen (Weights Fixed)
+$$\mathbf{R}_{i,j} \leftarrow 0 \quad \text{if } \mathbf{A}_{i,j} < \tau_{\text{neg}}, \quad \tau_{\text{neg}} = -0.1$$
 
-```python
-# adatt.py:307-308
-if self.is_frozen:
-    return self._apply_frozen_transfer(task_losses)
-```
+This is looser than PCGrad (Yu et al., 2020), which uses $\cos < 0$ as
+the conflict criterion — adaTT takes a more conservative stance: it
+does not *project* and thus *modify* gradients; it simply zeroes the
+harmful task's loss contribution. The original gradients stay intact.
 
-In Phase 3, transfer weights are fixed and gradients are no longer computed for them. `_apply_frozen_transfer` uses `transfer_w[i].detach()` (`adatt.py:425`).
+### Detection API
 
-- **Period**: `freeze_epoch` through end of training
-- **Config**: `model_config.yaml:599` — `freeze_epoch: 1` (test); recommended 28 in production
-- **Effect**: removes gradient overhead for transfer weights and stabilizes training
+Blocking is not the only output; *diagnostics* are also exposed.
+`detect_negative_transfer()` returns a
+$\{$task $i$: list of $j$ with affinity below $\tau_{neg}\}$ dict, so
+MLflow logging or offline analysis can show "which pairs are actually
+in conflict?" Example: `{"churn": ["ctr", "engagement"], "ltv": ["brand_prediction"]}`.
 
-> **⚠ H-6 validation: freeze_epoch > warmup_epochs.** `adatt.py:219-223` raises a `ValueError` if `freeze_epoch <= warmup_epochs`. If Phase 2 is completely skipped, no learned affinity ever gets reflected in transfer, so running adaTT becomes pointless. This check catches configuration errors early.
-
-### 6.4 The Phase Transition Trigger: on_epoch_end
-
-```python
-# adatt.py:431-452
-def on_epoch_end(self, epoch: int) -> None:
-    self.current_epoch.fill_(epoch)
-
-    if self.freeze_epoch is not None and epoch >= self.freeze_epoch:
-        if not self.is_frozen.item():
-            self.is_frozen.fill_(True)
-            logger.info(f"adaTT: transfer weights frozen (epoch {epoch})")
-```
-
-> **Why fill_().** Reassigning with `self.current_epoch = epoch` replaces the plain tensor and severs its connection with the buffer registered via `register_buffer`. `fill_()` is an in-place update that preserves `state_dict` and device management. `is_frozen` uses `fill_(True)` for the same reason (`adatt.py:441`).
-
-## 7. Negative Transfer Detection and Blocking
-
-### 7.1 What Is Negative Transfer
-
-When two tasks' gradients point in *opposite directions*, an update of the shared parameters that improves one task *degrades* the other.
-
-For instance, if CTR (click-through rate) and Churn have gradients in opposite directions, learning in the direction that improves CTR will worsen Churn prediction.
-
-### 7.2 The Blocking Mechanism
-
-Inside `_compute_transfer_weights()`, transfer paths whose affinity falls below the threshold are zeroed out.
-
-```python
-# adatt.py:383-388
-raw_weights = torch.where(
-    affinity > self.neg_threshold,     # -0.1 (default)
-    raw_weights,                       # keep
-    torch.zeros_like(raw_weights),     # block
-)
-```
-
-$$\mathbf{R}_{i,j} = \begin{cases} \mathbf{R}_{i,j} & \text{if } \mathbf{A}_{i,j} > \tau_{\text{neg}} \\ 0 & \text{otherwise} \end{cases}$$
-
-- $\tau_{\text{neg}} = -0.1$ (`negative_transfer_threshold`, `model_config.yaml:600`)
-
-> **Intuition.** This formula is a kind of *gate*. If affinity is above the threshold, the transfer weight passes through as-is; if below, it is completely blocked. Intuitively, it is a safety valve that says "I will simply ignore advice from a task whose direction is opposite to mine."
-
-> **Why the threshold is -0.1 (not 0).** Cosine similarity of 0 means "orthogonal" (unrelated), and a weak negative correlation can be noise. Setting it to $-0.1$ allows mild negative correlation while blocking only clearly-opposite gradients. A threshold of 0 would block so many paths that adaTT's effect would be diluted.
-
-> **State of the art — Recent evolution in negative-transfer mitigation (2023–2025).** Negative transfer is a central MTL challenge and is being actively researched. (1) *Aligned-MTL (Senushkin et al., CVPR 2023)* proposes a refined projection scheme that aligns gradients to a common descent direction while preserving per-task contributions. (2) *ForkMerge (Ye et al., NeurIPS 2023)* dynamically forks and merges tasks during training, automatically detecting and avoiding intervals of negative transfer. (3) *Auto-Lambda (Liu et al., ICLR 2022)* uses meta-gradients on a validation set to automatically tune task weights, indirectly mitigating negative transfer. Compared with these, adaTT's threshold-based blocking ($\tau_{\text{neg}} = -0.1$) is *extremely cheap yet effective*, making it practitioner-friendly. Natural extensions include an adaptive threshold ($\tau_{\text{neg}}$ tuned to the training stage) or soft gating (continuous attenuation instead of binary blocking).
-
-### 7.3 Negative Transfer Diagnostic API
-
-```python
-# adatt.py:460-476
-def detect_negative_transfer(self) -> Dict[str, List[str]]:
-    affinity = self.affinity_computer.get_affinity_matrix()
-    negative_pairs = {}
-    for i, task_i in enumerate(self.task_names):
-        neg_list = []
-        for j, task_j in enumerate(self.task_names):
-            if i != j and affinity[i, j] < self.neg_threshold:
-                neg_list.append(task_j)
-        if neg_list:
-            negative_pairs[task_i] = neg_list
-    return negative_pairs
-```
-
-Example return value: `{"churn": ["ctr", "engagement"], "ltv": ["brand_prediction"]}` — letting you see which task pairs exhibit negative transfer.
-
-### 7.4 Impact of Blocking on Training
-
-| Situation | Effect |
+| Setting | Effect |
 |---|---|
-| Blocking disabled | Task pairs with negative transfer inflate each other's loss, destabilizing training |
-| Over-blocking ($\tau_{\text{neg}} = 0$) | Most transfer paths are blocked → adaTT is effectively disabled |
-| Proper blocking ($\tau_{\text{neg}} = -0.1$) | Only clear negative transfer is blocked; neutral/positive transfers are preserved |
+| Blocking disabled | Conflicting pairs inflate each other's loss → unstable training |
+| Over-blocking ($\tau_{neg} = 0$) | Most transfer paths blocked → adaTT effectively disabled |
+| Proper blocking ($\tau_{neg} = -0.1$) | Only clear conflicts blocked, neutral / positive transfers preserved |
 
-Transfer Loss, Group Prior, the 3-Phase Schedule, and Negative Transfer blocking — the four layers interlock. The Prior fills the initially-empty affinity matrix with domain knowledge; the phase schedule enforces an observe → transfer → freeze curriculum; and negative-transfer blocking severs harmful paths when measured affinity dips into the negative regime. The G-01 FIX Clamp caps the whole thing so the transfer term never overwhelms the original loss. **ADATT-4** carries this structure into the actual training loop, loss-weighting strategies, optimizer settings, and the synchronization contract with CGC.
+## The Transfer-Weight Pipeline — Where the Four Decisions Meet
+
+All four decisions meet in one computation. The full pipeline for
+$w_{i \rightarrow j}$:
+
+$$\mathbf{R} = (\mathbf{W} + \mathbf{A}) \cdot (1 - r) + \mathbf{P} \cdot r \quad \text{(Decision 2)}$$
+
+$$\mathbf{R}_{i,j} \leftarrow 0 \text{ if } \mathbf{A}_{i,j} < \tau_{\text{neg}} \quad \text{(Decision 4)}$$
+
+$$\mathbf{R}_{i,i} = 0 \quad \text{(no self-transfer)}$$
+
+$$w_{i \rightarrow j} = \text{softmax}(\mathbf{R}_{i,j} / T) \quad \text{(ADATT-1's softmax normalisation)}$$
+
+We use $T = 1.0$. $T < 0.5$ is too sharp, concentrating transfer on
+only a few tasks; $T > 2.0$ is too uniform and fails to suppress
+negative transfer sufficiently.
+
+In Phase 1 the whole pipeline is inactive — only affinity accumulates
+(Decision 3). In Phase 2 the whole thing runs every step, and in
+Phase 3 training of $\mathbf{W}$ halts while weights stay fixed.
+
+## Where We Stop
+
+Transfer Loss, Group Prior, the 3-Phase Schedule, and Negative
+Transfer blocking — the four decisions interlock. The Prior fills the
+initially-empty affinity space with domain knowledge, the phase
+schedule enforces the "observe → transfer → freeze" curriculum, and
+negative-transfer blocking severs harmful paths when measured affinity
+dips into the negative regime. The G-01 FIX Clamp caps the whole thing
+so the transfer term never overwhelms the original loss.
+
+But this structure does not run alone. The actual training loop
+includes 2-Phase Training (Shared Pretrain → Cluster Finetune), 16-task
+Uncertainty Weighting, AdamW + SequentialLR, and CGC's gate dynamics.
+How adaTT's 3-Phase affinity schedule interlocks with the Trainer's
+2-Phase training loop, and why it must synchronise with CGC's gate
+freeze — that engineering contract is the subject of **ADATT-4**.
