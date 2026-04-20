@@ -363,13 +363,13 @@ const T = isKo
   }
   .post-body table th {
     text-align: left;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    font-weight: 500;
-    letter-spacing: 0.14em;
+    font-family: var(--mono), "SUIT Variable", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--muted);
-    padding: 13px 18px;
+    color: var(--ink-2);
+    padding: 14px 18px;
     border-bottom: 1.5px solid var(--hair);
     vertical-align: middle;
     line-height: 1.3;
@@ -418,9 +418,9 @@ const T = isKo
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
-  /* Korean body: tables use --kr for content but mono for headers and numeric col */
+  /* Korean body: content in SUIT; headers inherit the mono→SUIT fallback stack
+     already defined on table th; numeric last column stays mono (ASCII only). */
   .post-body.kr table { font-family: var(--kr); letter-spacing: -0.005em; }
-  .post-body.kr table th { font-family: var(--mono); }
   .post-body.kr table tbody td:last-child { font-family: var(--mono); }
   /* Inline code cells: pill style */
   .post-body table code {
