@@ -7,7 +7,7 @@ lang: ko
 series: study-thread
 part: 6
 alt_lang: /2026/04/19/ple-6-interpretability-uncertainty-specs-en/
-next_title: "ADATT-1 — adaTT 동기: 적응형 타워와 Transformer Attention 유비"
+next_title: "ADATT-1 — adaTT 동기: 적응형 타워와 Transformer Attention 의 유사성"
 next_desc: "adaTT 서브스레드 시작. 고정 타워의 한계에서 출발하는 '적응형 타워'의 동기, Transformer Attention이 왜 태스크 적응에 적합한 메커니즘인지, 그리고 조건부 계산·Hypernetwork 계보에서 adaTT가 어디에 위치하는지."
 next_status: published
 source_url: /PLE_기술_참조서.pdf

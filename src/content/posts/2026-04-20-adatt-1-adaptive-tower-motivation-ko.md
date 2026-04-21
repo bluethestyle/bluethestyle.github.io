@@ -1,5 +1,5 @@
 ---
-title: "[Study Thread] ADATT-1 — adaTT 동기: 적응형 타워와 Transformer Attention 유비"
+title: "[Study Thread] ADATT-1 — adaTT 동기: 적응형 타워와 Transformer Attention 의 유사성"
 date: 2026-04-20 12:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, attention, hypernetwork, mtl]
@@ -19,7 +19,7 @@ ADATT-1 → ADATT-4 에 걸쳐 본 프로젝트의 adaTT(Adaptive Task Transfer)
 피처 경로에서 태스크 간 충돌을 어떻게 분리했는지를 다뤘다면, adaTT
 서브스레드는 *gradient 경로* 에서 남아 있는 충돌을 어떻게 측정하고
 다시 협력으로 돌리는지를 다룬다. 이번 1편은 "왜 적응형 타워가 필요한가"
-라는 설계 결정 하나에서 출발해, Transformer Attention 과의 유비,
+라는 설계 결정 하나에서 출발해, Transformer Attention 과의 유사성,
 Conditional Computation · Hypernetwork 계보에서의 위치까지 따라간다.*
 
 > **잠정적 상태 — 합성 데이터에서 효용 미확인.** 솔직히 적어둔다.
