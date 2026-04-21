@@ -177,9 +177,9 @@ flowchart TB
   p2[Phase 2 · Dynamic<br/>warmup_epochs ~ freeze_epoch]
   p3[Phase 3 · Frozen<br/>freeze_epoch ~ end]
   p1 --> p2 --> p3
-  p1 -. measure ○ · transfer × .-> op1[accumulate affinity EMA]
-  p2 -. measure ○ · transfer ○ · W train .-> op2[transfer loss + prior blend<br/>r 0.5 → 0.1]
-  p3 -. measure × · transfer ○ · W frozen .-> op3[detach severs gradient]
+  p1 -.->|"measure ○<br/>transfer ×"| op1[accumulate affinity EMA]
+  p2 -.->|"measure ○ · transfer ○<br/>W train"| op2[transfer loss + prior blend<br/>r 0.5 → 0.1]
+  p3 -.->|"measure ×<br/>transfer ○ · W frozen"| op3[detach severs gradient]
   style p1 fill:#FDD8D1,stroke:#E14F3A
   style p2 fill:#D8E0FF,stroke:#2E5BFF
   style p3 fill:#E7F0E8,stroke:#2F7A3F
