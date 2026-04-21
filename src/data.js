@@ -70,9 +70,9 @@ export const EXCERPTS = {
   "/2026/04/21/mrm-ep2-champion-challenger-en/":
     "MRM Thread ep 2. Champion-Challenger implemented as a synchronous code gate — the four verdict shapes (force_promote / bootstrap / reject(fidelity) / promote·reject(competition)), why the safety floor comes before competition, and how every verdict becomes an HMAC-signed audit entry for SR 11-7 reconstruction.",
   "/2026/04/21/ep2-ai-collaboration-ko/":
-    "3개월 개발기 2편. Claude Code·Gemini·Cursor 를 설계·구현·리뷰 3단계로 분업한 이야기, 초기에 '범용 엔지니어'로 쓰다 실패한 경험, 구독료 함정과 재조정 ($240/월 × 3.5개월 = $900), 그리고 3.5개월 동안 굳은 plan-first·interface-contract·local-first·완료 4단계 검수 패턴.",
+    "3개월 개발기 2편. Phase A-E 로 나뉜 단계-도구 페어링 — Gemini (아이디에이션) → Claude Opus (기술 검증, 19편 기술 참조 공동 작성) → Cursor (환경·CLAUDE.md 가드레일) → Claude Code Opus/Sonnet (3인×AI 팀 병렬 구현) → Claude Code Extension (ablation 모니터링·논문). 왜 Claude Code 가 구현 단계에서 대체 불가능했는지 구체적 예 3가지 (leakage 3연쇄, FP16 NaN 4동시 진단, sigmoid 관찰→가설→문헌→구현 플로우).",
   "/2026/04/21/ep2-ai-collaboration-en/":
-    "FinAI Build ep 2. Dividing Claude Code / Gemini / Cursor across design, implementation, and review phases; the early mistake of using them as general-purpose engineers; the subscription trap and rebalance (~$240/mo × 3.5 months = $900); and the plan-first, interface-contract, local-first, four-check completion patterns that hardened over 3.5 months.",
+    "FinAI Build ep 2. The five phase-tool pairings (A-E) — Gemini for ideation, Claude Opus for technical validation and 19 co-authored tech reference docs, Cursor for environment and CLAUDE.md guardrails, Claude Code Opus/Sonnet for three-person × AI-team parallel implementation, Claude Code extension for ablation monitoring and papers. Why Claude Code was non-substitutable in implementation: three concrete examples (chained leakage tracing, simultaneous FP16 NaN diagnosis, sigmoid-gate observation→hypothesis→literature→implementation flow).",
   "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/":
     "adaTT 서브스레드 최종편. 2-Phase Training Loop, Loss Weighting(Uncertainty·GradNorm·DWA), Optimizer·Scheduler, CGC-adaTT 동기화, 메모리·성능 최적화, 디버깅 가이드, 설정 총람, 부록 + 전체 adaTT 기술 참조서 PDF 다운로드.",
   "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/":
@@ -128,7 +128,7 @@ export const EXCERPTS = {
  * shown greyed in Archives.
  */
 export const DRAFTS = [
-  { date: "2026-04-28", title: "[FinAI Build] Ep 3 — Hardware, Budget, and What It Bought Us", cat: "FinAI Build",  lang: "EN", ex: "One RTX 4070, three laptops, personal-wallet subscriptions.", tags: ["finai-build","claude-code"] },
+  { date: "2026-04-28", title: "[FinAI Build] Ep 3 — How We Adapted: Guardrails, Memory Bank, Contract Verification", cat: "FinAI Build",  lang: "EN", ex: "CLAUDE.md constitution, 8-file memory bank, .claude/RULES.md ↔ .cursorrules sync, interface contract checks.", tags: ["finai-build","claude-code"] },
   { date: "2026-04-28", title: "[MRM Thread] Ep 3 — Chain of Custody for an Agent Pipeline", cat: "MRM Thread", lang: "EN", ex: "Seven audit tables, HMAC hash chain, EU AI Act & KFCPA mappings.", tags: ["mrm","sr-11-7","audit"] },
 ];
 

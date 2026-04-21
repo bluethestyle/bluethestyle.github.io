@@ -1,5 +1,5 @@
 ---
-title: "[FinAI Build] Ep 2 — Organizing the AI Collaboration"
+title: "[FinAI Build] Ep 2 — Organizing the AI Agents"
 date: 2026-04-21 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, claude-code, architecture, financial-ai]
@@ -7,165 +7,208 @@ lang: en
 series: three-months
 part: 2
 alt_lang: /2026/04/21/ep2-ai-collaboration-ko/
-next_title: "Ep 3 — Hardware, Budget, and What It Bought Us"
-next_desc: "One RTX 4070, three personal laptops, subscriptions out of the PM's wallet, AWS spot costs. What the constraints actually forced at the design level."
+next_title: "Ep 3 — How We Adapted: Guardrails, Memory Bank, Contract Verification"
+next_desc: "The actual mechanisms that kept three parallel AI agent teams coherent — the CLAUDE.md constitution, the 8-file memory bank, .claude/RULES.md synced with .cursorrules, and the interface-key matching that had to run after every parallel work session."
 next_status: draft
-source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/ai_collaboration_guide_en.pdf
-source_label: "AI Collaboration Guide (EN, PDF)"
+source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf
+source_label: "Development Story (EN, PDF) §2"
 ---
 
 *Part 2 of "Building a Financial AI in Three Months". How three
-people divided work across Claude Code, Gemini, and Cursor, where
-we got it wrong, and what had hardened into practice by the end
-of 3.5 months.*
+people divided the work across Gemini, Claude Opus, Cursor, and
+Claude Code across five project phases — which tool did what,
+where the structural-isomorphism insight came from, and why Claude
+Code was the non-substitutable one in the implementation phase.*
 
-## The mistake we made early
+## Phase-tool pairing as a frame
 
-The starting conditions from Ep 1 — three people, one RTX 4070,
-personal time — make AI tools look like *salvation*. "If I can
-code at 3x speed, then three of us are a nine-person team." That
-fantasy came easy.
+The constraints from Ep 1 — three people, one GPU, personal time —
+did not only force the architecture. They also forced *how the
+AI collaboration itself was organized*. The "one Claude
+subscription covers everything" mindset collapsed within the first
+few days. Each phase needed a different tool's different strength;
+deliberate tool separation turned out to be better than tool
+uniformity, on both speed and quality.
 
-For the first two weeks we used Claude Code as a *general-purpose
-engineer*. Throw it a task, say "implement this", merge the
-result. The code looked plausible — but rereading it a few hours
-later, it rested on assumptions subtly different from our
-architecture. Feature-group names written slightly differently,
-config paths invented out of nothing, separation-of-concerns
-violated by inlining preprocessing into `train.py`.
+The five phases, in order:
 
-Catching these ate the time savings. Maybe more than ate them.
-The sense that "AI codes 3x faster" was not real; the real
-throughput was "AI writes code + we spend N hours correcting it".
-Once correction time exceeded ~70% of writing time, the net value
-went negative.
+## Phase A — Ideation (Gemini)
 
-Admitting that mistake reframed the question. Not "what do we
-make the AI do?" but "which AI capability goes into which phase
-so that we actually get faster?"
+Gemini drove initial concept exploration. ALS replacement options,
+Black-Litterman exploration, model-ensemble comparisons — scanning
+architecture candidates *broadly* matched Gemini's broad knowledge
+base.
 
-## A three-phase reframe
+The greatest value came from *cross-disciplinary feature
+ideation*. Questions like "can chemical kinetics describe spending
+behavior?", "is product adoption structurally equivalent to an
+epidemic?" were posed to systematically scan which academic fields
+had already solved structurally-isomorphic problems to financial
+customer behavior. The PM contributed domain expertise (FRM, credit
+analysis); Gemini contributed cross-domain connections.
 
-The division of labor that stabilized over 3.5 months:
+The concept of *structural isomorphism* emerged from this process.
+The decision to import features from eleven academic disciplines
+was set during this phase and became the foundation of every
+subsequent technical decision. Gemini was optimal not for depth
+in any single technology, but for rapidly scanning "which field
+has already solved a similar problem".
 
-**Phase 1 — Design conversation (Claude web interface).**
-Long conversations that don't write to files. Throw ideas,
-explore trade-offs, surface hidden assumptions. "If this expert
-is grounded in hyperbolic geometry, what does that buy and what
-does it cost?", "Why does Black-Litterman ensemble get rejected?"
-The output of this phase is *a decision with its rationale*,
-which gets copied into a hand-edited design document or
-markdown.
+## Phase B — Technical validation (Claude Opus)
 
-No code in this phase. Once code enters the conversation, the
-conversation shifts into "is this code right?" review mode, and
-trade-off exploration stops.
+Translating ideas into concrete architectures required Claude
+Opus. Work demanding technical depth concentrated here — loss
+function design with mathematical rigor, data-leakage
+verification, normalization pipeline design.
 
-**Phase 2 — Implementation (Claude Code, terminal).**
-Once a design is locked, hand it to Claude Code with *explicit
-context* — which files, which interface contract, which existing
-pattern to follow. Small chunks. One task per session. The agent
-proposes a diff; a human reads it and rejects or approves.
+Each expert's feasibility was validated one by one. "Does HGCN
+work on the MCC hierarchy?", "Is Mamba efficient enough for a
+17-month sequence?" — deep technical dialogue with Opus. PLE vs
+MMoE trade-off analysis, adaTT loss-level vs representation-level
+transfer comparisons — all architecture-level analyses landed
+here.
 
-The most important rule in this phase: *don't commit code you
-didn't read*. A simple rule, but under fatigue it's easy to
-break. Breaking it puts you back in the "70% correction time"
-trap.
+Opus also played the role of *challenging assumptions*. Its
+counterargument — "is Black-Litterman really suitable?" —
+accelerated the pivot toward PLE. The *expert collapse* problem
+in homogeneous MoE was first identified in dialogue with Opus; this
+identification would later (in Phase E) close the loop with the
+NeurIPS 2024 sigmoid gate paper.
 
-**Phase 3 — Review and debugging (Gemini + human).**
-When a bug surfaces or a design decision feels shaky, Gemini's
-long-context reading provides a second opinion. Paste the
-symptom, the relevant code, and our hypothesis together; ask
-"what other root causes are plausible?" Gemini is for *reading*,
-not *writing*. Writing stays consolidated in Claude Code so
-conventions don't fragment.
+Phase B's output: nineteen technical reference documents (`.typ`
+files). These served as the *design specifications* each AI agent
+would reference during the subsequent implementation phase.
 
-Cursor was used only by the two engineers when they needed
-autocomplete flow. It never drove architectural decisions or
-large edits.
+## Phase C — Environment setup (Cursor)
 
-## The subscription trap
+GitHub code environment, project structure, initial boilerplate —
+all Cursor. The IDE-integrated fast navigation and refactoring
+was its strength.
 
-We started with three Claude Pro subscriptions (\$20/mo each).
-After a month, usage data was lopsided: the PM always hit limits;
-the two engineers used 30–40% of their quota. We were collectively
-paying for \$60/mo but the PM was capacity-constrained and the
-engineers' capacity sat idle.
+The most important deliverable of this phase was not code. It was
+six initial design documents (00-09 architecture specifications)
+plus the establishment of `CLAUDE.md` guardrails. The
+config-driven principle, separation of concerns, leakage
+prevention rules — the "constitution" that every subsequent AI
+agent would follow — were all established *before a single line
+of code was written*. The order was deliberate: guardrails first,
+agent execution second. The reverse order would have broken Phase
+D's parallel implementation at every integration point.
 
-Rebalanced: PM upgraded to Claude Max (\$100/mo), the two engineers
-stayed on Pro. Added Gemini 2.5 Pro (\$20/mo) under the PM for the
-Gemini role. Cursor (\$20/mo) as a shared engineer seat.
+## Phase D — Parallel implementation (Claude Code · Opus/Sonnet)
 
-Final cost structure (all from the PM's personal wallet):
-- Claude Max (PM) — \$100/mo
-- Claude Pro × 2 (engineers) — \$40/mo
-- Gemini Pro — \$20/mo
-- Cursor — \$20/mo
-- AWS spot + S3 — avg \$60-80/mo
+In the full implementation phase, each team member served as the
+*"team lead"* for their own AI agents. Opus and Sonnet were run
+in parallel inside Claude Code to implement different modules
+simultaneously. Three humans, each leading one AI agent team.
 
-Total: about \$240-260/mo, ≈\$900 over 3.5 months. Roughly one
-week of a mid-level engineer's wages. The "AI tools are
-expensive" feeling never came from subscription prices; it came
-from *time wasted by using the wrong tool at the wrong phase*.
+- **PM / Lead Architect's AI team** — Opus for architecture-level
+  decisions (PLE config, adaTT task groups, logit-transfer design),
+  Sonnet for fast code implementation (generators, adapters,
+  pipeline runner). The critical debugging sessions — detection of
+  three label-leakage cases, diagnosis of four FP16 NaN root
+  causes, GPU utilization optimization — originated on this team.
+- **Engineer 1's AI team** — data ingestion pipeline, HIVE
+  parallel query logic, feature engineering across ten generators
+  (TDA, HMM, Mamba, Graph, GMM, etc.), feature-to-business
+  reverse-mapping registry.
+- **Engineer 2's AI team** — model training, mathematical
+  verification, knowledge distillation (PLE → LGBM).
 
-## Context hygiene
+Three teams running in parallel while staying coherent was made
+possible by Phase C's `CLAUDE.md` guardrails plus the *interface
+contract verification process*. After every parallel work
+session, it was mandatory to verify that the keys written by
+file A matched the keys read by file B. Without this routine,
+parallel AI agents accumulate subtle key-naming mismatches that
+only surface at runtime integration.
 
-The most expensive lesson across 3.5 months was about session
-lifetime. A Claude Code session left open for days accumulates
-context residue from earlier tasks — hypotheses since discarded,
-approaches since rejected, pre-edit code. All of that interferes
-with the current task.
+## Phase E — Experimentation + papers (Claude Code extension)
 
-Rules that stuck:
-- Task done = session closed (next task gets a fresh session)
-- If the topic shifts mid-session, force `/compact`
-- Persistent rules go in `CLAUDE.md` at the project root, not
-  into session history
-- Large reference material (papers, on-prem docs) goes into the
-  first message of a session, once; afterwards it's referenced
-  rather than re-pasted
+Ablation experiments used Claude Code as a *real-time monitoring
+tool*. Progress, GPU utilization, error detection — all watched
+live and adjusted on the fly. This is how the PLE toggle bug was
+caught in live debugging: `use_ple=false` was altering the expert
+composition itself, making fair comparison impossible. Days of
+results would have been invalidated without the live watch.
 
-`CLAUDE.md` was especially critical. Our project's `CLAUDE.md`
-is now six sections covering hardcoding bans, separation of
-concerns, cost management, and orchestration efficiency.
-Re-explaining these each session would be impossible. Writing
-them once and letting the agent auto-reference them was the only
-way to scale.
+Literature research during experiment wait times was the other
+shape of this phase. Observing that PLE's val_loss was failing to
+converge, dialogue with Opus produced the hypothesis that the
+*softmax gate's competitive nature was hindering convergence
+among heterogeneous experts*. A search led to the NeurIPS 2024
+sigmoid gate paper, providing theoretical grounding; the sigmoid
+gate was implemented immediately. The expert-collapse thread that
+Opus first raised in Phase B thus closed in a single session —
+observation → hypothesis → literature → implementation.
 
-## Patterns that hardened over 3.5 months
+Paper-writing phase produced four papers (English/Korean) and
+twenty-two technical documents through iterative work with
+Claude. In this phase AI was not a text generator but a *thought
+partner* in constructing the project's meaning.
 
-**Plan-first.** New features always start with a plan document.
-This exists to stop Claude Code from diving straight into
-implementation. We developed a reflex — within five minutes of
-starting, pause and ask "did we write the plan?" If not, roll
-back and write it.
+## Why Claude Code specifically
 
-**Interface-contract verification.** After running parallel
-agents on related work, we *always* run a separate interface
-contract check — does "the key name A writes" match "the key
-name B reads"? Agents each choose plausible names in their own
-context; two agents' "plausible names" disagreeing is a failure
-that only surfaces at runtime.
+We split work across five tools, but three things made Claude
+Code *non-substitutable* in the implementation, experiment, and
+paper phases.
 
-**Local first, SageMaker last.** Debugging code on SageMaker
-costs \$0.50+ per job submission, instantly. Local GPU until a
-1-epoch end-to-end run succeeds → only then submit to SageMaker.
-Without this discipline, every mistake turns into ~10 jobs and
-\$5 evaporates.
+**1M-token context + within-session continuous tracking.** Tracing
+three label-leakage cases in sequence was only possible because
+days of context stayed alive. After fixing the first (duplicate
+`has_nba` column), the second (ground-truth glob ordering) and
+the third (generator label input) were found *in the same
+session* because the context of the earlier fixes was still
+accessible.
 
-**Completion-report discipline.** To report a task as "done", it
-has to pass four checks — compile, interface contract, hardcoding
-scan, separation-of-concerns. Partial completion is reported
-explicitly as "compile OK, interface unverified, hardcoding
-unscanned". Without this habit the gap between "reported done"
-and "actually working" compounds.
+**Global survey + local trace, simultaneously.** Simultaneously
+diagnosing four FP16 NaN sources (CGC entropy, OT Sinkhorn,
+Causal DAG, logits) required surveying the entire model
+architecture while tracing numerical operations inside each
+expert. Impossible file-by-file.
+
+**Observation → hypothesis → literature → implementation in one
+flow.** The sigmoid-gate episode above is the clearest example.
+Experiment analysis, hypothesis formation, literature search,
+theoretical grounding, code implementation — all inside a single
+continuous context. Had we switched tools across this chain, the
+context discontinuities would likely have prevented the
+connection from being made.
+
+## Patterns that hardened
+
+Several patterns that we never designed but that emerged
+naturally — in rough order of how often we said them out loud:
+
+**AI does HOW, humans decide WHAT and WHY.** AI generated code
+and text; architecture decisions stayed with humans. The
+structural-isomorphism insight emerged from human-AI dialogue,
+but *adopting it as a design principle* was a human judgment.
+
+**Guardrails before agents.** `CLAUDE.md` was written *before*
+code, not after. Constitution precedes legislation.
+
+**Heterogeneous AI = heterogeneous experts.** The model's
+heterogeneous-expert design philosophy was applied to development
+tool selection as well. Each AI tool ran a specialized role, and
+the combination reached quality and speed unreachable by any
+single tool. The Phase A-E division of labor is the concrete
+shape of this.
+
+**Fail fast with AI.** Leakage, FP16 NaN, ablation filter
+failures — bugs that would have taken days to find manually were
+caught and fixed in minutes with AI agents. Fast failure, fast
+learning.
 
 ## Next
 
-Ep 3 covers hardware and budget — how the single RTX 4070
-concretely forced specific design choices, how we decided the
-AWS spot vs on-demand vs local hybrid split, and what made the
-\$900 out of the PM's wallet worth it over 3.5 months.
+Ep 3 covers the actual mechanisms that kept three parallel AI
+agent teams coherent in Phase D — the specific clauses of
+`CLAUDE.md`, the eight-file memory bank, the `.claude/RULES.md` ↔
+`.cursorrules` synchronization, and what the interface contract
+verification that ran after every parallel work session actually
+looked like.
 
-Source material lives in the repo at
-[AI Collaboration Guide (EN, PDF)](https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/ai_collaboration_guide_en.pdf).
+Source material:
+[Development Story (EN, PDF)](https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf)
+§2 "Organizing AI Agents".
