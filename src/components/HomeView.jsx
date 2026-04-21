@@ -184,7 +184,7 @@ function HomeView({ lang, posts = [] }) {
           <div className="sec-head-l">
             <div className="title" data-lang-ui="en"><em>Series</em></div>
             <div className="title kr" data-lang-ui="ko"><em>시리즈</em></div>
-            <div className="count"><span data-i18n-ko="영·한 병행">EN · KO parallel</span></div>
+            <div className="count"><span data-i18n-ko="영/한 병행">EN · KO parallel</span></div>
           </div>
         </div>
         <div className="series-grid">

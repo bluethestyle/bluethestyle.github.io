@@ -62,7 +62,7 @@ export const SERIES = [
     tag: "Study Thread",
     tagKo: "스터디 스레드",
     desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized in parallel English/Korean.",
-    descKo: "PLE 아키텍처의 뿌리가 되는 논문·수학 기초·참고 문헌을 영한 두 언어로 정리해 둔 학습 기록.",
+    descKo: "PLE 아키텍처의 뿌리가 되는 논문·수학 기초·참고 문헌을 영/한 두 언어로 정리해 둔 학습 기록.",
     ep: 10,
     ko: "/series/study-thread-ko/",
     en: "/series/study-thread/",
