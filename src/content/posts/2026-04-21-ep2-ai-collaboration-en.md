@@ -72,8 +72,9 @@ Opus also played the role of *challenging assumptions*. Its
 counterargument — "is Black-Litterman really suitable?" —
 accelerated the pivot toward PLE. The *expert collapse* problem
 in homogeneous MoE was first identified in dialogue with Opus; this
-identification would later (in Phase E) close the loop with the
-NeurIPS 2024 sigmoid gate paper.
+identification would later (in Phase E) lead to the NeurIPS 2024
+sigmoid gate paper — and that conclusion would itself get overturned
+weeks later, which turned out to be part of the same thread.
 
 Phase B's output: nineteen technical reference documents (`.typ`
 files). These served as the *design specifications* each AI agent
@@ -134,13 +135,38 @@ results would have been invalidated without the live watch.
 
 Literature research during experiment wait times was the other
 shape of this phase. Observing that PLE's val_loss was failing to
-converge, dialogue with Opus produced the hypothesis that the
-*softmax gate's competitive nature was hindering convergence
+converge, dialogue with Opus produced the hypothesis that *the
+softmax gate's competitive nature was hindering convergence
 among heterogeneous experts*. A search led to the NeurIPS 2024
 sigmoid gate paper, providing theoretical grounding; the sigmoid
-gate was implemented immediately. The expert-collapse thread that
-Opus first raised in Phase B thus closed in a single session —
-observation → hypothesis → literature → implementation.
+gate was implemented immediately. Experiments agreed — sigmoid
+consistently outperformed softmax. That finding was documented as
+a conclusion and carried into subsequent experiment design.
+
+If the story had ended there, the Phase B expert-collapse thread
+would have closed cleanly in Phase E. It did not. Weeks later,
+after fixing an implementation bug in uncertainty weighting, the
+result reversed — softmax began to outperform sigmoid on NDCG
+metrics. In retrospect, the root cause traced to broken loss
+weighting: with all 13 tasks equally weighted, the numerous
+binary-classification gradients overwhelmed multiclass and
+regression; sigmoid's non-competitive routing *happened* to act
+as a firewall under those broken conditions. With correct loss
+weighting, softmax's competitive routing instead acted as a
+structural barrier between task-type gradient flows. The sigmoid
+literature result — proven in *homogeneous* MTL settings — did
+not transfer directly to our heterogeneous 13-task, 3-type regime.
+
+The lesson is not sigmoid vs softmax but a methodological one:
+*training bugs can corrupt architectural conclusions*. "Sigmoid
+is better" was a valid adaptation to a broken training environment
+— not an architectural preference. Without the root-cause
+investigation, that conclusion would have persisted indefinitely.
+What made the re-investigation possible was long-lived context —
+the original sigmoid-adoption reasoning was still accessible when
+the new evidence (post-uncertainty-fix reversal) arrived, so
+revisiting the earlier conclusion was a continuation rather than
+a rebuild.
 
 Paper-writing phase produced four papers (English/Korean) and
 twenty-two technical documents through iterative work with
@@ -167,13 +193,16 @@ Causal DAG, logits) required surveying the entire model
 architecture while tracing numerical operations inside each
 expert. Impossible file-by-file.
 
-**Observation → hypothesis → literature → implementation in one
-flow.** The sigmoid-gate episode above is the clearest example.
-Experiment analysis, hypothesis formation, literature search,
-theoretical grounding, code implementation — all inside a single
-continuous context. Had we switched tools across this chain, the
-context discontinuities would likely have prevented the
-connection from being made.
+**Observation → hypothesis → literature → implementation, and
+the later re-investigation of the conclusion.** The sigmoid ↔
+softmax arc is the clearest example. The forward chain (analysis
+→ hypothesis → literature → implementation) ran inside a single
+session; weeks later, with the original adoption reasoning still
+accessible in context, the re-investigation after new evidence
+could proceed as a continuation rather than a rebuild. Had we
+switched tools across these chains, we would have lost not just
+the forward flow but also the ability to *challenge the earlier
+conclusion* once better evidence arrived.
 
 ## Patterns that hardened
 

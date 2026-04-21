@@ -21,11 +21,10 @@ how emergencies intrude, and how the post-deployment loop closes.*
 
 ## 3 a.m., Monday
 
-The weekly scheduled retraining job finishes on SageMaker. A
-Challenger — call it v147 — sits in the registry, waiting. What
-happens between this moment and a customer getting a new
-recommendation is where the old process and ours diverge
-completely.
+The weekly scheduled retraining job finishes on SageMaker. A new
+Challenger lands in the registry, waiting. What happens between
+this moment and a customer getting a new recommendation is where
+the old process and ours diverge completely.
 
 In the conventional flow: a duty officer reads the email Tuesday
 morning. A comparison report is requested, drafted on Wednesday,
@@ -38,8 +37,8 @@ and meeting minutes.
 In our flow: the registration event fires `_decide_promotion()`
 synchronously. Within seconds of the training job finishing, a
 verdict is reached, an audit entry is written, and if promoted
-v147 serves the next Lambda request. The decision is already
-closed before anyone is awake.
+the Challenger serves the next Lambda request. The decision is
+already closed before anyone is awake.
 
 The time difference sounds like it's about automation, but the
 real point is *where the judgment lives*. The conventional flow
@@ -47,34 +46,75 @@ pushes judgment out to a committee. We push it into a code path.
 
 ## What happens inside the gate
 
-Step into `_decide_promotion()`. This is the sequence v147 goes
-through.
+Step into `_decide_promotion()`. The gate is a short-circuit
+structure that runs four checks in sequence. Whichever check
+resolves first settles the verdict on the spot, writes one audit
+entry, and the function returns.
+
+```mermaid
+flowchart TB
+  start([Challenger registration])
+  q1{{"1\. --force-promote?"}}
+  q2{{"2\. Champion exists?"}}
+  q3{{"3\. Fidelity floor OK?"}}
+  q4{{"4\. Competition passes?<br/>(0.5% lift · 2% drop · p<0.05)"}}
+  d1([force\_promote · manual])
+  d2([bootstrap · auto])
+  d3([reject · fidelity fail])
+  d4a([promote · competition])
+  d4b([reject · competition])
+  audit[("HMAC audit log entry")]
+
+  start --> q1
+  q1 -- yes --> d1
+  q1 -- no --> q2
+  q2 -- no --> d2
+  q2 -- yes --> q3
+  q3 -- no --> d3
+  q3 -- yes --> q4
+  q4 -- yes --> d4a
+  q4 -- no --> d4b
+  d1 --> audit
+  d2 --> audit
+  d3 --> audit
+  d4a --> audit
+  d4b --> audit
+
+  style d1 fill:#FDE7CF,stroke:#C77A2E
+  style d2 fill:#E2E8F5,stroke:#4A6AB1
+  style d3 fill:#F5D5D5,stroke:#B14747
+  style d4a fill:#D7ECD8,stroke:#3F7A3F
+  style d4b fill:#F5D5D5,stroke:#B14747
+  style audit fill:#EEE,stroke:#777
+```
+
+Walk one Challenger along this map.
 
 *Step 1 — operator override check.* Is `--force-promote` set? It
 is not; this is scheduled retraining. Move on.
 
-*Step 2 — champion existence.* The registry has a current champion,
-v143. This is a real competition, not a bootstrap.
+*Step 2 — champion existence.* The registry has a current Champion.
+This is a real competition, not a bootstrap.
 
-*Step 3 — fidelity floor.* Does the distilled student model clear
-the fidelity floor against the teacher on each of thirteen tasks?
-v147 clears all of them. If even one had failed, the function
-would halt here and reject. The reason for this ordering is
-coming back below.
+*Step 3 — fidelity floor.* Does the distilled student clear the
+fidelity floor against the teacher on each of thirteen tasks?
+This Challenger clears all of them. If even one had failed, the
+function would halt here and reject. The reason for this ordering
+comes back below.
 
-*Step 4 — `ModelCompetition.evaluate()`.* Compare v143 and v147's
-training metrics. Three criteria:
+*Step 4 — `ModelCompetition.evaluate()`.* Compare the current
+Champion and the new Challenger on training metrics. Three
+criteria:
 
-- Does the primary metric avg\_auc improve by at least 0.5%?
-  v147 at 0.731 vs v143 at 0.724 — an improvement of 0.97%, pass.
-- No secondary metric degrades by more than 2%? One task's AUC
-  drops 0.8% — within tolerance, pass.
+- Does primary metric avg\_auc improve by at least 0.5%? Pass.
+- No secondary metric degrades by more than 2%? One task drops
+  slightly, within tolerance. Pass.
 - Is the improvement statistically significant? t-test p-value
-  0.012, below the 0.05 threshold, pass.
+  below the 0.05 threshold. Pass.
 
-All three pass. `promotion_approved=True` lands, `registry.promote(
-v147)` is called. An audit entry is written — `champion_version=
-v143`, `challenger_version=v147`, `decision=promote`, reason =
+All three pass. `promotion_approved=True` lands, `registry.promote()`
+is called. An audit entry is written — `champion_version` (prior),
+`challenger_version` (this one), `decision=promote`, reason =
 competition summary, comparison = per-metric values, significance
 = p-value. The function returns and the pipeline continues to the
 next stage (serving-manifest update, CloudWatch notification).
@@ -82,28 +122,29 @@ next stage (serving-manifest update, CloudWatch notification).
 Total elapsed time: under ten seconds. By 4 a.m. it is all
 finished.
 
-## Two weeks later, v148 stops at the same gate
+## Two weeks later, another Challenger stops at the same gate
 
 Same `_decide_promotion()`, different ending.
 
 At step 3, on two of the thirteen tasks the student-teacher KL
 divergence exceeds the floor. Training produced a distribution
 shift somewhere and the student diverged from the teacher as a
-function. Look only at training metrics and v148's avg\_auc is
-actually higher than v147's. But fidelity is checked *before*
-competition, so the rejection is sealed here. Step 4 never runs.
+function. Look only at training metrics and this week's Challenger
+actually posts a higher avg\_auc than last week's. But fidelity is
+checked *before* competition, so the rejection is sealed here.
+Step 4 never runs.
 
 Audit entry — `decision=reject`, reason = "2 fidelity failures:
-task\_churn (KL=0.31 > 0.20), task\_next\_best (KL=0.28 > 0.20)".
-v148 is stored in the registry with `promoted=False`, but it never
+task\_churn, task\_next\_best (KL above threshold)". The Challenger
+is stored in the registry with `promoted=False`, but it never
 enters production.
 
 Why fidelity sits before competition becomes visible here. If the
 order were reversed — competition first, fidelity as a final check
 — the temptation would emerge: "avg\_auc climbed that much, surely
-a fidelity of 0.31 is tolerable?" Knowing the performance delta
-makes it natural to nudge the fidelity floor. Putting fidelity
-first means the floor operates independent of performance
+this much fidelity delta is tolerable?" Knowing the performance
+delta makes it natural to nudge the fidelity floor. Putting
+fidelity first means the floor operates independent of performance
 information. Operational safety does not depend on competition
 outcomes.
 
@@ -115,30 +156,31 @@ regardless of performance" — the latter is a structural guarantee.
 
 ## Tuesday afternoon, an emergency
 
-v147 has been in production a week. Tuesday afternoon at 2 p.m.,
-the fairness monitor raises an alert — on a specific age × region
-segment, the Disparate Impact ratio drops below threshold. The
-next scheduled retrain is five days away. Can't wait.
+The current Champion has been in production a week. Tuesday
+afternoon at 2 p.m., the fairness monitor raises an alert — on
+a specific age × region segment, the Disparate Impact ratio drops
+below threshold. The next scheduled retrain is five days away.
+Can't wait.
 
-The duty engineer finds v141 in the registry (a known-good version
-that had successfully run production three weeks prior). One
+The duty engineer finds a known-good version in the registry (one
+that had successfully run production several weeks prior). One
 explicit command:
 
 ```
-python scripts/submit_pipeline.py --force-promote --version v141
+python scripts/submit_pipeline.py --force-promote --version <known-good>
 ```
 
 `_decide_promotion()` runs again. This time it terminates at step
 1 — with `--force-promote` set, every subsequent check is skipped
-and v141 is promoted. Audit entry — `decision=force_promote`,
-`trigger=manual`, reason = "DI breach emergency rollback to
-v141", `operator` = engineer's ID.
+and the known-good version is promoted. Audit entry —
+`decision=force_promote`, `trigger=manual`, reason = "DI breach
+emergency rollback", `operator` = engineer's ID.
 
-Within two minutes, v141 is serving. The committee reviews the
-audit entry later that Friday. The review is about "was this
-override appropriate", not "did an override happen". The entry is
-immutable; who intervened when and for what reason is permanently
-fixed in the hash chain.
+Within two minutes, the known-good version is serving. The
+committee reviews the audit entry later that Friday. The review
+is about "was this override appropriate", not "did an override
+happen". The entry is immutable; who intervened when and for what
+reason is permanently fixed in the hash chain.
 
 Making force-promote an explicit separate CLI option, not just
 another flag, is the center of this design. There is no path
@@ -149,8 +191,8 @@ necessarily writes an audit entry.
 
 ## The loop around the gate
 
-MRM does not stop once v147 is in production. That is where the
-second loop starts.
+MRM does not stop once a Challenger has been promoted to Champion.
+That is where the second loop starts.
 
 Every prediction is recorded in the HMAC hash chain (covered in
 Ep 3). The fairness monitor computes Disparate Impact, Statistical
@@ -179,7 +221,7 @@ property". This episode shows what that phrase looks like as a
 flow.
 
 Judgment no longer depends on the committee calendar. The fact
-that v148 was rejected at 3 a.m. on a Monday is settled regardless
+that a Challenger was rejected at 3 a.m. on a Monday is settled regardless
 of whether anyone reads the email. A year after a promotion, when
 a regulator asks, the audit log reconstructs that moment's
 Champion metrics, Challenger metrics, significance test, and
