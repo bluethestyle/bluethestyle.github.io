@@ -249,6 +249,16 @@ html[data-lang-pref="ko"] [data-lang-ui="ko"] * {
   word-break: keep-all;
   overflow-wrap: break-word;
 }
+/* Italic in Korean headings reads as a fake slant (SUIT Variable
+   has no italic cut), so strip italicization inside .kr elements
+   and KO variant wrappers. <em> still marks emphasis semantically
+   but renders upright. */
+.kr em,
+.kr i,
+[data-lang-ui="ko"] em,
+[data-lang-ui="ko"] i {
+  font-style: normal;
+}
 
 /* ============ FRAME ============ */
 .frame {
