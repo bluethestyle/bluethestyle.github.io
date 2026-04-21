@@ -1,10 +1,11 @@
 import React from "react";
-import { CATEGORIES, POSTS } from "../data.js";
+import { CATEGORIES } from "../data.js";
 
 // ========= CATEGORIES TAB =========
 
-function CategoriesView() {
+function CategoriesView({ posts = [] }) {
   const cats = CATEGORIES;
+  const POSTS = posts;
   return (
     <>
       <section className="hero" style={{paddingBottom:32, marginBottom:32}}>

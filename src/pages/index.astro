@@ -1,7 +1,9 @@
 ---
 import Base from "../layouts/Base.astro";
 import HomeView from "../components/HomeView.jsx";
+import { loadPosts } from "../lib/posts.js";
+const posts = await loadPosts();
 ---
 <Base title="bluethestyle / field notes" tab="home">
-  <HomeView client:load lang="en" />
+  <HomeView client:load lang="en" posts={posts} />
 </Base>

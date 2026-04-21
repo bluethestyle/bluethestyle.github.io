@@ -1,7 +1,9 @@
 ---
 import Base from "../layouts/Base.astro";
 import ArchivesView from "../components/ArchivesView.jsx";
+import { loadPosts } from "../lib/posts.js";
+const posts = await loadPosts();
 ---
 <Base title="archives / bluethestyle" tab="archives">
-  <ArchivesView client:load />
+  <ArchivesView client:load posts={posts} />
 </Base>

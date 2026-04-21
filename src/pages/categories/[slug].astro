@@ -1,10 +1,12 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { CATEGORIES, POSTS } from "../../data.js";
+import { CATEGORIES } from "../../data.js";
+import { loadPosts } from "../../lib/posts.js";
 
 export async function getStaticPaths() {
+  const allPosts = await loadPosts();
   return CATEGORIES.filter((c) => c.count > 0).map((c) => {
-    const posts = POSTS
+    const posts = allPosts
       .filter((p) => !p.draft && (p.cat === c.name || p.cat === c.ko))
       .sort((a, b) => b.date.localeCompare(a.date));
     return { params: { slug: c.slug }, props: { cat: c, posts } };

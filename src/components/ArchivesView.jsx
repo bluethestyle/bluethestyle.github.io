@@ -1,11 +1,10 @@
 import React from "react";
-import { POSTS } from "../data.js";
 
 // ========= ARCHIVES TAB =========
 
-function ArchivesView() {
+function ArchivesView({ posts = [] }) {
   // group posts (all, including drafts) by year-month
-  const all = POSTS.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const all = posts.slice().sort((a,b)=>b.date.localeCompare(a.date));
   const byMonth = {};
   all.forEach(p => {
     const ym = p.date.slice(0,7);

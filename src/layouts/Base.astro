@@ -1,23 +1,25 @@
 ---
 import "../styles/site.css";
-import { SITE, RECENT, TAGS, POSTS, CATEGORIES, SERIES } from "../data.js";
-import { getCollection } from "astro:content";
+import { SITE, TAGS, CATEGORIES, SERIES } from "../data.js";
+import { loadPosts, loadRecent } from "../lib/posts.js";
 const { title = "bluethestyle", tab = "home" } = Astro.props;
 const trendingTags = [...TAGS].sort((a, b) => b.count - a.count).slice(0, 9);
-const publishedCount = POSTS.filter(p => !p.draft).length;
-const lastDate = [...POSTS].filter(p => !p.draft).sort((a, b) => b.date.localeCompare(a.date))[0]?.date;
+
+const posts = await loadPosts();
+const published = posts.filter((p) => !p.draft);
+const publishedCount = published.length;
+const lastDate = published[0]?.date;
 const lastLabel = lastDate
   ? new Date(lastDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }).toLowerCase()
   : "";
+const RECENT = await loadRecent(4);
 
-// Dynamic ep count: unique part numbers per series (language-agnostic, drafts excluded)
-const allPosts = await getCollection("posts");
+// Dynamic ep count: unique part numbers per series (drafts excluded)
 const seriesEpCount = {};
-for (const p of allPosts) {
-  const key = p.data.series;
-  if (!key || typeof p.data.part !== "number") continue;
-  if (!seriesEpCount[key]) seriesEpCount[key] = new Set();
-  seriesEpCount[key].add(p.data.part);
+for (const p of published) {
+  if (!p.series || typeof p.part !== "number") continue;
+  if (!seriesEpCount[p.series]) seriesEpCount[p.series] = new Set();
+  seriesEpCount[p.series].add(p.part);
 }
 const seriesCurrent = Object.fromEntries(
   Object.entries(seriesEpCount).map(([k, v]) => [k, v.size]),

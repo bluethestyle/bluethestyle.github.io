@@ -1,5 +1,5 @@
 import React from "react";
-import { SITE, CURRENT_WORK, COAUTHORS, SERIES, POSTS } from "../data.js";
+import { SITE, CURRENT_WORK, COAUTHORS, SERIES } from "../data.js";
 
 // ========= HOME TAB (faithful to bluethestyle.github.io structure) =========
 
@@ -66,7 +66,8 @@ function PLEDiagram() {
   );
 }
 
-function HomeView({ lang }) {
+function HomeView({ lang, posts = [] }) {
+  const POSTS = posts;
   const KO = lang === "ko";
   const latest = POSTS.filter(p => !p.draft).slice(0, 4);
 

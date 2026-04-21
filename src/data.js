@@ -57,45 +57,71 @@ export const SERIES = [
   },
 ];
 
-export const POSTS = [
-  // ADATT-4
-  { date: "2026-04-20", title: "[Study Thread] ADATT-4 — 학습 루프·Loss Weighting·Optimizer·CGC 동기화", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/", ex: "adaTT 서브스레드 최종편. 2-Phase Training Loop, Loss Weighting(Uncertainty·GradNorm·DWA), Optimizer·Scheduler, CGC-adaTT 동기화, 메모리·성능 최적화, 디버깅 가이드, 설정 총람, 부록 + 전체 adaTT 기술 참조서 PDF 다운로드.", tags: ["study-thread","adatt","training-loop","loss-weighting","optimizer","specs"] },
-  { date: "2026-04-20", title: "[Study Thread] ADATT-4 — Training Loop, Loss Weighting, Optimizer, and CGC Synchronization", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/", ex: "Final post of the adaTT sub-thread. 2-Phase Training Loop, Loss Weighting (Uncertainty / GradNorm / DWA), Optimizer and Scheduler, CGC-adaTT sync, memory and performance, debugging guide, full settings reference, appendix — plus downloadable PDF of the full adaTT tech reference.", tags: ["study-thread","adatt","training-loop","loss-weighting","optimizer","specs"] },
-  // ADATT-3
-  { date: "2026-04-20", title: "[Study Thread] ADATT-3 — Transfer Loss · Group Prior · 3-Phase Schedule", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-ko/", ex: "adaTT Transfer Loss 의 전체 공식과 전이 가중치, G-01 FIX Clamp, Target 마스킹, 태스크 그룹 기반 Prior 행렬 + Prior Blend Annealing, 3-Phase Schedule(Warmup → Dynamic → Frozen), 그리고 Negative Transfer 감지·차단 메커니즘.", tags: ["study-thread","adatt","transfer-loss","group-prior","schedule","negative-transfer"] },
-  { date: "2026-04-20", title: "[Study Thread] ADATT-3 — Transfer Loss, Group Prior, and the 3-Phase Schedule", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-en/", ex: "adaTT's Transfer Loss formula and transfer weights, the G-01 FIX clamp, target-task masking, the task-group-based Prior matrix with Prior Blend Annealing, the 3-Phase Schedule (Warmup → Dynamic → Frozen), and Negative Transfer detection/blocking.", tags: ["study-thread","adatt","transfer-loss","group-prior","schedule","negative-transfer"] },
-  // ADATT-2
-  { date: "2026-04-20", title: "[Study Thread] ADATT-2 — TaskAffinityComputer와 Gradient Cosine Similarity", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-2-task-affinity-gradient-cosine-ko/", ex: "태스크 간 친화도를 실제로 측정하는 TaskAffinityComputer 엔진, gradient cosine similarity 의 수학적 정의와 EMA 평활화, 유클리드 거리 대비 코사인을 쓰는 이유, 그리고 torch.compiler.disable 로 처리한 gradient 추출 경로까지.", tags: ["study-thread","adatt","gradient","cosine-similarity","ema"] },
-  { date: "2026-04-20", title: "[Study Thread] ADATT-2 — TaskAffinityComputer and Gradient Cosine Similarity", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-2-task-affinity-gradient-cosine-en/", ex: "The TaskAffinityComputer engine that measures task-to-task affinity, gradient cosine similarity definition with EMA smoothing, why cosine over Euclidean distance, and the torch.compiler.disable-handled gradient extraction path.", tags: ["study-thread","adatt","gradient","cosine-similarity","ema"] },
-  // ADATT-1
-  { date: "2026-04-20", title: "[Study Thread] ADATT-1 — adaTT 동기: 적응형 타워와 Transformer Attention 의 유사성", cat: "Study Thread", lang: "KO", url: "/2026/04/20/adatt-1-adaptive-tower-motivation-ko/", ex: "adaTT 서브스레드 1편. '왜 적응형 타워인가' 의 근본 동기, Transformer Attention 과의 유사성, 조건부 계산·Hypernetwork 계보에서의 위치, 핵심 수식 직관, 그리고 '측정하고·선택하고·조절한다' 내러티브.", tags: ["study-thread","adatt","attention","hypernetwork","mtl"] },
-  { date: "2026-04-20", title: "[Study Thread] ADATT-1 — Why adaTT: Adaptive Towers and the Transformer Attention Analogy", cat: "Study Thread", lang: "EN", url: "/2026/04/20/adatt-1-adaptive-tower-motivation-en/", ex: "Opening the adaTT sub-thread. The root motivation for adaptive towers, the Transformer Attention analogy, where adaTT sits in the conditional-computation / hypernetwork lineage, intuitions for the core equations, and the 'measure, select, modulate' narrative.", tags: ["study-thread","adatt","attention","hypernetwork","mtl"] },
-  // PLE-6
-  { date: "2026-04-19", title: "[Study Thread] PLE-6 — 해석성·불확실성·전체 사양", cat: "Study Thread", lang: "KO", url: "/2026/04/19/ple-6-interpretability-uncertainty-specs-ko/", ex: "PLE 서브스레드 최종편. SAE 기반 Expert 해석성, Evidential Deep Learning 불확실성 정량화, 18 태스크 전체 사양, 논문 vs 구현 비교, 디버깅 가이드, 부록 — 그리고 전체 PLE 기술 참조서 PDF 다운로드 포함.", tags: ["study-thread","ple","sae","uncertainty","evidential","specs"] },
-  { date: "2026-04-19", title: "[Study Thread] PLE-6 — Interpretability, Uncertainty, and Full Specs", cat: "Study Thread", lang: "EN", url: "/2026/04/19/ple-6-interpretability-uncertainty-specs-en/", ex: "Final post of the PLE sub-thread. SAE-based Expert interpretability, Evidential Deep Learning uncertainty quantification, 18-task spec, paper-vs-implementation innovations, debugging guide, appendix — plus a downloadable PDF of the full PLE tech reference.", tags: ["study-thread","ple","sae","uncertainty","evidential","specs"] },
-  // PLE-5
-  { date: "2026-04-19", title: "[Study Thread] PLE-5 — GroupTaskExpertBasket · Logit Transfer · Task Tower", cat: "Study Thread", lang: "KO", url: "/2026/04/19/ple-5-basket-logit-tower-ko/", ex: "GroupTaskExpertBasket v3.2 가 태스크별 전용 Expert 를 만드는 방식, 태스크 간 명시적 정보 전달 Logit Transfer 3가지 모드, 그리고 최종 예측을 수행하는 Task Tower 의 구조.", tags: ["study-thread","ple","logit-transfer","task-tower","group-encoder"] },
-  { date: "2026-04-19", title: "[Study Thread] PLE-5 — GroupTaskExpertBasket, Logit Transfer, Task Tower", cat: "Study Thread", lang: "EN", url: "/2026/04/19/ple-5-basket-logit-tower-en/", ex: "How GroupTaskExpertBasket v3.2 produces per-task specialized experts, three modes of Logit Transfer for explicit cross-task information flow, and the Task Tower architecture that produces final predictions.", tags: ["study-thread","ple","logit-transfer","task-tower","group-encoder"] },
-  // PLE-4
-  { date: "2026-04-19", title: "[Study Thread] PLE-4 — CGC 게이팅의 두 단계(CGCLayer + CGCAttention)와 HMM Triple-Mode 라우팅", cat: "Study Thread", lang: "KO", url: "/2026/04/19/ple-4-cgc-hmm-routing-ko/", ex: "두 단계 CGC — 1단계 CGCLayer(Shared + Task 함께 가중합, 논문 원형)와 2단계 CGCAttention(Shared concat 위 블록 스케일링)의 수식. Expert Collapse 를 막는 entropy 정규화, 이종 차원 비대칭을 보정하는 차원 정규화, 그리고 HMM Triple-Mode 라우팅의 전체 구조.", tags: ["study-thread","ple","cgc","hmm","regularization"] },
-  { date: "2026-04-19", title: "[Study Thread] PLE-4 — The Two-Stage CGC Gate (CGCLayer + CGCAttention) and HMM Triple-Mode Routing", cat: "Study Thread", lang: "EN", url: "/2026/04/19/ple-4-cgc-hmm-routing-en/", ex: "Two-stage CGC — Stage 1 CGCLayer (Shared + Task weighted sum together, paper-exact) and Stage 2 CGCAttention (block-scaling on the Shared concat) — math for both. Entropy regularization to prevent Expert Collapse, dimension normalization to correct heterogeneous output asymmetry, and the full HMM Triple-Mode routing architecture.", tags: ["study-thread","ple","cgc","hmm","regularization"] },
-  // PLE-3
-  { date: "2026-04-19", title: "[Study Thread] PLE-3 — 입력 구조와 이종 Shared Expert Pool (512D)", cat: "Study Thread", lang: "KO", url: "/2026/04/19/ple-3-heterogeneous-expert-pool-ko/", ex: "PLEClusterInput 의 전체 필드 사양과 734D features 텐서 인덱스 매핑, HMM 모드 라우팅. 그리고 본 프로젝트의 7개 이종 Shared Expert 가 각자 어떤 수학적 관점으로 고객을 해석하는지.", tags: ["study-thread","ple","expert-pool","hmm","shared-experts"] },
-  { date: "2026-04-19", title: "[Study Thread] PLE-3 — Input Structure and Heterogeneous Shared Expert Pool (512D)", cat: "Study Thread", lang: "EN", url: "/2026/04/19/ple-3-heterogeneous-expert-pool-en/", ex: "The full PLEClusterInput field spec, 734D feature-tensor index mapping, and HMM mode routing. Plus the seven heterogeneous Shared Experts this project runs, each interpreting the customer through a structurally different mathematical lens.", tags: ["study-thread","ple","expert-pool","hmm","shared-experts"] },
-  // PLE-2
-  { date: "2026-04-19", title: "[Study Thread] PLE-2 — Progressive Layered Extraction: 명시적 전문가 분리와 CGC 게이트", cat: "Study Thread", lang: "KO", url: "/2026/04/19/ple-2-progressive-layered-extraction-ko/", ex: "PLE(Tang et al., RecSys 2020)가 Shared-Bottom·MMoE의 실패를 어떻게 해결했는지 — 공유와 분리의 명시적 균형, Expert와 Gate의 직관적 역할, 수학적 고찰, 핵심 수식 해석, 그리고 '왜 PLE인가' 내러티브.", tags: ["study-thread","ple","cgc","tang2020","mtl"] },
-  { date: "2026-04-19", title: "[Study Thread] PLE-2 — Progressive Layered Extraction: Explicit Expert Separation and CGC Gates", cat: "Study Thread", lang: "EN", url: "/2026/04/19/ple-2-progressive-layered-extraction-en/", ex: "How PLE (Tang et al., RecSys 2020) answered Shared-Bottom and MMoE's failures — the explicit balance of sharing and separation, the intuitive roles of Experts and Gates, mathematical discussion, interpretations of the core equations, and the 'why PLE' narrative end-to-end.", tags: ["study-thread","ple","cgc","tang2020","mtl"] },
-  // PLE-1
-  { date: "2026-04-19", title: "[Study Thread] PLE-1 — MTL과 게이트드 전문가로의 진화 (Shared-Bottom → MMoE)", cat: "Study Thread", lang: "KO", url: "/2026/04/19/ple-1-mtl-evolution-ko/", ex: "Study Thread의 PLE 서브스레드 1편. 멀티태스크 학습의 동기(외국어 학습 비유), Negative Transfer의 수학적 정의(gradient 충돌·상호정보량·줄다리기 비유), 그리고 Shared-Bottom·MMoE가 각자 어디서 무너지는지(Caruana 1997 · Ma 2018 · Jacobs 1991 역사적 맥락)까지.", tags: ["study-thread","ple","mmoe","mtl"] },
-  { date: "2026-04-19", title: "[Study Thread] PLE-1 — MTL and the Evolution Toward Gated Experts (Shared-Bottom → MMoE)", cat: "Study Thread", lang: "EN", url: "/2026/04/19/ple-1-mtl-evolution-en/", ex: "First post of the PLE sub-thread in Study Thread. MTL motivation (foreign-language transfer analogy), the math of Negative Transfer (gradient conflict, mutual information, tug-of-war analogy), and where Shared-Bottom and MMoE each break (with Caruana 1997 / Ma 2018 / Jacobs 1991 historical context).", tags: ["study-thread","ple","mmoe","mtl"] },
-  // 2026-04-18 posts
-  { date: "2026-04-18", title: "[MRM 스레드] 에피소드 1 — MRM 은 검증이 아니라 아키텍처에 속한다",        cat: "MRM 스레드",   lang: "KO", url: "/2026/04/18/mrm-ep1-architecture-ko/", ex: "시리즈 'MRM 스레드' 1편. AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.", tags: ["mrm","architecture","sr-11-7","regulation"] },
-  { date: "2026-04-18", title: "[MRM Thread] Ep 1 — Why MRM Belongs in the Architecture",                 cat: "MRM Thread",   lang: "EN", url: "/2026/04/18/mrm-ep1-architecture-en/", ex: "Part 1 of 'The MRM Thread' — a short parallel series on regulatory compliance and model risk management for AI recommendation systems, written from a GARP FRM practitioner perspective.", tags: ["mrm","architecture","sr-11-7","regulation"] },
-  { date: "2026-04-18", title: "[3개월 개발기] 에피소드 1 — 전제 조건",                                  cat: "3개월 개발기", lang: "KO", url: "/2026/04/18/ep1-premise-ko/", ex: "시리즈 '3개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.", tags: ["finai-build","claude-code","ple","financial-ai"] },
-  { date: "2026-04-18", title: "[FinAI Build] Ep 1 — The Premise",                                       cat: "FinAI Build",  lang: "EN", url: "/2026/04/18/ep1-premise-en/", ex: "Part 1 of 'Building a Financial AI in Three Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.", tags: ["finai-build","claude-code","ple","financial-ai"] },
-  // planned but unpublished — shown greyed in Archives
-  { date: "2026-04-25", title: "[FinAI Build] Ep 2 — Hardware & Budget", cat: "FinAI Build",  lang: "EN", ex: "One consumer GPU, three laptops, three months.", tags: ["finai-build","claude-code"], draft: true },
-  { date: "2026-04-25", title: "[MRM Thread] Ep 2 — Three Lines of Defense, Rewritten", cat: "MRM Thread", lang: "EN", ex: "Where 3LoD breaks once an agent is in the loop.", tags: ["mrm","sr-11-7"], draft: true },
+/**
+ * Excerpts keyed by post URL. These are separate from the markdown
+ * frontmatter because (a) historically they were authored here and
+ * (b) migrating them into every markdown file is a large, mechanical
+ * diff that's better done lazily. Posts that set `excerpt:` in their
+ * frontmatter override the entry below.
+ */
+export const EXCERPTS = {
+  "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/":
+    "adaTT 서브스레드 최종편. 2-Phase Training Loop, Loss Weighting(Uncertainty·GradNorm·DWA), Optimizer·Scheduler, CGC-adaTT 동기화, 메모리·성능 최적화, 디버깅 가이드, 설정 총람, 부록 + 전체 adaTT 기술 참조서 PDF 다운로드.",
+  "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/":
+    "Final post of the adaTT sub-thread. 2-Phase Training Loop, Loss Weighting (Uncertainty / GradNorm / DWA), Optimizer and Scheduler, CGC-adaTT sync, memory and performance, debugging guide, full settings reference, appendix — plus downloadable PDF of the full adaTT tech reference.",
+  "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-ko/":
+    "adaTT Transfer Loss 의 전체 공식과 전이 가중치, G-01 FIX Clamp, Target 마스킹, 태스크 그룹 기반 Prior 행렬 + Prior Blend Annealing, 3-Phase Schedule(Warmup → Dynamic → Frozen), 그리고 Negative Transfer 감지·차단 메커니즘.",
+  "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-en/":
+    "adaTT's Transfer Loss formula and transfer weights, the G-01 FIX clamp, target-task masking, the task-group-based Prior matrix with Prior Blend Annealing, the 3-Phase Schedule (Warmup → Dynamic → Frozen), and Negative Transfer detection/blocking.",
+  "/2026/04/20/adatt-2-task-affinity-gradient-cosine-ko/":
+    "태스크 간 친화도를 실제로 측정하는 TaskAffinityComputer 엔진, gradient cosine similarity 의 수학적 정의와 EMA 평활화, 유클리드 거리 대비 코사인을 쓰는 이유, 그리고 torch.compiler.disable 로 처리한 gradient 추출 경로까지.",
+  "/2026/04/20/adatt-2-task-affinity-gradient-cosine-en/":
+    "The TaskAffinityComputer engine that measures task-to-task affinity, gradient cosine similarity definition with EMA smoothing, why cosine over Euclidean distance, and the torch.compiler.disable-handled gradient extraction path.",
+  "/2026/04/20/adatt-1-adaptive-tower-motivation-ko/":
+    "adaTT 서브스레드 1편. '왜 적응형 타워인가' 의 근본 동기, Transformer Attention 과의 유사성, 조건부 계산·Hypernetwork 계보에서의 위치, 핵심 수식 직관, 그리고 '측정하고·선택하고·조절한다' 내러티브.",
+  "/2026/04/20/adatt-1-adaptive-tower-motivation-en/":
+    "Opening the adaTT sub-thread. The root motivation for adaptive towers, the Transformer Attention analogy, where adaTT sits in the conditional-computation / hypernetwork lineage, intuitions for the core equations, and the 'measure, select, modulate' narrative.",
+  "/2026/04/19/ple-6-interpretability-uncertainty-specs-ko/":
+    "PLE 서브스레드 최종편. SAE 기반 Expert 해석성, Evidential Deep Learning 불확실성 정량화, 18 태스크 전체 사양, 논문 vs 구현 비교, 디버깅 가이드, 부록 — 그리고 전체 PLE 기술 참조서 PDF 다운로드 포함.",
+  "/2026/04/19/ple-6-interpretability-uncertainty-specs-en/":
+    "Final post of the PLE sub-thread. SAE-based Expert interpretability, Evidential Deep Learning uncertainty quantification, 18-task spec, paper-vs-implementation innovations, debugging guide, appendix — plus a downloadable PDF of the full PLE tech reference.",
+  "/2026/04/19/ple-5-basket-logit-tower-ko/":
+    "GroupTaskExpertBasket 이 태스크별 전용 Expert 를 만드는 방식, 태스크 간 명시적 정보 전달 Logit Transfer 3가지 모드, 그리고 최종 예측을 수행하는 Task Tower 의 구조.",
+  "/2026/04/19/ple-5-basket-logit-tower-en/":
+    "How GroupTaskExpertBasket produces per-task specialized experts, three modes of Logit Transfer for explicit cross-task information flow, and the Task Tower architecture that produces final predictions.",
+  "/2026/04/19/ple-4-cgc-hmm-routing-ko/":
+    "두 단계 CGC — 1단계 CGCLayer(Shared + Task 함께 가중합, 논문 원형)와 2단계 CGCAttention(Shared concat 위 블록 스케일링)의 수식. Expert Collapse 를 막는 entropy 정규화, 이종 차원 비대칭을 보정하는 차원 정규화, 그리고 HMM Triple-Mode 라우팅의 전체 구조.",
+  "/2026/04/19/ple-4-cgc-hmm-routing-en/":
+    "Two-stage CGC — Stage 1 CGCLayer (Shared + Task weighted sum together, paper-exact) and Stage 2 CGCAttention (block-scaling on the Shared concat) — math for both. Entropy regularization to prevent Expert Collapse, dimension normalization to correct heterogeneous output asymmetry, and the full HMM Triple-Mode routing architecture.",
+  "/2026/04/19/ple-3-heterogeneous-expert-pool-ko/":
+    "PLE-2 에서 이종 Shared Expert pool 을 결정한 뒤, 왜 7명인가, 왜 이 7명인가. 각 자리가 어떤 수학적 빈틈을 메우는지, 어떤 대안이 후보였는지, 그리고 왜 이 후보가 뽑혔는지를 하나씩 짚는다.",
+  "/2026/04/19/ple-3-heterogeneous-expert-pool-en/":
+    "Once PLE-2 committed to a heterogeneous Shared Expert pool, the question became: why seven, and why these seven? For each seat, what gap it fills, what alternatives were on the table, and why this specific one won.",
+  "/2026/04/19/ple-2-progressive-layered-extraction-ko/":
+    "PLE(Tang et al., RecSys 2020)가 Shared-Bottom·MMoE의 실패를 어떻게 해결했는지 — 공유와 분리의 명시적 균형, Expert와 Gate의 직관적 역할, 수학적 고찰, 핵심 수식 해석, 그리고 '왜 PLE인가' 내러티브.",
+  "/2026/04/19/ple-2-progressive-layered-extraction-en/":
+    "How PLE (Tang et al., RecSys 2020) answered Shared-Bottom and MMoE's failures — the explicit balance of sharing and separation, the intuitive roles of Experts and Gates, mathematical discussion, interpretations of the core equations, and the 'why PLE' narrative end-to-end.",
+  "/2026/04/19/ple-1-mtl-evolution-ko/":
+    "Study Thread의 PLE 서브스레드 1편. 멀티태스크 학습의 동기(외국어 학습 비유), Negative Transfer의 수학적 정의(gradient 충돌·상호정보량·줄다리기 비유), 그리고 Shared-Bottom·MMoE가 각자 어디서 무너지는지(Caruana 1997 · Ma 2018 · Jacobs 1991 역사적 맥락)까지.",
+  "/2026/04/19/ple-1-mtl-evolution-en/":
+    "First post of the PLE sub-thread in Study Thread. MTL motivation (foreign-language transfer analogy), the math of Negative Transfer (gradient conflict, mutual information, tug-of-war analogy), and where Shared-Bottom and MMoE each break (with Caruana 1997 / Ma 2018 / Jacobs 1991 historical context).",
+  "/2026/04/18/mrm-ep1-architecture-ko/":
+    "시리즈 'MRM 스레드' 1편. AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.",
+  "/2026/04/18/mrm-ep1-architecture-en/":
+    "Part 1 of 'The MRM Thread' — a short parallel series on regulatory compliance and model risk management for AI recommendation systems, written from a GARP FRM practitioner perspective.",
+  "/2026/04/18/ep1-premise-ko/":
+    "시리즈 '3개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.",
+  "/2026/04/18/ep1-premise-en/":
+    "Part 1 of 'Building a Financial AI in Three Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.",
+};
+
+/**
+ * Planned-but-unpublished posts. These have no markdown file yet —
+ * shown greyed in Archives.
+ */
+export const DRAFTS = [
+  { date: "2026-04-25", title: "[FinAI Build] Ep 2 — Hardware & Budget", cat: "FinAI Build",  lang: "EN", ex: "One consumer GPU, three laptops, three months.", tags: ["finai-build","claude-code"] },
+  { date: "2026-04-25", title: "[MRM Thread] Ep 2 — Three Lines of Defense, Rewritten", cat: "MRM Thread", lang: "EN", ex: "Where 3LoD breaks once an agent is in the loop.", tags: ["mrm","sr-11-7"] },
 ];
 
 export const TAGS = [
@@ -147,9 +173,6 @@ export const CATEGORIES = [
   { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 0,  desc: "Readings of regulatory drafts and papers. (empty)",                                                           color: "4" },
 ];
 
-export const RECENT = [
-  { title: "[Study Thread] ADATT-4 — 학습 루프·Loss Weighting·Optimizer·CGC 동기화",                        date: "2026-04-20", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/" },
-  { title: "[Study Thread] ADATT-4 — Training Loop, Loss Weighting, Optimizer, and CGC Synchronization",    date: "2026-04-20", url: "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/" },
-  { title: "[Study Thread] ADATT-3 — Transfer Loss · Group Prior · 3-Phase Schedule",                       date: "2026-04-20", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-ko/" },
-  { title: "[Study Thread] ADATT-3 — Transfer Loss, Group Prior, and the 3-Phase Schedule",                 date: "2026-04-20", url: "/2026/04/20/adatt-3-transfer-loss-group-prior-schedule-en/" },
-];
+// RECENT is now derived from loadRecent() in src/lib/posts.js — pages
+// that need it call the loader in their frontmatter script and pass
+// the result as a prop. No hardcoded list here anymore.

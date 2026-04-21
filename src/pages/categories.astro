@@ -1,7 +1,9 @@
 ---
 import Base from "../layouts/Base.astro";
 import CategoriesView from "../components/CategoriesView.jsx";
+import { loadPosts } from "../lib/posts.js";
+const posts = await loadPosts();
 ---
 <Base title="categories / bluethestyle" tab="categories">
-  <CategoriesView client:load />
+  <CategoriesView client:load posts={posts} />
 </Base>

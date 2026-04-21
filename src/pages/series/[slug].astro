@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { SERIES, POSTS } from "../../data.js";
+import { SERIES } from "../../data.js";
+import { loadPosts } from "../../lib/posts.js";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
@@ -38,14 +39,16 @@ const T = isKo
   ? { published: (n) => `${n} 편 공개`, total_suffix: (t) => t ? ` · 총 ${t} 편 예정` : "", back: "← 시리즈", other_lang: "English", all_series: "시리즈 전체" }
   : { published: (n) => `${n} post${n === 1 ? "" : "s"} published`, total_suffix: (t) => t ? ` · ${t} planned` : "", back: "← Series", other_lang: "한국어", all_series: "All series" };
 
-// Enrich each entry with excerpt from data.js POSTS (matched by URL)
+// Enrich each entry with excerpt via URL lookup (loader merges
+// EXCERPTS map + frontmatter excerpt, so this is single-source).
+const allPosts = await loadPosts();
+const exByUrl = Object.fromEntries(allPosts.map((p) => [p.url, p.ex]));
 const enriched = entries.map((entry) => {
   const url = entryUrl(entry);
-  const match = POSTS.find((p) => p.url === url);
   return {
     ...entry,
     _url: url,
-    _ex: match?.ex || "",
+    _ex: exByUrl[url] || "",
     _tags: entry.data.tags || [],
   };
 });
