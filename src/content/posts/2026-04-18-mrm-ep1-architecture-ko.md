@@ -9,7 +9,7 @@ part: 1
 alt_lang: /2026/04/18/mrm-ep1-architecture-en/
 next_title: "에피소드 2 — 관문으로서의 Champion-Challenger"
 next_desc: "동기 관문으로서의 Champion-Challenger — `--force-promote` override 패턴과 모든 승격 결정 (승인, 거부, 부트스트랩, 수동 override) 이 SR 11-7 하 HMAC 서명 감사 엔트리가 되는 방식."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---

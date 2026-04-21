@@ -33,7 +33,7 @@ export const SERIES = [
     title: "Building a Financial AI in Three Months",
     tag: "FinAI Build",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.",
-    ep: 1, total: 8,
+    ep: 2, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -42,7 +42,7 @@ export const SERIES = [
     title: "The MRM Thread",
     tag: "MRM Thread",
     desc: "Regulatory compliance and model risk management for AI recommendation systems, from a GARP FRM practitioner perspective.",
-    ep: 1, total: 6,
+    ep: 2, total: 6,
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
   },
@@ -65,6 +65,14 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/04/21/mrm-ep2-champion-challenger-ko/":
+    "MRM 스레드 2편. Champion-Challenger 를 동기 코드 게이트로 구현한 이야기 — 4가지 판정 형태(force_promote / bootstrap / reject(fidelity) / promote·reject(competition)), 안전 플로어가 경쟁 이전에 오는 이유, 그리고 모든 판정이 HMAC 서명 감사 엔트리가 되는 SR 11-7 재구성 가능성.",
+  "/2026/04/21/mrm-ep2-champion-challenger-en/":
+    "MRM Thread ep 2. Champion-Challenger implemented as a synchronous code gate — the four verdict shapes (force_promote / bootstrap / reject(fidelity) / promote·reject(competition)), why the safety floor comes before competition, and how every verdict becomes an HMAC-signed audit entry for SR 11-7 reconstruction.",
+  "/2026/04/21/ep2-ai-collaboration-ko/":
+    "3개월 개발기 2편. Claude Code·Gemini·Cursor 를 설계·구현·리뷰 3단계로 분업한 이야기, 초기에 '범용 엔지니어'로 쓰다 실패한 경험, 구독료 함정과 재조정 ($240/월 × 3.5개월 = $900), 그리고 3.5개월 동안 굳은 plan-first·interface-contract·local-first·완료 4단계 검수 패턴.",
+  "/2026/04/21/ep2-ai-collaboration-en/":
+    "FinAI Build ep 2. Dividing Claude Code / Gemini / Cursor across design, implementation, and review phases; the early mistake of using them as general-purpose engineers; the subscription trap and rebalance (~$240/mo × 3.5 months = $900); and the plan-first, interface-contract, local-first, four-check completion patterns that hardened over 3.5 months.",
   "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/":
     "adaTT 서브스레드 최종편. 2-Phase Training Loop, Loss Weighting(Uncertainty·GradNorm·DWA), Optimizer·Scheduler, CGC-adaTT 동기화, 메모리·성능 최적화, 디버깅 가이드, 설정 총람, 부록 + 전체 adaTT 기술 참조서 PDF 다운로드.",
   "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/":
@@ -120,8 +128,8 @@ export const EXCERPTS = {
  * shown greyed in Archives.
  */
 export const DRAFTS = [
-  { date: "2026-04-25", title: "[FinAI Build] Ep 2 — Hardware & Budget", cat: "FinAI Build",  lang: "EN", ex: "One consumer GPU, three laptops, three months.", tags: ["finai-build","claude-code"] },
-  { date: "2026-04-25", title: "[MRM Thread] Ep 2 — Three Lines of Defense, Rewritten", cat: "MRM Thread", lang: "EN", ex: "Where 3LoD breaks once an agent is in the loop.", tags: ["mrm","sr-11-7"] },
+  { date: "2026-04-28", title: "[FinAI Build] Ep 3 — Hardware, Budget, and What It Bought Us", cat: "FinAI Build",  lang: "EN", ex: "One RTX 4070, three laptops, personal-wallet subscriptions.", tags: ["finai-build","claude-code"] },
+  { date: "2026-04-28", title: "[MRM Thread] Ep 3 — Chain of Custody for an Agent Pipeline", cat: "MRM Thread", lang: "EN", ex: "Seven audit tables, HMAC hash chain, EU AI Act & KFCPA mappings.", tags: ["mrm","sr-11-7","audit"] },
 ];
 
 export const TAGS = [

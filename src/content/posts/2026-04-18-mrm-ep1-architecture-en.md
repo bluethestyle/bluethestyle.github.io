@@ -9,7 +9,7 @@ part: 1
 alt_lang: /2026/04/18/mrm-ep1-architecture-ko/
 next_title: "Ep 2 — Champion-Challenger as a Gate"
 next_desc: "Champion-Challenger as a synchronous gate — the `--force-promote` override pattern and how every promotion decision (approval, rejection, bootstrap, manual override) becomes an HMAC-signed audit entry under SR 11-7."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---

@@ -9,7 +9,7 @@ part: 1
 alt_lang: /2026/04/18/ep1-premise-ko/
 next_title: "Ep 2 — Organizing the AI Collaboration"
 next_desc: "How three people actually organized the AI collaboration — which tools got used for what, how we avoided burning subscriptions on the wrong phase, and what patterns emerged that transferred across 3.5 months."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf
 source_label: "Development Story (EN, PDF)"
 ---

@@ -9,7 +9,7 @@ part: 1
 alt_lang: /2026/04/18/ep1-premise-en/
 next_title: "에피소드 2 — AI 협업을 어떻게 조직했나"
 next_desc: "3명이 실제로 어떻게 AI 협업을 조직했는지를 다룬다 — 어떤 도구를 어떤 단계에 썼는지, 잘못된 단계에 구독료를 소모하지 않은 방법, 3.5개월에 걸쳐 전이된 패턴들."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/development_story.pdf
 source_label: "개발 스토리 (KO, PDF)"
 ---
