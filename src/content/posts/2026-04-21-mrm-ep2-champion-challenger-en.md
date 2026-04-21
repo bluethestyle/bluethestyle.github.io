@@ -52,33 +52,32 @@ resolves first settles the verdict on the spot, writes one audit
 entry, and the function returns.
 
 ```mermaid
-flowchart LR
-  subgraph D [Decision steps]
-    direction TB
-    start([Challenger registration])
-    q1{{"force-promote flag?"}}
-    q2{{"Champion exists?"}}
-    q3{{"Fidelity floor OK?"}}
-    q4{{"Competition passes?<br/>0.5% lift · 2% drop<br/>p &lt; 0.05"}}
-    start --> q1
-    q1 -- no --> q2
-    q2 -- yes --> q3
-    q3 -- yes --> q4
-  end
-  subgraph O [Outcomes · each writes an HMAC audit entry]
-    direction TB
-    d1([force_promote<br/>trigger=manual])
-    d2([bootstrap<br/>trigger=auto])
-    d3([reject<br/>fidelity failure])
-    d4a([promote<br/>competition])
-    d4b([reject<br/>competition])
-  end
+flowchart TB
+  start([Challenger registration])
+  q1{{"force-promote flag?"}}
+  q2{{"Champion exists?"}}
+  q3{{"Fidelity floor OK?"}}
+  q4{{"Competition passes?<br/>0.5% lift · 2% drop<br/>p &lt; 0.05"}}
+  d1([force_promote · manual])
+  d2([bootstrap · auto])
+  d3([reject · fidelity fail])
+  d4a([promote · competition])
+  d4b([reject · competition])
+
+  start --> q1
+  q1 -- no --> q2
+  q2 -- yes --> q3
+  q3 -- yes --> q4
   q1 -. yes .-> d1
   q2 -. no .-> d2
   q3 -. no .-> d3
   q4 -. yes .-> d4a
   q4 -. no .-> d4b
 
+  style q1 fill:#FFF,stroke:#666
+  style q2 fill:#FFF,stroke:#666
+  style q3 fill:#FFF,stroke:#666
+  style q4 fill:#FFF,stroke:#666
   style d1 fill:#FDE7CF,stroke:#C77A2E
   style d2 fill:#E2E8F5,stroke:#4A6AB1
   style d3 fill:#F5D5D5,stroke:#B14747
@@ -86,10 +85,11 @@ flowchart LR
   style d4b fill:#F5D5D5,stroke:#B14747
 ```
 
-At any step on the left spine, a branch condition pops out to the
-right-hand outcomes column and settles the verdict, which lands as
-one entry in the HMAC hash-chained audit log. Below is what one
-Challenger actually looks like walking this map.
+The spine flows downward as `no → yes → yes → yes`; each step's
+branch peels sideways and settles the verdict on the spot. Every
+outcome (the color-coded nodes) writes one entry into the HMAC
+hash-chained audit log. Below is what one Challenger actually looks
+like walking this map.
 
 *Step 1 — operator override check.* Is `--force-promote` set? It
 is not; this is scheduled retraining. Move on.
