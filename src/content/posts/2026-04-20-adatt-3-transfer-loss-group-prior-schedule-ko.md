@@ -221,20 +221,13 @@ gradient 를 건드리지 않는 것이다.
 
 ## 전이 가중치 파이프라인 — 네 결정이 모이는 자리
 
-네 결정이 한 계산에서 만난다. $w_{i \rightarrow j}$ 를 구하는 실제
-파이프라인:
-
-$$\mathbf{R} = (\mathbf{W} + \mathbf{A}) \cdot (1 - r) + \mathbf{P} \cdot r \quad \text{(결정 2)}$$
-
-$$\mathbf{R}_{i,j} \leftarrow 0 \text{ if } \mathbf{A}_{i,j} < \tau_{\text{neg}} \quad \text{(결정 4)}$$
-
-$$\mathbf{R}_{i,i} = 0 \quad \text{(자기 전이 제외)}$$
-
-$$w_{i \rightarrow j} = \text{softmax}(\mathbf{R}_{i,j} / T) \quad \text{(ADATT-1 의 softmax 정규화)}$$
-
-$T = 1.0$ 을 쓴다. $T < 0.5$ 는 너무 sharp 해서 소수 태스크에만 전이가
-집중되고, $T > 2.0$ 은 너무 uniform 해서 negative transfer 를 충분히
-차단하지 못한다.
+네 결정이 한 계산에서 만난다. 전이 가중치 $w_{i \to j}$ 는 ① **결정 2**
+의 Prior Blend 로 학습 가중치와 측정 친화도를 합친 $\mathbf{R}$ 을 만들고,
+② **결정 4** 에 따라 $\mathbf{A}_{i,j} < \tau_{\text{neg}}$ 인 엔트리를
+0 으로 마스킹하고, ③ 대각을 제외한 뒤, ④ ADATT-1 에서 언급한 softmax
+정규화를 온도 $T = 1.0$ 으로 거쳐 확률 분포로 변환한다. $T < 0.5$ 는 너무
+sharp 해서 소수 태스크에 집중, $T > 2.0$ 은 너무 uniform 해서 negative
+transfer 를 충분히 차단 못 한다.
 
 Phase 1 에서는 이 전체 파이프라인이 비활성 — 친화도만 축적한다 (결정 3).
 Phase 2 에서는 매 step 전체가 돌고, Phase 3 에서는 $\mathbf{W}$ 학습을

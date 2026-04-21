@@ -162,60 +162,36 @@ relationships is reflected immediately.
 | Parameter count | large (the generator itself is large) | small ($n^2$ transfer matrix + prior) |
 | Adaptation speed | tied to training | fast adaptation via EMA |
 
-Mathematically, the effect on task $i$'s gradient is captured in one
-formula.
+The shape is: *task $i$'s update direction gets a correction vector
+that weighs peer tasks' gradients by affinity*. High-affinity pairs
+contribute strongly; low-affinity or opposing pairs collapse to near
+zero. The explicit formulas and derivations arrive step by step across
+ADATT-2 and ADATT-3.
 
-$$\nabla_\theta \mathcal{L}_i^{\text{adaTT}} = \nabla_\theta \mathcal{L}_i + \lambda \sum_{j \neq i} w_{i \to j} \nabla_\theta \mathcal{L}_j$$
+## Five decisions become five equations
 
-The second term is a *correction vector that adjusts task $i$'s
-parameter-update direction*. High-affinity tasks' gradients enter with
-large $w_{i \to j}$, nudging the shared parameters toward a direction
-that is simultaneously favourable for both sides.
+The five core equations that show up across the following posts each
+correspond to one design decision. Here I leave only the name and the
+role of each — the equation lands in the post where the decision is
+unpacked.
 
-## The Five Core Equations — One Line Each, on Form
-
-Below are the five equations I unpack across ADATT-2 and ADATT-3, each
-distilled here to "why this form?" in a single line.
-
-*Cosine similarity.* Gradient *magnitude* is dominated by the absolute
-scale of the loss, but *direction* carries the essential information —
-"which way do we push parameters to reduce loss?" We have to compare
-direction only, or per-task loss-scale differences pollute everything.
-
-$$\cos(\theta_{i,j}) = \frac{\mathbf{g}_i \cdot \mathbf{g}_j}{\|\mathbf{g}_i\| \cdot \|\mathbf{g}_j\|}$$
-
-*Softmax normalisation.* Transfer weights always sum to 1, so the
-meaning of $\lambda = 0.1$ is preserved whether there are 16 or 32
-tasks. Unlike hard argmax it is differentiable, so $\mathbf{W}$ can be
-learned.
-
-$$w_{i \to j} = \frac{\exp(\mathbf{R}_{i,j} / T)}{\sum_{k \neq i} \exp(\mathbf{R}_{i,k} / T)}$$
-
-*EMA smoothing.* Single-batch gradients are noisy. $\alpha = 0.9$
-approximates a weighted average over the last ten observations and
-achieves the same effect as a sliding window in $O(1)$ memory.
-
-$$\mathbf{A}_t = \alpha \cdot \mathbf{A}_{t-1} + (1 - \alpha) \cdot \mathbf{C}_t$$
-
-*Transfer-Enhanced Loss.* "90% of your own judgement, 10% from peers"
-— with $\lambda = 0.1$, the learning direction of the original loss is
-not greatly distorted while the benefit of positive transfer is kept.
-`max_transfer_ratio = 0.5` is the second safety net.
-
-$$\mathcal{L}_i^{\text{adaTT}} = \mathcal{L}_i + \lambda \cdot \sum_{j \neq i} w_{i \to j} \cdot \mathcal{L}_j$$
-
-*Prior Blend.* Early in training, measured affinity is unstable — lean
-on domain knowledge for half; late in training, trust data 90%.
-Bayesian "prior → posterior" transition, pragmatically replaced by one
-blend ratio $r$.
-
-$$\mathbf{R}_{\text{blended}} = (\mathbf{W} + \mathbf{A}) \cdot (1 - r) + \mathbf{P} \cdot r$$
-
-> **Undergrad math — dot product and direction.** Since
-> $\mathbf{a} \cdot \mathbf{b} = \|\mathbf{a}\| \|\mathbf{b}\| \cos\theta$,
-> a large dot product means either (1) the vectors are long, or (2)
-> the angle is small. Cosine normalises magnitude so only (2) survives.
-> $\cos = 1$ aligned, $\cos = 0$ orthogonal, $\cos = -1$ opposite.
+- **Cosine similarity** — gradient magnitudes vary with each task's
+  loss scale, so the only thing that can be compared is *direction*.
+  Magnitude-normalised, direction-only. (ADATT-2)
+- **Softmax normalisation** — keeping transfer weights summing to 1
+  preserves the meaning of the transfer strength $\lambda$ whether
+  there are 16 or 32 tasks. A differentiable choice over hard argmax.
+  (ADATT-3)
+- **EMA smoothing** — single-batch gradients are noisy; past
+  observations are folded in via exponential decay for stability.
+  $O(1)$ memory, sliding-window-equivalent. (ADATT-2)
+- **Transfer-Enhanced Loss** — peer loss enters as a residual on top
+  of own loss. The residual form means a useless transfer naturally
+  converges to zero weight — safe default. (ADATT-3)
+- **Prior Blend** — early on, data confidence is low, so a domain
+  prior carries half the weight; as training proceeds, the ratio
+  shifts toward data. Bayesian "prior → posterior" transition reduced
+  to a single blend ratio. (ADATT-3)
 
 ## "Measure, Select, Regulate"
 

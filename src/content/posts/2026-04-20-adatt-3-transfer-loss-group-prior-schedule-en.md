@@ -236,20 +236,15 @@ in conflict?" Example: `{"churn": ["ctr", "engagement"], "ltv": ["brand_predicti
 
 ## The Transfer-Weight Pipeline — Where the Four Decisions Meet
 
-All four decisions meet in one computation. The full pipeline for
-$w_{i \rightarrow j}$:
-
-$$\mathbf{R} = (\mathbf{W} + \mathbf{A}) \cdot (1 - r) + \mathbf{P} \cdot r \quad \text{(Decision 2)}$$
-
-$$\mathbf{R}_{i,j} \leftarrow 0 \text{ if } \mathbf{A}_{i,j} < \tau_{\text{neg}} \quad \text{(Decision 4)}$$
-
-$$\mathbf{R}_{i,i} = 0 \quad \text{(no self-transfer)}$$
-
-$$w_{i \rightarrow j} = \text{softmax}(\mathbf{R}_{i,j} / T) \quad \text{(ADATT-1's softmax normalisation)}$$
-
-We use $T = 1.0$. $T < 0.5$ is too sharp, concentrating transfer on
-only a few tasks; $T > 2.0$ is too uniform and fails to suppress
-negative transfer sufficiently.
+All four decisions meet in one computation. The transfer weight
+$w_{i \to j}$ is produced by ① **Decision 2**'s Prior Blend combining
+learned weights and measured affinity into $\mathbf{R}$, ② masking the
+entries where $\mathbf{A}_{i,j} < \tau_{\text{neg}}$ to zero per
+**Decision 4**, ③ zeroing the diagonal to exclude self-transfer, and
+④ passing through the softmax normalisation mentioned in ADATT-1 at
+temperature $T = 1.0$. $T < 0.5$ concentrates transfer on too few
+tasks; $T > 2.0$ is too uniform and fails to suppress negative
+transfer sufficiently.
 
 In Phase 1 the whole pipeline is inactive — only affinity accumulates
 (Decision 3). In Phase 2 the whole thing runs every step, and in
