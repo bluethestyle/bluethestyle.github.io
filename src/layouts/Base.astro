@@ -265,7 +265,31 @@ const seriesCurrent = Object.fromEntries(
             b.classList.toggle("on", !!on);
             b.setAttribute("aria-pressed", on ? "true" : "false");
           });
+          // Mirror active state on in-page lang filter pills
+          // (e.g. Latest posts "all / en / 한국어"). The "all" pill
+          // is active when no preference is set.
+          document.querySelectorAll("[data-set-lang]").forEach((el) => {
+            const target = el.getAttribute("data-set-lang") || "";
+            const currentKey = pref || "";
+            el.classList.toggle("on", target === currentKey);
+          });
           applyI18n(pref);
+        };
+
+        const setPref = (next, { navigateAlt = true } = {}) => {
+          if (next === "en" || next === "ko") {
+            localStorage.setItem(KEY, next);
+          } else {
+            localStorage.removeItem(KEY);
+          }
+          applyPref(next || null);
+          if (!navigateAlt) return;
+          const body = document.body;
+          const pageLang = (body.getAttribute("data-page-lang") || "").toLowerCase();
+          const alt = body.getAttribute("data-alt-lang") || "";
+          if (next && alt && pageLang && pageLang !== next) {
+            window.location.href = alt;
+          }
         };
 
         applyPref(localStorage.getItem(KEY));
@@ -274,16 +298,19 @@ const seriesCurrent = Object.fromEntries(
           btn.addEventListener("click", () => {
             const clicked = btn.getAttribute("data-lang");
             const current = localStorage.getItem(KEY);
-            const next = current === clicked ? null : clicked;
-            if (next) localStorage.setItem(KEY, next);
-            else localStorage.removeItem(KEY);
-            applyPref(next);
-            const body = document.body;
-            const pageLang = (body.getAttribute("data-page-lang") || "").toLowerCase();
-            const alt = body.getAttribute("data-alt-lang") || "";
-            if (next && alt && pageLang && pageLang !== next) {
-              window.location.href = alt;
-            }
+            // Top-bar button toggles: clicking the current pref clears it.
+            setPref(current === clicked ? null : clicked);
+          });
+        });
+
+        // In-page lang filter pills — clicking sets the global pref
+        // directly; no toggle-off behavior (clicking the active pill
+        // is a no-op).
+        document.querySelectorAll("[data-set-lang]").forEach((el) => {
+          el.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            const target = el.getAttribute("data-set-lang") || "";
+            setPref(target || null);
           });
         });
       })();

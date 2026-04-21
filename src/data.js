@@ -12,27 +12,33 @@ export const SITE = {
 
 export const CURRENT_WORK = {
   title: "Heterogeneous Expert PLE for Financial Product Recommendation",
+  titleKo: "금융 상품 추천을 위한 이종 전문가 PLE",
   desc: "A 13-task multi-task learning system with seven structurally distinct expert networks, distilled to LightGBM for AWS Lambda serving, with regulatory-grade audit infrastructure.",
+  descKo: "구조적으로 구분되는 7개 전문가 네트워크로 13개 태스크를 동시 학습하고 LightGBM 으로 증류하여 AWS Lambda 에서 서빙하는 멀티태스크 시스템. 규제 대응을 위한 감사 인프라 포함.",
   meta: "Built by three people on personal time · early 2026 · with Claude Code (Anthropic) as the primary development partner",
+  metaKo: "3명이 개인 시간에 · 2026년 초 · Claude Code (Anthropic) 를 주 개발 파트너로 삼아 구축",
   links: [
-    { label: "Paper 1 · Architecture & Ablation", href: "https://doi.org/10.5281/zenodo.19621884", tag: "DOI" },
-    { label: "Paper 2 · Agentic Reason Generation & Compliance", href: "https://doi.org/10.5281/zenodo.19622052", tag: "DOI" },
-    { label: "Source code", href: "https://github.com/bluethestyle/aws_ple_for_financial", tag: "MIT" },
+    { label: "Paper 1 · Architecture & Ablation", labelKo: "Paper 1 · 아키텍처 & Ablation", href: "https://doi.org/10.5281/zenodo.19621884", tag: "DOI" },
+    { label: "Paper 2 · Agentic Reason Generation & Compliance", labelKo: "Paper 2 · 에이전틱 사유 생성 & 컴플라이언스", href: "https://doi.org/10.5281/zenodo.19622052", tag: "DOI" },
+    { label: "Source code", labelKo: "소스 코드", href: "https://github.com/bluethestyle/aws_ple_for_financial", tag: "MIT" },
   ]
 };
 
 export const COAUTHORS = [
-  { name: "Seonkyu Jeong", role: "architecture, regulatory framing", lead: true },
-  { name: "Euncheol Sim",  role: "engineering, experimentation" },
-  { name: "Youngchan Kim", role: "engineering, evaluation" },
+  { name: "Seonkyu Jeong", nameKo: "정선규", role: "architecture, regulatory framing", roleKo: "아키텍처, 규제 프레이밍", lead: true },
+  { name: "Euncheol Sim",  nameKo: "심은철",  role: "engineering, experimentation", roleKo: "엔지니어링, 실험" },
+  { name: "Youngchan Kim", nameKo: "김영찬", role: "engineering, evaluation", roleKo: "엔지니어링, 평가" },
 ];
 
 export const SERIES = [
   {
     slug: "three-months",
     title: "Building a Financial AI in Three Months",
+    titleKo: "3개월간의 금융 AI 개발기",
     tag: "FinAI Build",
+    tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.",
+    descKo: "3명이 개인 시간에, 소비자용 GPU 한 대로, Claude Code 를 파트너 삼아 금융 추천 시스템을 구축한 과정.",
     ep: 2, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
@@ -40,8 +46,11 @@ export const SERIES = [
   {
     slug: "mrm-thread",
     title: "The MRM Thread",
+    titleKo: "MRM 스레드",
     tag: "MRM Thread",
+    tagKo: "MRM 스레드",
     desc: "Regulatory compliance and model risk management for AI recommendation systems, from a GARP FRM practitioner perspective.",
+    descKo: "AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.",
     ep: 2, total: 6,
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
@@ -49,8 +58,11 @@ export const SERIES = [
   {
     slug: "study-thread",
     title: "Study Thread — Papers & Math Foundations",
+    titleKo: "스터디 스레드 — 논문 & 수학 기초",
     tag: "Study Thread",
+    tagKo: "스터디 스레드",
     desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized in parallel English/Korean.",
+    descKo: "PLE 아키텍처의 배경이 되는 논문·수학 기초·참고 문헌을 영한 병행으로 정리한 학습 노트.",
     ep: 10,
     ko: "/series/study-thread-ko/",
     en: "/series/study-thread/",
@@ -175,10 +187,10 @@ export const TAGS = [
 ];
 
 export const CATEGORIES = [
-  { slug: "finai-build",  name: "FinAI Build",   ko: "3개월 개발기",  count: 2,  desc: "Building a financial AI in three months — engineering notes.",                                                color: "1" },
-  { slug: "mrm-thread",   name: "MRM Thread",    ko: "MRM 스레드",    count: 2,  desc: "Model risk management for AI recommendation systems.",                                                         color: "2" },
-  { slug: "study-thread", name: "Study Thread",  ko: "스터디 스레드", count: 20, desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized.",      color: "3" },
-  { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 0,  desc: "Readings of regulatory drafts and papers. (empty)",                                                           color: "4" },
+  { slug: "finai-build",  name: "FinAI Build",   ko: "3개월 개발기",  count: 2,  desc: "Building a financial AI in three months — engineering notes.",                                                descKo: "3개월간의 금융 AI 개발 기록 — 엔지니어링 노트.",                                                            color: "1" },
+  { slug: "mrm-thread",   name: "MRM Thread",    ko: "MRM 스레드",    count: 2,  desc: "Model risk management for AI recommendation systems.",                                                         descKo: "AI 추천 시스템의 모델 리스크 관리.",                                                                       color: "2" },
+  { slug: "study-thread", name: "Study Thread",  ko: "스터디 스레드", count: 20, desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized.",      descKo: "PLE 아키텍처의 배경이 되는 논문·수학 기초·참고 문헌을 학습하며 정리한 노트.",                               color: "3" },
+  { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 0,  desc: "Readings of regulatory drafts and papers. (empty)",                                                           descKo: "규제 초안과 논문 읽기 (비어있음).",                                                                        color: "4" },
 ];
 
 // RECENT is now derived from loadRecent() in src/lib/posts.js — pages

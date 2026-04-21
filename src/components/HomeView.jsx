@@ -122,15 +122,22 @@ function HomeView({ lang, posts = [] }) {
         <div className="work-card">
           <div className="work-main">
             <div className="work-tag"><span className="d"></span><span data-i18n-ko="추천 · MRM · 에이전틱">Recommendation · MRM · Agentic</span></div>
-            <h3>{CURRENT_WORK.title}</h3>
-            <p className="d">{CURRENT_WORK.desc}</p>
-            <p className="m">{CURRENT_WORK.meta}</p>
+            <h3 data-lang-ui="en">{CURRENT_WORK.title}</h3>
+            <h3 data-lang-ui="ko" className="kr">{CURRENT_WORK.titleKo}</h3>
+            <p className="d" data-lang-ui="en">{CURRENT_WORK.desc}</p>
+            <p className="d kr" data-lang-ui="ko">{CURRENT_WORK.descKo}</p>
+            <p className="m" data-lang-ui="en">{CURRENT_WORK.meta}</p>
+            <p className="m kr" data-lang-ui="ko">{CURRENT_WORK.metaKo}</p>
 
             <div className="work-links">
               {CURRENT_WORK.links.map((l,i) => (
                 <a key={i} href={l.href}>
                   <span className="lt">{l.tag}</span>
-                  <span>{l.label}<br/><span style={{fontFamily:"JetBrains Mono",fontSize:10,color:"var(--muted-2)",letterSpacing:".02em"}}>{l.href.replace("https://","")}</span></span>
+                  <span>
+                    <span data-lang-ui="en">{l.label}</span>
+                    <span data-lang-ui="ko" className="kr">{l.labelKo || l.label}</span>
+                    <br/><span style={{fontFamily:"JetBrains Mono",fontSize:10,color:"var(--muted-2)",letterSpacing:".02em"}}>{l.href.replace("https://","")}</span>
+                  </span>
                   <span className="arr">↗</span>
                 </a>
               ))}
@@ -162,8 +169,10 @@ function HomeView({ lang, posts = [] }) {
           {COAUTHORS.map((a,i) => (
             <div key={i} className={"author" + (a.lead ? " lead" : "")}>
               <div className="init">{a.name.split(" ").map(w => w[0]).join("")}</div>
-              <div className="nm">{a.name}</div>
-              <div className="rl">{a.role}</div>
+              <div className="nm" data-lang-ui="en">{a.name}</div>
+              <div className="nm kr" data-lang-ui="ko">{a.nameKo || a.name}</div>
+              <div className="rl" data-lang-ui="en">{a.role}</div>
+              <div className="rl kr" data-lang-ui="ko">{a.roleKo || a.role}</div>
             </div>
           ))}
         </div>
@@ -182,11 +191,14 @@ function HomeView({ lang, posts = [] }) {
           {SERIES.map(s => (
             <div key={s.slug} className="series">
               <div className="top">
-                <span className="cat">[{s.tag}]</span>
+                <span className="cat" data-lang-ui="en">[{s.tag}]</span>
+                <span className="cat" data-lang-ui="ko">[{s.tagKo || s.tag}]</span>
                 <span className="prog">{s.total ? <><span data-i18n-ko="에피소드">ep</span> {s.ep} <span data-i18n-ko="/">of</span> {s.total}</> : <><span data-i18n-ko="에피소드">ep</span> {s.ep}</>}</span>
               </div>
-              <h4>{s.title}</h4>
-              <p>{s.desc}</p>
+              <h4 data-lang-ui="en">{s.title}</h4>
+              <h4 className="kr" data-lang-ui="ko">{s.titleKo || s.title}</h4>
+              <p data-lang-ui="en">{s.desc}</p>
+              <p className="kr" data-lang-ui="ko">{s.descKo || s.desc}</p>
               <div className="bar"><span style={{width: (s.ep/(s.total||s.ep)*100) + "%"}}></span></div>
               <div className="lang">
                 <a href={s.en} data-i18n-ko="한국어로 읽기 ↗">read · english ↗</a>
@@ -206,8 +218,8 @@ function HomeView({ lang, posts = [] }) {
             <div className="title kr" data-lang-ui="ko">최근 <em>글</em></div>
             <div className="count">{latest.length} · <span data-i18n-ko="전체">total</span> {POSTS.filter(p=>!p.draft).length}</div>
           </div>
-          <div className="filters">
-            <a className="on" data-i18n-ko="전체">all</a><a>en</a><a>한국어</a>
+          <div className="filters lang-filters">
+            <a data-set-lang="" data-i18n-ko="전체">all</a><a data-set-lang="en">en</a><a data-set-lang="ko">한국어</a>
           </div>
         </div>
 

@@ -235,7 +235,20 @@ html, body {
 * { box-sizing: border-box; }
 a { color: inherit; text-decoration: none; }
 ::selection { background: var(--accent); color: var(--bg); }
-.kr { font-family: var(--kr); letter-spacing: -0.015em; }
+.kr {
+  font-family: var(--kr);
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+/* When lang preference is KO, apply the same word-break behavior to
+   any descendant of the ko variant wrapper (hero paragraphs, section
+   titles, etc.) so Korean text doesn't split mid-syllable. */
+html[data-lang-pref="ko"] [data-lang-ui="ko"],
+html[data-lang-pref="ko"] [data-lang-ui="ko"] * {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
 
 /* ============ FRAME ============ */
 .frame {

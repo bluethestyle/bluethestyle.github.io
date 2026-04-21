@@ -71,7 +71,8 @@ function CategoriesView({ posts = [] }) {
                 <h3 data-lang-ui="ko" className="kr" style={{fontFamily:"var(--display)", fontSize:30, fontWeight:400, margin:"0 0 4px", letterSpacing:"-0.02em", lineHeight:1.05}}>{c.ko}</h3>
                 <div className="kr" data-lang-ui="en" style={{fontSize:14, color:"var(--muted)", marginBottom:14}}>{c.ko}</div>
                 <div data-lang-ui="ko" style={{fontSize:14, color:"var(--muted)", marginBottom:14}}>{c.name}</div>
-                <p style={{fontSize:13.5, color:"var(--ink-2)", margin:"0 0 18px", lineHeight:1.55, maxWidth:420}}>{c.desc}</p>
+                <p data-lang-ui="en" style={{fontSize:13.5, color:"var(--ink-2)", margin:"0 0 18px", lineHeight:1.55, maxWidth:420}}>{c.desc}</p>
+                <p data-lang-ui="ko" className="kr" style={{fontSize:13.5, color:"var(--ink-2)", margin:"0 0 18px", lineHeight:1.55, maxWidth:420}}>{c.descKo || c.desc}</p>
                 <div style={{display:"flex", gap:5, flexWrap:"wrap"}}>
                   {POSTS.filter(p=>!p.draft && (p.cat===c.name || p.cat===c.ko)).slice(0,4).map((p,j)=>(
                     <span key={j} data-lang-post={(p.lang||"").toLowerCase()} style={{fontFamily:"JetBrains Mono", fontSize:10, padding:"3px 7px", background:cs, color:cvar, borderRadius:3, letterSpacing:".02em"}}>
@@ -90,8 +91,8 @@ function CategoriesView({ posts = [] }) {
         <div className="sec-head">
           <div className="sec-head-l">
             <div className="title" data-lang-ui="en"><em>Distribution</em></div>
-            <div className="title kr" data-lang-ui="ko"><em>분포</em></div>
-            <div className="count" data-i18n-ko="카테고리별">by category</div>
+            <div className="title kr" data-lang-ui="ko"><em>구성</em></div>
+            <div className="count" data-i18n-ko="카테고리별 글 수">by category</div>
           </div>
         </div>
         <div style={{background:"var(--surface)", border:"1px solid var(--hair)", borderRadius:10, padding:22}}>
