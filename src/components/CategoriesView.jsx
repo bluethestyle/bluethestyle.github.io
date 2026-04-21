@@ -9,21 +9,31 @@ function CategoriesView({ posts = [] }) {
   return (
     <>
       <section className="hero" style={{paddingBottom:32, marginBottom:32}}>
-        <div className="label"><span className="pulse"></span>Navigation · 4 categories</div>
-        <h1 style={{fontSize:52}}>
-          <em>Categories</em> — everything here is<br/>a <span className="hl">field note</span>, grouped.
-        </h1>
-        <p>Long-form work is organized into four categories. Each post usually exists as an English/Korean pair. Empty categories are listed so you can see what's coming.</p>
+        <div data-lang-ui="en">
+          <div className="label"><span className="pulse"></span>Navigation · 4 categories</div>
+          <h1 style={{fontSize:52}}>
+            <em>Categories</em> — everything here is<br/>a <span className="hl">field note</span>, grouped.
+          </h1>
+          <p>Long-form work is organized into four categories. Each post usually exists as an English/Korean pair. Empty categories are listed so you can see what's coming.</p>
+        </div>
+        <div data-lang-ui="ko">
+          <div className="label"><span className="pulse"></span>내비게이션 · 4개 카테고리</div>
+          <h1 className="kr" style={{fontSize:52}}>
+            <em>카테고리</em> — 이곳의 모든 글은<br/>주제별로 묶인 <span className="hl">현장 노트</span>다.
+          </h1>
+          <p className="kr">장문 작업은 네 개 카테고리로 분류된다. 대부분의 글은 영어/한국어 페어로 존재한다. 비어 있는 카테고리도 표시해서 앞으로의 계획을 보여준다.</p>
+        </div>
       </section>
 
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title">All <em>categories</em></div>
-            <div className="count">{cats.length} total · {cats.filter(c=>c.count).length} active</div>
+            <div className="title" data-lang-ui="en">All <em>categories</em></div>
+            <div className="title kr" data-lang-ui="ko">전체 <em>카테고리</em></div>
+            <div className="count">{cats.length} <span data-i18n-ko="개">total</span> · {cats.filter(c=>c.count).length} <span data-i18n-ko="활성">active</span></div>
           </div>
           <div className="filters">
-            <a className="on">all</a><a>active</a><a>planned</a>
+            <a className="on" data-i18n-ko="전체">all</a><a data-i18n-ko="활성">active</a><a data-i18n-ko="예정">planned</a>
           </div>
         </div>
 
@@ -54,11 +64,13 @@ function CategoriesView({ posts = [] }) {
                     <span style={{fontFamily:"JetBrains Mono", fontSize:10, letterSpacing:".12em", textTransform:"uppercase", color:"var(--muted)"}}>cat {String(i+1).padStart(2,"0")}</span>
                   </div>
                   <span style={{fontFamily:"JetBrains Mono", fontSize:10, color: active?"var(--ink-2)":"var(--muted-2)", padding:"2px 8px", border:"1px solid var(--hair)", borderRadius:3}}>
-                    {active ? c.count + " posts" : "empty"}
+                    {active ? <><span>{c.count}</span> <span data-i18n-ko="글">posts</span></> : <span data-i18n-ko="비어있음">empty</span>}
                   </span>
                 </div>
-                <h3 style={{fontFamily:"var(--display)", fontSize:30, fontWeight:400, margin:"0 0 4px", letterSpacing:"-0.02em", lineHeight:1.05}}>{c.name}</h3>
-                <div className="kr" style={{fontSize:14, color:"var(--muted)", marginBottom:14}}>{c.ko}</div>
+                <h3 data-lang-ui="en" style={{fontFamily:"var(--display)", fontSize:30, fontWeight:400, margin:"0 0 4px", letterSpacing:"-0.02em", lineHeight:1.05}}>{c.name}</h3>
+                <h3 data-lang-ui="ko" className="kr" style={{fontFamily:"var(--display)", fontSize:30, fontWeight:400, margin:"0 0 4px", letterSpacing:"-0.02em", lineHeight:1.05}}>{c.ko}</h3>
+                <div className="kr" data-lang-ui="en" style={{fontSize:14, color:"var(--muted)", marginBottom:14}}>{c.ko}</div>
+                <div data-lang-ui="ko" style={{fontSize:14, color:"var(--muted)", marginBottom:14}}>{c.name}</div>
                 <p style={{fontSize:13.5, color:"var(--ink-2)", margin:"0 0 18px", lineHeight:1.55, maxWidth:420}}>{c.desc}</p>
                 <div style={{display:"flex", gap:5, flexWrap:"wrap"}}>
                   {POSTS.filter(p=>!p.draft && (p.cat===c.name || p.cat===c.ko)).slice(0,4).map((p,j)=>(
@@ -77,8 +89,9 @@ function CategoriesView({ posts = [] }) {
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title"><em>Distribution</em></div>
-            <div className="count">by category</div>
+            <div className="title" data-lang-ui="en"><em>Distribution</em></div>
+            <div className="title kr" data-lang-ui="ko"><em>분포</em></div>
+            <div className="count" data-i18n-ko="카테고리별">by category</div>
           </div>
         </div>
         <div style={{background:"var(--surface)", border:"1px solid var(--hair)", borderRadius:10, padding:22}}>

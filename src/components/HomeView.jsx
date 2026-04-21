@@ -75,19 +75,37 @@ function HomeView({ lang, posts = [] }) {
     <>
       {/* HERO */}
       <section className="hero">
-        <div className="label">
-          <span className="pulse"></span>
-          Working notes · est. 2026 · 기록과 정리
+        <div data-lang-ui="en">
+          <div className="label">
+            <span className="pulse"></span>
+            Working notes · est. 2026 · 기록과 정리
+          </div>
+          <h1>
+            Seonkyu <em>Jeong</em> — notes on <span className="hl">financial&nbsp;AI</span>, model&nbsp;risk, and the slow integration of <em>agents</em> into regulated workflows.
+          </h1>
+          <p>
+            <b>Independent researcher · Seoul.</b> {SITE.bio}
+          </p>
+          <p>{SITE.bio2}</p>
+          <div>
+            <span className="frm">◆ GARP FRM · Financial Risk Manager</span>
+          </div>
         </div>
-        <h1>
-          Seonkyu <em>Jeong</em> — notes on <span className="hl">financial&nbsp;AI</span>, model&nbsp;risk, and the slow integration of <em>agents</em> into regulated workflows.
-        </h1>
-        <p>
-          <b>Independent researcher · Seoul.</b> {SITE.bio}
-        </p>
-        <p>{SITE.bio2}</p>
-        <div>
-          <span className="frm">◆ GARP FRM · Financial Risk Manager</span>
+        <div data-lang-ui="ko">
+          <div className="label">
+            <span className="pulse"></span>
+            작업 노트 · 2026년 · 기록과 정리
+          </div>
+          <h1 className="kr">
+            <em>정선규</em> — <span className="hl">금융&nbsp;AI</span>, 모델 리스크, 그리고 <em>에이전트</em>가 규제 워크플로우에 천천히 통합되는 과정에 대한 노트.
+          </h1>
+          <p className="kr">
+            <b>독립 연구자 · 서울.</b> 저널 논문이나 GitHub README에 들어가지 않는 것들 — 결정과 그 이유, 실패한 실험, 3개월간 AI 와 협업한 실제 모습을 모아둔 곳.
+          </p>
+          <p className="kr">금융 AI, 모델 리스크 관리, 에이전틱 시스템에 대한 장문의 노트·작업 논문·사고 기록. GARP 금융 리스크 관리자 (FRM) 보유.</p>
+          <div>
+            <span className="frm">◆ GARP FRM · 금융 리스크 관리자</span>
+          </div>
         </div>
       </section>
 
@@ -95,14 +113,15 @@ function HomeView({ lang, posts = [] }) {
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title">Current <em>work</em></div>
-            <div className="count">2026 · active</div>
+            <div className="title" data-lang-ui="en">Current <em>work</em></div>
+            <div className="title kr" data-lang-ui="ko">현재 <em>작업</em></div>
+            <div className="count"><span data-i18n-ko="2026 · 진행중">2026 · active</span></div>
           </div>
         </div>
 
         <div className="work-card">
           <div className="work-main">
-            <div className="work-tag"><span className="d"></span>Recommendation · MRM · Agentic</div>
+            <div className="work-tag"><span className="d"></span><span data-i18n-ko="추천 · MRM · 에이전틱">Recommendation · MRM · Agentic</span></div>
             <h3>{CURRENT_WORK.title}</h3>
             <p className="d">{CURRENT_WORK.desc}</p>
             <p className="m">{CURRENT_WORK.meta}</p>
@@ -119,12 +138,12 @@ function HomeView({ lang, posts = [] }) {
           </div>
 
           <div className="work-viz">
-            <div className="viz-top"><span>fig. 01</span><b>hetero-expert PLE</b></div>
+            <div className="viz-top"><span>fig. 01</span><b data-i18n-ko="이종 전문가 PLE">hetero-expert PLE</b></div>
             <PLEDiagram />
             <div className="viz-nums">
-              <div><div className="n">7</div><div className="l">experts</div></div>
-              <div><div className="n">13</div><div className="l">tasks</div></div>
-              <div><div className="n">λ</div><div className="l">lambda</div></div>
+              <div><div className="n">7</div><div className="l" data-i18n-ko="전문가">experts</div></div>
+              <div><div className="n">13</div><div className="l" data-i18n-ko="태스크">tasks</div></div>
+              <div><div className="n">λ</div><div className="l" data-i18n-ko="람다">lambda</div></div>
             </div>
           </div>
         </div>
@@ -134,8 +153,9 @@ function HomeView({ lang, posts = [] }) {
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title">Co-<em>authors</em></div>
-            <div className="count">3 · personal time</div>
+            <div className="title" data-lang-ui="en">Co-<em>authors</em></div>
+            <div className="title kr" data-lang-ui="ko"><em>공저자</em></div>
+            <div className="count"><span data-i18n-ko="3명 · 개인 시간">3 · personal time</span></div>
           </div>
         </div>
         <div className="authors">
@@ -153,8 +173,9 @@ function HomeView({ lang, posts = [] }) {
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title"><em>Series</em></div>
-            <div className="count">EN · KO parallel</div>
+            <div className="title" data-lang-ui="en"><em>Series</em></div>
+            <div className="title kr" data-lang-ui="ko"><em>시리즈</em></div>
+            <div className="count"><span data-i18n-ko="영·한 병행">EN · KO parallel</span></div>
           </div>
         </div>
         <div className="series-grid">
@@ -162,15 +183,15 @@ function HomeView({ lang, posts = [] }) {
             <div key={s.slug} className="series">
               <div className="top">
                 <span className="cat">[{s.tag}]</span>
-                <span className="prog">ep {s.ep} of {s.total}</span>
+                <span className="prog">{s.total ? <><span data-i18n-ko="에피소드">ep</span> {s.ep} <span data-i18n-ko="/">of</span> {s.total}</> : <><span data-i18n-ko="에피소드">ep</span> {s.ep}</>}</span>
               </div>
               <h4>{s.title}</h4>
               <p>{s.desc}</p>
-              <div className="bar"><span style={{width: (s.ep/s.total*100) + "%"}}></span></div>
+              <div className="bar"><span style={{width: (s.ep/(s.total||s.ep)*100) + "%"}}></span></div>
               <div className="lang">
-                <a>read · english ↗</a>
+                <a href={s.en} data-i18n-ko="한국어로 읽기 ↗">read · english ↗</a>
                 <span className="sep">·</span>
-                <a>한국어로 읽기 ↗</a>
+                <a href={s.ko} data-i18n-ko="영어로 읽기 ↗">한국어로 읽기 ↗</a>
               </div>
             </div>
           ))}
@@ -181,11 +202,12 @@ function HomeView({ lang, posts = [] }) {
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title">Latest <em>posts</em></div>
-            <div className="count">{latest.length} · 전체 {POSTS.filter(p=>!p.draft).length}</div>
+            <div className="title" data-lang-ui="en">Latest <em>posts</em></div>
+            <div className="title kr" data-lang-ui="ko">최근 <em>글</em></div>
+            <div className="count">{latest.length} · <span data-i18n-ko="전체">total</span> {POSTS.filter(p=>!p.draft).length}</div>
           </div>
           <div className="filters">
-            <a className="on">all</a><a>en</a><a>한국어</a>
+            <a className="on" data-i18n-ko="전체">all</a><a>en</a><a>한국어</a>
           </div>
         </div>
 
@@ -209,7 +231,7 @@ function HomeView({ lang, posts = [] }) {
                   </div>
                 </div>
                 <div className="right">
-                  <span>read</span>
+                  <span data-i18n-ko="읽기">read</span>
                   <span className="arr">↗</span>
                 </div>
               </a>
@@ -219,12 +241,12 @@ function HomeView({ lang, posts = [] }) {
 
         {/* Contact strip */}
         <div className="contact-bar">
-          <span><span className="k">contact</span> &nbsp; <span className="v">{SITE.contact}</span></span>
+          <span><span className="k" data-i18n-ko="연락처">contact</span> &nbsp; <span className="v">{SITE.contact}</span></span>
           <span className="sep">·</span>
           <span><span className="k">orcid</span> &nbsp; <a>{SITE.orcid} ↗</a></span>
           <span className="sep">·</span>
           <span><span className="k">github</span> &nbsp; <a>@{SITE.github} ↗</a></span>
-          <span style={{marginLeft:"auto"}}><span className="k">license</span> &nbsp; <span className="v">content CC BY-NC 4.0 · code MIT</span></span>
+          <span style={{marginLeft:"auto"}}><span className="k" data-i18n-ko="라이선스">license</span> &nbsp; <span className="v" data-i18n-ko="본문 CC BY-NC 4.0 · 코드 MIT">content CC BY-NC 4.0 · code MIT</span></span>
         </div>
       </section>
     </>

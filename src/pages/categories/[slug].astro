@@ -21,23 +21,28 @@ const cs = `var(--c${cat.color}s)`;
   <section class="hero" style="padding-bottom:32px; margin-bottom:32px">
     <div class="label">
       <span class="pulse" style={`background:${cvar};box-shadow:0 0 0 3px ${cs}`}></span>
-      Category · {posts.length} post{posts.length === 1 ? "" : "s"}
+      <span data-i18n-ko={`카테고리 · 글 ${posts.length}개`}>Category · {posts.length} post{posts.length === 1 ? "" : "s"}</span>
     </div>
-    <h1 style="font-size:52px">
+    <h1 data-lang-ui="en" style="font-size:52px">
       <em>{cat.name}</em>
       <span style="display:block; font-family:var(--kr); font-size:28px; font-style:normal; color:var(--muted); margin-top:8px; letter-spacing:-0.02em">{cat.ko}</span>
     </h1>
+    <h1 data-lang-ui="ko" class="kr" style="font-size:52px">
+      <em>{cat.ko}</em>
+      <span style="display:block; font-family:var(--mono); font-style:italic; font-size:24px; color:var(--muted); margin-top:8px; letter-spacing:-0.02em">{cat.name}</span>
+    </h1>
     <p>{cat.desc}</p>
     <div style="margin-top:14px">
-      <a href="/categories/" style="font-family:var(--mono); font-size:12px; color:var(--muted);">← all categories</a>
+      <a href="/categories/" style="font-family:var(--mono); font-size:12px; color:var(--muted);" data-i18n-ko="← 전체 카테고리">← all categories</a>
     </div>
   </section>
 
   <section class="block">
     <div class="sec-head">
       <div class="sec-head-l">
-        <div class="title">Posts in <em>{cat.name}</em></div>
-        <div class="count">{posts.length} published</div>
+        <div class="title" data-lang-ui="en">Posts in <em>{cat.name}</em></div>
+        <div class="title kr" data-lang-ui="ko"><em>{cat.ko}</em>의 글</div>
+        <div class="count">{posts.length} <span data-i18n-ko="게시됨">published</span></div>
       </div>
     </div>
 
@@ -63,7 +68,7 @@ const cs = `var(--c${cat.color}s)`;
                 </div>
               </div>
               <div class="right">
-                <span>read</span>
+                <span data-i18n-ko="읽기">read</span>
                 <span class="arr">↗</span>
               </div>
             </a>

@@ -19,19 +19,29 @@ function ArchivesView({ posts = [] }) {
   return (
     <>
       <section className="hero" style={{paddingBottom:32, marginBottom:32}}>
-        <div className="label"><span className="pulse"></span>Navigation · chronological</div>
-        <h1 style={{fontSize:52}}>
-          <em>Archives</em> — everything, in<br/>the order it was <span className="hl">written</span>.
-        </h1>
-        <p>A chronological index. Hollow dots are drafts; filled rows are published. The calendar shows writing density for the current month.</p>
+        <div data-lang-ui="en">
+          <div className="label"><span className="pulse"></span>Navigation · chronological</div>
+          <h1 style={{fontSize:52}}>
+            <em>Archives</em> — everything, in<br/>the order it was <span className="hl">written</span>.
+          </h1>
+          <p>A chronological index. Hollow dots are drafts; filled rows are published. The calendar shows writing density for the current month.</p>
+        </div>
+        <div data-lang-ui="ko">
+          <div className="label"><span className="pulse"></span>내비게이션 · 시간 순</div>
+          <h1 className="kr" style={{fontSize:52}}>
+            <em>아카이브</em> — 모든 글을<br/><span className="hl">쓰여진</span> 순서대로.
+          </h1>
+          <p className="kr">시간 순 색인. 빈 점은 초안, 꽉 찬 행은 게시된 글. 캘린더는 이번 달의 글쓰기 밀도를 보여준다.</p>
+        </div>
       </section>
 
       {/* calendar heatmap */}
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title">April <em>2026</em></div>
-            <div className="count">writing density</div>
+            <div className="title" data-lang-ui="en">April <em>2026</em></div>
+            <div className="title kr" data-lang-ui="ko"><em>2026</em>년 4월</div>
+            <div className="count" data-i18n-ko="글쓰기 밀도">writing density</div>
           </div>
         </div>
         <div style={{background:"var(--surface)", border:"1px solid var(--hair)", borderRadius:10, padding:22}}>
@@ -58,7 +68,7 @@ function ArchivesView({ posts = [] }) {
             })}
           </div>
           <div style={{display:"flex", justifyContent:"space-between", marginTop:14, fontFamily:"JetBrains Mono", fontSize:10, color:"var(--muted)", letterSpacing:".02em"}}>
-            <span>less</span>
+            <span data-i18n-ko="적음">less</span>
             <div style={{display:"flex", gap:3}}>
               {[0,1,2,3].map(n => (
                 <span key={n} style={{width:12, height:12, borderRadius:2,
@@ -69,7 +79,7 @@ function ArchivesView({ posts = [] }) {
                 }}></span>
               ))}
             </div>
-            <span>more · 6 posts in Apr</span>
+            <span data-i18n-ko="많음 · 4월 6개 글">more · 6 posts in Apr</span>
           </div>
         </div>
       </section>
@@ -78,11 +88,12 @@ function ArchivesView({ posts = [] }) {
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title">All <em>posts</em></div>
-            <div className="count">{all.length} entries · {all.filter(p=>p.draft).length} drafts</div>
+            <div className="title" data-lang-ui="en">All <em>posts</em></div>
+            <div className="title kr" data-lang-ui="ko">전체 <em>글</em></div>
+            <div className="count">{all.length} <span data-i18n-ko="건">entries</span> · {all.filter(p=>p.draft).length} <span data-i18n-ko="초안">drafts</span></div>
           </div>
           <div className="filters">
-            <a className="on">all</a><a>published</a><a>drafts</a>
+            <a className="on" data-i18n-ko="전체">all</a><a data-i18n-ko="게시됨">published</a><a data-i18n-ko="초안">drafts</a>
           </div>
         </div>
 
@@ -119,7 +130,7 @@ function ArchivesView({ posts = [] }) {
                       </div>
                     </div>
                     <div className="right">
-                      <span>{p.draft ? "—" : "read"}</span>
+                      {p.draft ? <span>—</span> : <span data-i18n-ko="읽기">read</span>}
                       <span className="arr">{p.draft ? "" : "↗"}</span>
                     </div>
                   </Tag>

@@ -51,14 +51,14 @@ const seriesCurrent = Object.fromEntries(
       <div class="topbar">
         <a href="/" class="logo"><span class="dot"></span>bluethestyle<span class="sub">/ field notes</span></a>
         <div class="tabs">
-          <a href="/" class={tab === "home" ? "on" : ""}>HOME</a>
-          <a href="/categories/" class={tab === "categories" ? "on" : ""}>CATEGORIES <span class="n">04</span></a>
-          <a href="/tags/" class={tab === "tags" ? "on" : ""}>TAGS <span class="n">09</span></a>
-          <a href="/archives/" class={tab === "archives" ? "on" : ""}>ARCHIVES <span class="n">06</span></a>
+          <a href="/" class={tab === "home" ? "on" : ""}><span data-i18n-ko="홈">HOME</span></a>
+          <a href="/categories/" class={tab === "categories" ? "on" : ""}><span data-i18n-ko="카테고리">CATEGORIES</span> <span class="n">04</span></a>
+          <a href="/tags/" class={tab === "tags" ? "on" : ""}><span data-i18n-ko="태그">TAGS</span> <span class="n">09</span></a>
+          <a href="/archives/" class={tab === "archives" ? "on" : ""}><span data-i18n-ko="아카이브">ARCHIVES</span> <span class="n">06</span></a>
         </div>
         <div class="tb-tools">
-          <div class="status"><span class="live"></span>writing</div>
-          <div class="search"><input placeholder="search…" /><span class="kbd">⌘K</span></div>
+          <div class="status"><span class="live"></span><span data-i18n-ko="집필중">writing</span></div>
+          <div class="search"><input placeholder="search…" data-i18n-ko-placeholder="검색…" /><span class="kbd">⌘K</span></div>
           <div class="lang-sw" role="group" aria-label="Language preference">
             <button type="button" data-lang="en" aria-pressed="false">EN</button>
             <button type="button" data-lang="ko" aria-pressed="false">한</button>
@@ -69,27 +69,28 @@ const seriesCurrent = Object.fromEntries(
       <aside class="sidebar-l">
         <div class="bio-card">
           <div class="avatar"></div>
-          <div class="who">Seonkyu Jeong</div>
-          <div class="role"><b>Independent researcher</b><br/>financial AI · MRM · agents<br/>GARP FRM · Seoul</div>
+          <div class="who" data-i18n-ko="정선규">Seonkyu Jeong</div>
+          <div class="role" data-lang-ui="en"><b>Independent researcher</b><br/>financial AI · MRM · agents<br/>GARP FRM · Seoul</div>
+          <div class="role kr" data-lang-ui="ko"><b>독립 연구자</b><br/>금융 AI · MRM · 에이전트<br/>GARP FRM · 서울</div>
         </div>
 
-        <div class="nav-label">Navigate</div>
+        <div class="nav-label" data-i18n-ko="바로가기">Navigate</div>
         <ul class="nav-list">
-          <li><a href="/" class={tab === "home" ? "on" : ""}><span class="nav-inner"><span class="num">01</span><span class="lbl">HOME</span></span></a></li>
-          <li><a href="/categories/" class={tab === "categories" ? "on" : ""}><span class="nav-inner"><span class="num">02</span><span class="lbl">CATEGORIES</span></span><span class="n">{CATEGORIES.length}</span></a></li>
-          <li><a href="/tags/" class={tab === "tags" ? "on" : ""}><span class="nav-inner"><span class="num">03</span><span class="lbl">TAGS</span></span><span class="n">{TAGS.length}</span></a></li>
-          <li><a href="/archives/" class={tab === "archives" ? "on" : ""}><span class="nav-inner"><span class="num">04</span><span class="lbl">ARCHIVES</span></span><span class="n">{publishedCount}</span></a></li>
+          <li><a href="/" class={tab === "home" ? "on" : ""}><span class="nav-inner"><span class="num">01</span><span class="lbl" data-i18n-ko="홈">HOME</span></span></a></li>
+          <li><a href="/categories/" class={tab === "categories" ? "on" : ""}><span class="nav-inner"><span class="num">02</span><span class="lbl" data-i18n-ko="카테고리">CATEGORIES</span></span><span class="n">{CATEGORIES.length}</span></a></li>
+          <li><a href="/tags/" class={tab === "tags" ? "on" : ""}><span class="nav-inner"><span class="num">03</span><span class="lbl" data-i18n-ko="태그">TAGS</span></span><span class="n">{TAGS.length}</span></a></li>
+          <li><a href="/archives/" class={tab === "archives" ? "on" : ""}><span class="nav-inner"><span class="num">04</span><span class="lbl" data-i18n-ko="아카이브">ARCHIVES</span></span><span class="n">{publishedCount}</span></a></li>
         </ul>
 
-        <div class="nav-label">Elsewhere</div>
+        <div class="nav-label" data-i18n-ko="다른 곳">Elsewhere</div>
         <div class="socials">
-          <a href="mailto:jsk320098@gmail.com"><span>Email</span><span class="arr">↗</span></a>
+          <a href="mailto:jsk320098@gmail.com"><span data-i18n-ko="이메일">Email</span><span class="arr">↗</span></a>
           <a href="https://github.com/bluethestyle" rel="me"><span>GitHub</span><span class="arr">↗</span></a>
           <a href={`https://orcid.org/${SITE.orcid}`} rel="me"><span>ORCID</span><span class="arr">↗</span></a>
           <a href="https://zenodo.org/communities/bluethestyle" rel="me"><span>Zenodo</span><span class="arr">↗</span></a>
         </div>
 
-        <div class="nav-label">Series · active</div>
+        <div class="nav-label" data-i18n-ko="진행중 시리즈">Series · active</div>
         <div class="series-mini">
           {SERIES.map((s) => {
             const n = seriesCurrent[s.slug] ?? s.ep;
@@ -105,9 +106,9 @@ const seriesCurrent = Object.fromEntries(
         <div class="kv">
           <div><span class="k">build</span>idx.2026.04</div>
           <div><span class="k">stack</span>astro · react</div>
-          <div><span class="k">last</span>{lastLabel}</div>
-          <div><span class="k">posts</span>{publishedCount}</div>
-          <div><span class="k">lic</span>cc by-nc 4.0</div>
+          <div><span class="k" data-i18n-ko="최근">last</span>{lastLabel}</div>
+          <div><span class="k" data-i18n-ko="글 수">posts</span>{publishedCount}</div>
+          <div><span class="k" data-i18n-ko="라이선스">lic</span>cc by-nc 4.0</div>
         </div>
       </aside>
       <!-- main -->
@@ -115,24 +116,24 @@ const seriesCurrent = Object.fromEntries(
       <!-- sidebar-r -->
       <aside class="sidebar-r">
         <div class="widget">
-          <div class="w-head"><h3>Index</h3><span class="n">live</span></div>
+          <div class="w-head"><h3 data-i18n-ko="인덱스">Index</h3><span class="n">live</span></div>
           <div class="stats">
-            <div class="stat"><div class="v">{publishedCount}</div><div class="l">posts</div></div>
-            <div class="stat"><div class="v">{CATEGORIES.length}</div><div class="l">categories</div></div>
-            <div class="stat"><div class="v">{TAGS.length}</div><div class="l">tags</div></div>
-            <div class="stat"><div class="v">{SITE.counts.years}</div><div class="l">years</div></div>
+            <div class="stat"><div class="v">{publishedCount}</div><div class="l" data-i18n-ko="글">posts</div></div>
+            <div class="stat"><div class="v">{CATEGORIES.length}</div><div class="l" data-i18n-ko="카테고리">categories</div></div>
+            <div class="stat"><div class="v">{TAGS.length}</div><div class="l" data-i18n-ko="태그">tags</div></div>
+            <div class="stat"><div class="v">{SITE.counts.years}</div><div class="l" data-i18n-ko="년">years</div></div>
           </div>
         </div>
 
         <div class="widget">
-          <div class="w-head"><h3>Recently updated</h3><span class="n">{RECENT.length}</span></div>
+          <div class="w-head"><h3 data-i18n-ko="최근 업데이트">Recently updated</h3><span class="n">{RECENT.length}</span></div>
           <div class="recent">
             {RECENT.map((r) => {
               const isKo = /[\uac00-\ud7af]/.test(r.title);
               return (
                 <a href={r.url || "#"}>
                   <div class="r-top">
-                    <span>today</span>
+                    <span data-i18n-ko="오늘">today</span>
                     <span>{r.date}</span>
                   </div>
                   <div class={"r-t" + (isKo ? " kr" : "")}>
@@ -146,7 +147,7 @@ const seriesCurrent = Object.fromEntries(
         </div>
 
         <div class="widget">
-          <div class="w-head"><h3>Trending tags</h3><span class="n">{TAGS.length}</span></div>
+          <div class="w-head"><h3 data-i18n-ko="인기 태그">Trending tags</h3><span class="n">{TAGS.length}</span></div>
           <div class="tags-w">
             {trendingTags.map((t) => (
               <a class={"tag-pill" + (t.hot ? " hot" : "")} href={`/tags/#${t.slug}`}>
@@ -159,19 +160,19 @@ const seriesCurrent = Object.fromEntries(
         <div class="widget">
           <div class="w-head"><h3>ORCID</h3></div>
           <div class="orcid">
-            <div class="hdr">Verified researcher</div>
+            <div class="hdr" data-i18n-ko="검증된 연구자">Verified researcher</div>
             <div class="id">{SITE.orcid}</div>
             <a class="link" href={`https://orcid.org/${SITE.orcid}`} rel="me">orcid.org ↗</a>
           </div>
         </div>
 
         <div class="widget">
-          <div class="w-head"><h3>Colophon</h3></div>
+          <div class="w-head"><h3 data-i18n-ko="콜로폰">Colophon</h3></div>
           <div class="kv">
-            <div><span class="k">theme</span>paper · ink · warm · vellum</div>
-            <div><span class="k">engine</span>astro · react</div>
-            <div><span class="k">host</span>github pages</div>
-            <div><span class="k">©</span>2026 {SITE.owner}</div>
+            <div><span class="k" data-i18n-ko="테마">theme</span>paper · ink · warm · vellum</div>
+            <div><span class="k" data-i18n-ko="엔진">engine</span>astro · react</div>
+            <div><span class="k" data-i18n-ko="호스트">host</span>github pages</div>
+            <div><span class="k">©</span>2026 <span data-i18n-ko="정선규">{SITE.owner}</span></div>
           </div>
         </div>
       </aside>
@@ -206,14 +207,51 @@ const seriesCurrent = Object.fromEntries(
       }
     </script>
     <script is:inline>
-      // Top-bar language preference. Persists across pages via localStorage.
-      // When a preference is set, html[data-lang-pref] enables CSS rules that
-      // hide non-matching list items. On post pages, if the clicked language
-      // differs from the current post's language and an alt_lang is wired,
-      // navigate to the alternate version.
+      // Top-bar language preference + UI-chrome translation. Persists across
+      // pages via localStorage.
+      //
+      // Two translation patterns supported:
+      //   1. Leaf-text swap — elements with data-i18n-ko (optionally
+      //      data-i18n-en) have their textContent swapped on toggle. The
+      //      original EN text is cached on first application.
+      //   2. Variant wrapper — elements with data-lang-ui="en|ko" are shown
+      //      or hidden as whole blocks. Default CSS hides KO variants so
+      //      pre-JS render shows EN only.
+      //
+      // Also handles placeholder attributes via data-i18n-ko-placeholder.
+      //
+      // On post pages, <body data-page-lang> + data-alt-lang enable
+      // cross-language navigation: clicking the other lang goes to alt_lang.
       (function () {
         const KEY = "lang-pref";
         const root = document.documentElement;
+
+        const applyI18n = (pref) => {
+          const lang = pref === "ko" ? "ko" : "en";
+          // Pattern 1: leaf-text swap
+          document.querySelectorAll("[data-i18n-ko]").forEach((el) => {
+            if (el.dataset.i18nEnCache === undefined) {
+              el.dataset.i18nEnCache = el.dataset.i18nEn !== undefined ? el.dataset.i18nEn : el.textContent;
+            }
+            el.textContent = lang === "ko" ? el.dataset.i18nKo : el.dataset.i18nEnCache;
+          });
+          // Placeholder attribute swap
+          document.querySelectorAll("[data-i18n-ko-placeholder]").forEach((el) => {
+            if (el.dataset.i18nEnPlaceholderCache === undefined) {
+              el.dataset.i18nEnPlaceholderCache = el.getAttribute("placeholder") || "";
+            }
+            el.setAttribute(
+              "placeholder",
+              lang === "ko" ? el.dataset.i18nKoPlaceholder : el.dataset.i18nEnPlaceholderCache,
+            );
+          });
+          // Pattern 2: variant wrappers
+          document.querySelectorAll("[data-lang-ui]").forEach((el) => {
+            const variant = el.getAttribute("data-lang-ui");
+            el.style.display = variant === lang ? "" : "none";
+          });
+        };
+
         const applyPref = (pref) => {
           if (pref === "en" || pref === "ko") {
             root.setAttribute("data-lang-pref", pref);
@@ -225,8 +263,11 @@ const seriesCurrent = Object.fromEntries(
             b.classList.toggle("on", !!on);
             b.setAttribute("aria-pressed", on ? "true" : "false");
           });
+          applyI18n(pref);
         };
+
         applyPref(localStorage.getItem(KEY));
+
         document.querySelectorAll(".lang-sw button[data-lang]").forEach((btn) => {
           btn.addEventListener("click", () => {
             const clicked = btn.getAttribute("data-lang");

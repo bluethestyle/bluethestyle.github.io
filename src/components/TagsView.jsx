@@ -9,22 +9,32 @@ function TagsView() {
   return (
     <>
       <section className="hero" style={{paddingBottom:32, marginBottom:32}}>
-        <div className="label"><span className="pulse"></span>Navigation · {tags.length} tags</div>
-        <h1 style={{fontSize:52}}>
-          <em>Tags</em> — 자주 다루는 주제들,<br/>사이즈는 빈도.
-        </h1>
-        <p>Sized by frequency. Hot tags are currently driving most of the writing. Click any tag to filter the archive.</p>
+        <div data-lang-ui="en">
+          <div className="label"><span className="pulse"></span>Navigation · {tags.length} tags</div>
+          <h1 style={{fontSize:52}}>
+            <em>Tags</em> — the topics covered<br/>most often, sized by frequency.
+          </h1>
+          <p>Sized by frequency. Hot tags are currently driving most of the writing. Click any tag to filter the archive.</p>
+        </div>
+        <div data-lang-ui="ko">
+          <div className="label"><span className="pulse"></span>내비게이션 · 태그 {tags.length}개</div>
+          <h1 className="kr" style={{fontSize:52}}>
+            <em>태그</em> — 자주 다루는 주제들,<br/>사이즈는 빈도.
+          </h1>
+          <p className="kr">빈도에 따라 크기가 결정된다. hot 태그는 최근 글쓰기를 주도하고 있다. 태그를 클릭하면 해당 태그의 글로 이동한다.</p>
+        </div>
       </section>
 
       {/* cloud */}
       <section className="block">
         <div className="sec-head">
           <div className="sec-head-l">
-            <div className="title">Tag <em>cloud</em></div>
-            <div className="count">sized by post count</div>
+            <div className="title" data-lang-ui="en">Tag <em>cloud</em></div>
+            <div className="title kr" data-lang-ui="ko">태그 <em>구름</em></div>
+            <div className="count" data-i18n-ko="글 수 기준 크기">sized by post count</div>
           </div>
           <div className="filters">
-            <a className="on">by count</a><a>a–z</a><a>recent</a>
+            <a className="on" data-i18n-ko="빈도순">by count</a><a data-i18n-ko="가나다순">a–z</a><a data-i18n-ko="최근순">recent</a>
           </div>
         </div>
 

@@ -361,6 +361,10 @@ html[data-lang-pref="ko"] [data-lang-post="en"] {
   display: none !important;
 }
 
+/* UI-chrome variant wrappers: default to showing EN only. The applyI18n
+   script toggles inline style.display once the preference is known. */
+[data-lang-ui="ko"] { display: none; }
+
 /* ============ LEFT SIDEBAR ============ */
 .sidebar-l { grid-column: 1; grid-row: 2; }
 .bio-card {
