@@ -271,6 +271,16 @@ task conflicts in the *feature path*; adaTT measured the remaining
 conflicts in the *gradient path* and turned them back into cooperation
 — two sub-threads taking on two faces of the same MTL problem.
 
+> **Open experimental result — adaTT removal under consideration.**
+> As flagged in ADATT-1: on the synthetic-data benchmark, PLE+adaTT
+> shows no clear performance gap over PLE-only. The same comparison
+> is now running on real data (card transaction logs). If the
+> result reproduces, *removing adaTT* from the stack is the plan.
+> These four posts stay in either case — a record of "why we tried
+> this design, and the basis on which we pulled it" is, for the next
+> person, a map marked 'already tried here, move on'. (Update: the
+> real-data results will be shared in a separate post.)
+
 From here, we move on to the mathematical foundations of each of the
 seven heterogeneous Shared Experts. Sub-threads will open for CausalOT
 (causal inference + optimal transport), TDA (topological data

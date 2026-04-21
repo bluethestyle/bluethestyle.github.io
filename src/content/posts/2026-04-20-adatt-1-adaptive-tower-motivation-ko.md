@@ -22,6 +22,14 @@ ADATT-1 → ADATT-4 에 걸쳐 본 프로젝트의 adaTT(Adaptive Task Transfer)
 라는 설계 결정 하나에서 출발해, Transformer Attention 과의 유비,
 Conditional Computation · Hypernetwork 계보에서의 위치까지 따라간다.*
 
+> **잠정적 상태 — 합성 데이터에서 효용 미확인.** 솔직히 적어둔다.
+> 현재까지 합성 데이터 벤치마크에서 adaTT 를 붙인 PLE 와 붙이지 않은
+> PLE 사이에 뚜렷한 성능 차이가 관찰되지 않는다. 실 데이터에서도 동일한
+> 결과라면 *adaTT 를 제거* 하는 방향이 합리적이다. 아래 4편은 제거를
+> 전제로 쓰이지 않고 "왜 이 설계를 선택했는가" 를 남기는 기록에
+> 가깝다 — 쓸모가 없다고 판명되더라도 그 판단의 수학적·공학적 근거는
+> 가치가 있다고 본다.
+
 ## PLE 가 다 해결하지 못한 것 — gradient 충돌
 
 PLE-2 는 피처 경로에서 "어떤 태스크가 어떤 Expert 를 보느냐" 를 CGC

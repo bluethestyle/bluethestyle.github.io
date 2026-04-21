@@ -25,6 +25,16 @@ adaptive tower?" — and walks through its analogy with Transformer
 Attention and its position in the Conditional Computation /
 Hypernetwork lineage.*
 
+> **Provisional status — no measurable benefit on synthetic data.**
+> Stated plainly: on the synthetic-data benchmarks so far, PLE with
+> adaTT shows no clear performance gap against PLE without adaTT. If
+> the real-data evaluation confirms the same, *removing adaTT* is the
+> reasonable move. The four posts that follow are not written under
+> an assumption of removal — they are a record of "why we chose this
+> design." Even if the component turns out to be unused, the
+> mathematical and engineering reasoning behind the choice is worth
+> preserving.
+
 ## What PLE Did Not Fix — Gradient Conflict
 
 PLE-2 split "which task looks at which expert" in the feature path via
