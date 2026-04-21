@@ -42,7 +42,12 @@ const seriesCurrent = Object.fromEntries(
       src="//gc.zgo.at/count.js"
     ></script>
     <style is:global>
-      :root { --display: "Fraunces", Georgia, serif; --sans: "Inter Tight", -apple-system, sans-serif; --mono: "JetBrains Mono", monospace; --kr: "SUIT Variable", -apple-system, sans-serif; }
+      :root {
+        --display: "Fraunces", "SUIT Variable", Georgia, serif;
+        --sans: "Inter Tight", "SUIT Variable", -apple-system, sans-serif;
+        --mono: "JetBrains Mono", "SUIT Variable", monospace;
+        --kr: "SUIT Variable", -apple-system, sans-serif;
+      }
     </style>
   </head>
   <body data-theme="paper" data-page-lang={currentLang ?? ""} data-alt-lang={altLang ?? ""}>
@@ -228,7 +233,7 @@ const seriesCurrent = Object.fromEntries(
 
         const applyI18n = (pref) => {
           const lang = pref === "ko" ? "ko" : "en";
-          // Pattern 1: leaf-text swap
+          // Pattern 1: leaf-text swap. EN original is cached on first run.
           document.querySelectorAll("[data-i18n-ko]").forEach((el) => {
             if (el.dataset.i18nEnCache === undefined) {
               el.dataset.i18nEnCache = el.dataset.i18nEn !== undefined ? el.dataset.i18nEn : el.textContent;
@@ -245,11 +250,8 @@ const seriesCurrent = Object.fromEntries(
               lang === "ko" ? el.dataset.i18nKoPlaceholder : el.dataset.i18nEnPlaceholderCache,
             );
           });
-          // Pattern 2: variant wrappers
-          document.querySelectorAll("[data-lang-ui]").forEach((el) => {
-            const variant = el.getAttribute("data-lang-ui");
-            el.style.display = variant === lang ? "" : "none";
-          });
+          // Pattern 2: variant wrappers are toggled by pure CSS rules
+          // keyed on html[data-lang-pref]. No JS manipulation needed.
         };
 
         const applyPref = (pref) => {

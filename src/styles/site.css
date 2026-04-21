@@ -361,9 +361,17 @@ html[data-lang-pref="ko"] [data-lang-post="en"] {
   display: none !important;
 }
 
-/* UI-chrome variant wrappers: default to showing EN only. The applyI18n
-   script toggles inline style.display once the preference is known. */
-[data-lang-ui="ko"] { display: none; }
+/* UI-chrome variant wrappers: CSS-only toggle based on <html>
+   data-lang-pref. Default (no preference) shows EN, hides KO.
+   Explicit "en" same as default. "ko" flips. Pure CSS so no JS
+   display fight. */
+html:not([data-lang-pref="ko"]) [data-lang-ui="ko"],
+html[data-lang-pref="en"] [data-lang-ui="ko"] {
+  display: none !important;
+}
+html[data-lang-pref="ko"] [data-lang-ui="en"] {
+  display: none !important;
+}
 
 /* ============ LEFT SIDEBAR ============ */
 .sidebar-l { grid-column: 1; grid-row: 2; }
