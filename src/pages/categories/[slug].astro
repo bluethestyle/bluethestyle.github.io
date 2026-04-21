@@ -47,7 +47,7 @@ const cs = `var(--c${cat.color}s)`;
         {posts.map((p) => {
           const isKo = p.lang === "KO";
           return (
-            <a class="post-row" href={p.url}>
+            <a class="post-row" href={p.url} data-lang-post={(p.lang||"").toLowerCase()}>
               <div>
                 <div class="meta-line">
                   <span>{p.date.slice(5).replace("-", " · ")}</span>

@@ -2,7 +2,7 @@
 import "../styles/site.css";
 import { SITE, TAGS, CATEGORIES, SERIES } from "../data.js";
 import { loadPosts, loadRecent } from "../lib/posts.js";
-const { title = "bluethestyle", tab = "home" } = Astro.props;
+const { title = "bluethestyle", tab = "home", altLang, currentLang } = Astro.props;
 const trendingTags = [...TAGS].sort((a, b) => b.count - a.count).slice(0, 9);
 
 const posts = await loadPosts();
@@ -45,7 +45,7 @@ const seriesCurrent = Object.fromEntries(
       :root { --display: "Fraunces", Georgia, serif; --sans: "Inter Tight", -apple-system, sans-serif; --mono: "JetBrains Mono", monospace; --kr: "SUIT Variable", -apple-system, sans-serif; }
     </style>
   </head>
-  <body data-theme="paper">
+  <body data-theme="paper" data-page-lang={currentLang ?? ""} data-alt-lang={altLang ?? ""}>
     <div class="frame">
       <!-- topbar -->
       <div class="topbar">
@@ -59,7 +59,10 @@ const seriesCurrent = Object.fromEntries(
         <div class="tb-tools">
           <div class="status"><span class="live"></span>writing</div>
           <div class="search"><input placeholder="search…" /><span class="kbd">⌘K</span></div>
-          <div class="lang-sw"><button class="on">EN</button><button>한</button></div>
+          <div class="lang-sw" role="group" aria-label="Language preference">
+            <button type="button" data-lang="en" aria-pressed="false">EN</button>
+            <button type="button" data-lang="ko" aria-pressed="false">한</button>
+          </div>
         </div>
       </div>
       <!-- sidebar-l -->
@@ -201,6 +204,46 @@ const seriesCurrent = Object.fromEntries(
         });
         await mermaid.run({ nodes: diagrams });
       }
+    </script>
+    <script is:inline>
+      // Top-bar language preference. Persists across pages via localStorage.
+      // When a preference is set, html[data-lang-pref] enables CSS rules that
+      // hide non-matching list items. On post pages, if the clicked language
+      // differs from the current post's language and an alt_lang is wired,
+      // navigate to the alternate version.
+      (function () {
+        const KEY = "lang-pref";
+        const root = document.documentElement;
+        const applyPref = (pref) => {
+          if (pref === "en" || pref === "ko") {
+            root.setAttribute("data-lang-pref", pref);
+          } else {
+            root.removeAttribute("data-lang-pref");
+          }
+          document.querySelectorAll(".lang-sw button[data-lang]").forEach((b) => {
+            const on = pref && b.getAttribute("data-lang") === pref;
+            b.classList.toggle("on", !!on);
+            b.setAttribute("aria-pressed", on ? "true" : "false");
+          });
+        };
+        applyPref(localStorage.getItem(KEY));
+        document.querySelectorAll(".lang-sw button[data-lang]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const clicked = btn.getAttribute("data-lang");
+            const current = localStorage.getItem(KEY);
+            const next = current === clicked ? null : clicked;
+            if (next) localStorage.setItem(KEY, next);
+            else localStorage.removeItem(KEY);
+            applyPref(next);
+            const body = document.body;
+            const pageLang = (body.getAttribute("data-page-lang") || "").toLowerCase();
+            const alt = body.getAttribute("data-alt-lang") || "";
+            if (next && alt && pageLang && pageLang !== next) {
+              window.location.href = alt;
+            }
+          });
+        });
+      })();
     </script>
   </body>
 </html>

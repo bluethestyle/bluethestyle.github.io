@@ -87,7 +87,7 @@ const enriched = entries.map((entry) => {
             const dateShort = p.data.date.toISOString().slice(5, 10).replace("-", " · ");
             const langUp = p.data.lang.toUpperCase();
             return (
-              <a class="post-row" href={p._url}>
+              <a class="post-row" href={p._url} data-lang-post={(p.data.lang || "").toLowerCase()}>
                 <div>
                   <div class="meta-line">
                     <span class="cat">EP {p.data.part ?? "?"}</span>

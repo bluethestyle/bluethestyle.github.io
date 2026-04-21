@@ -99,7 +99,7 @@ function ArchivesView({ posts = [] }) {
                 const Tag = p.draft ? "div" : "a";
                 const href = p.draft ? undefined : p.url;
                 return (
-                  <Tag key={i} className={"post-row" + (p.draft ? " draft" : "")} href={href}>
+                  <Tag key={i} className={"post-row" + (p.draft ? " draft" : "")} href={href} data-lang-post={(p.lang||"").toLowerCase()}>
                     <div>
                       <div className="meta-line">
                         <span>{p.date.slice(8)}</span>

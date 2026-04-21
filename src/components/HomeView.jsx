@@ -193,7 +193,7 @@ function HomeView({ lang, posts = [] }) {
           <div className="year">2026</div>
           <div>
             {latest.map((p,i) => (
-              <a key={i} className="post-row" href={p.url || "#"}>
+              <a key={i} className="post-row" href={p.url || "#"} data-lang-post={(p.lang||"").toLowerCase()}>
                 <div>
                   <div className="meta-line">
                     <span>{p.date.slice(5).replace("-"," · ")}</span>

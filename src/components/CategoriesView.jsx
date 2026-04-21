@@ -62,7 +62,7 @@ function CategoriesView({ posts = [] }) {
                 <p style={{fontSize:13.5, color:"var(--ink-2)", margin:"0 0 18px", lineHeight:1.55, maxWidth:420}}>{c.desc}</p>
                 <div style={{display:"flex", gap:5, flexWrap:"wrap"}}>
                   {POSTS.filter(p=>!p.draft && (p.cat===c.name || p.cat===c.ko)).slice(0,4).map((p,j)=>(
-                    <span key={j} style={{fontFamily:"JetBrains Mono", fontSize:10, padding:"3px 7px", background:cs, color:cvar, borderRadius:3, letterSpacing:".02em"}}>
+                    <span key={j} data-lang-post={(p.lang||"").toLowerCase()} style={{fontFamily:"JetBrains Mono", fontSize:10, padding:"3px 7px", background:cs, color:cvar, borderRadius:3, letterSpacing:".02em"}}>
                       {p.lang}·{p.date.slice(5)}
                     </span>
                   ))}
