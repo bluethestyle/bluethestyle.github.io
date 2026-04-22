@@ -67,6 +67,45 @@ A unified table collapses to the strictest policy across the set,
 which inflates storage cost without improving any individual
 audit.
 
+## One customer request, seven audit writes
+
+To see how these tables coordinate, follow one 14:37:08 customer
+request from April 2026 — the kind the 2027 regulator will later
+ask about.
+
+14:37:08.112 — a bank branch employee submits a recommendation
+request on behalf of the customer. The Lambda handler validates
+the payload. `log_data_access` entry #1: operator ID, customer
+ID, access reason "branch-initiated recommendation".
+
+14:37:08.241 — the LightGBM model (distilled from PLE) runs
+inference. `log_model_inference` entry: prediction scores across
+13 tasks, model version pointer, feature-tensor hash.
+
+14:37:08.263 — per-feature contributions computed.
+`log_attribution` entry: top-K features with SHAP-like scores,
+expert gate weights.
+
+14:37:08.305 — the Safety Gate agent reviews the generated
+explanation for regulatory, suitability, hallucination, tone,
+and factuality criteria. All pass. `log_guardrail` entry:
+decision "pass", criteria scores.
+
+14:37:08.412 — the response leaves the Lambda handler and
+reaches the branch employee's screen.
+
+That's four tables touched in ~300ms. The remaining three
+(`log_operation`, `log_dimension_change`, `log_model_promotion`)
+aren't touched during inference — they fire on system-state
+transitions (retrains, schema changes, promotions), not per
+request. That separation is why the per-request overhead stays
+bounded.
+
+One year and five months later, when the dispute arrives, all
+four entries are in their respective tables with their
+`prev_hash` links intact. A single join reconstructs the entire
+decision path, byte for byte.
+
 ## HMAC hash chain — why this isn't "just a log"
 
 An entry is not simply written. When `log_operation()` is called,

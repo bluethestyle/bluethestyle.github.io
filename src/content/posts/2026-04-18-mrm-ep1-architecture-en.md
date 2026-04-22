@@ -38,6 +38,16 @@ This is the *validation-first* picture. MRM is a gate, applied
 Basel-style risk management, and it has served credit and market
 risk modeling well for twenty years.
 
+What this looks like at a mid-size Korean institution, concretely:
+every quarter, the model-risk team receives a packet — performance
+charts, stability plots, sample predictions, and a narrative
+summary. They review it over two weeks, flag questions, schedule a
+committee meeting, and sign off. For a logistic regression trained
+on last year's loan book, this cadence is roughly right. The
+model hasn't changed since the last packet; the regulatory
+environment hasn't moved; customer distributions shift
+gradually. Quarterly is fast enough.
+
 It starts to break when the "model" stops being a logistic
 regression and starts being an *agent pipeline*.
 
@@ -131,6 +141,28 @@ override is an API endpoint, not an organizational process.
 Disabling the entire pipeline takes one call; disabling a
 specific task takes another. The operator's ability to stop the
 system is not dependent on a ticket queue.
+
+## How we arrived at this approach
+
+None of the five properties above were in the original project
+plan. The original plan was the conventional one — build the
+model, write the validation report, hand it to the MRM team
+quarterly. What changed it was running into specific failure
+modes as the agent pipeline took shape. The first Reason
+Generator we tested produced a plausible-but-factually-wrong
+recommendation, and we asked "how would the MRM team have caught
+this if we'd shipped it?" — the honest answer was "they wouldn't,
+because they see outputs, not the process that generated them".
+That's where the "explainability as structural output" property
+came from.
+
+Each of the other four properties followed a similar route — a
+concrete failure mode or regulatory question that the
+validation-first template couldn't answer, and a structural
+change that made the question *not require* an out-of-band
+process to answer. This episode frames the outcome, but the
+subsequent episodes walk through the specific scenes that forced
+each property into existence.
 
 ## Why the architectural approach is not "MRM is dead"
 
