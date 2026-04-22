@@ -580,6 +580,16 @@ html[data-lang-pref="ko"] [data-lang-ui="en"] {
   background: linear-gradient(180deg, transparent 62%, var(--accent-soft) 62%);
   padding: 0 2px;
 }
+/* Korean hero heading: Fraunces at 58px / weight 400 falls through to
+   SUIT for Hangul glyphs, which reads far heavier than the English
+   equivalent. Editorial Korean blogs favor a lighter display; drop the
+   size and weight when the hero is explicitly flagged as Korean. */
+.hero h1.kr-hero {
+  font-size: 44px;
+  font-weight: 300;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+}
 .hero p {
   font-size: 15.5px;
   line-height: 1.6;

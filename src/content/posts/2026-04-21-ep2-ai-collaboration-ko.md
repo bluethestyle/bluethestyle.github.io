@@ -9,7 +9,7 @@ series: three-months
 part: 2
 alt_lang: /2026/04/21/ep2-ai-collaboration-en/
 next_title: "에피소드 3 — 우리의 적응 방식: 가드레일, 메모리 뱅크, 계약 검증"
-next_desc: "3인 × AI 팀이 병렬로 굴러가면서도 일관성을 잃지 않았던 실제 장치들 — CLAUDE.md 헌법, 8개 컨텍스트 파일 메모리 뱅크, .claude/RULES.md ↔ .cursorrules 동기화, 매 병렬 작업 후 인터페이스 키 매칭 검증."
+next_desc: "3인 × AI 팀이 병렬로 굴러가면서도 일관성을 잃지 않았던 실제 장치들 — CLAUDE.md 기본 규약, 초기의 8 파일 수동 메모리 뱅크에서 auto-memory 로의 이행, 매 병렬 작업 후 인터페이스 키 매칭 검증."
 next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/development_story.pdf
 source_label: "개발 스토리 (KO, PDF) §2"
@@ -79,7 +79,7 @@ GitHub 기반 코드 환경 구성, 프로젝트 구조 설계, 초기 보일러
 
 이 단계의 가장 중요한 산출물은 6편의 초기 설계 문서 (00-09 아키텍처
 명세) 와 `CLAUDE.md` 가드레일 수립이었다. Config-driven 원칙, 관심사
-분리, 리키지 방지 규칙 — 이후 모든 AI 에이전트가 따라야 할 "헌법" 이
+분리, 리키지 방지 규칙 — 이후 모든 AI 에이전트가 따라야 할 기본 규약이
 *코드 한 줄 작성되기 전에* 확립됐다. 순서가 의도적이었다: 가드레일이
 먼저, 에이전트 실행이 그다음. 이 순서를 반대로 했다면 Phase D 의
 병렬 구현이 통합 지점에서 깨졌을 것이다.
@@ -182,7 +182,7 @@ sigmoid ↔ softmax 아크가 이 역량의 가장 좋은 예다. 실험 분석 
 한 것* 은 인간의 판단이었다.
 
 **에이전트 전에 가드레일을 세운다.** `CLAUDE.md` 는 코드가 아니라
-코드 *이전에* 작성됐다. 헌법이 먼저이고 입법이 나중인 것처럼.
+코드 *이전에* 작성됐다. 규약이 먼저이고 구현이 나중인 순서.
 
 **이종 AI = 이종 전문가.** 모델의 이종 전문가 설계 철학이 개발 도구
 선택에도 그대로 적용됐다. 각 AI 도구가 특화된 역할을 수행하면서,
