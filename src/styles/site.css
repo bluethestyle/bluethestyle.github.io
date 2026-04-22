@@ -252,12 +252,16 @@ html[data-lang-pref="ko"] [data-lang-ui="ko"] * {
 /* Italic in Korean headings reads as a fake slant (SUIT Variable
    has no italic cut), so strip italicization inside .kr elements
    and KO variant wrappers. <em> still marks emphasis semantically
-   but renders upright. */
-.kr em,
-.kr i,
-[data-lang-ui="ko"] em,
-[data-lang-ui="ko"] i {
-  font-style: normal;
+   but renders upright. !important is required because existing
+   rules like ".sec-head .title em" and ".hero h1 em" win on
+   specificity. */
+.kr,
+.kr *,
+[data-lang-ui="ko"],
+[data-lang-ui="ko"] *,
+html[data-lang-pref="ko"] .kr,
+html[data-lang-pref="ko"] .kr * {
+  font-style: normal !important;
 }
 
 /* ============ FRAME ============ */
