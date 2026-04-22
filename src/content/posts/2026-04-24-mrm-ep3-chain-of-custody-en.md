@@ -43,8 +43,8 @@ the structure that produces that precision.
 
 ## Seven tables, divided by concern
 
-`core/monitoring/audit_logger.py` exposes seven `log_*` methods,
-each writing to a separate audit table:
+The audit-logger module exposes seven `log_*` methods, each
+writing to a separate audit table:
 
 - `log_operation` — system state transitions (retrain
   start/finish, promotion, serving-manifest swap)
@@ -124,7 +124,7 @@ three things happen at once:
 1. **Entry serialization** — timestamp, event type, and payload
    normalized to canonical JSON.
 2. **HMAC signing** — the previous entry's hash combined with the
-   current entry's content, signed with `AUDIT_HMAC_SECRET_KEY`.
+   current entry's content, signed with the audit-signing key.
 3. **Chain linking** — the current entry's `prev_hash` field
    carries the previous entry's hash.
 
@@ -132,7 +132,7 @@ One property this buys — *modifying entry n requires re-signing
 n+1, n+2, …, up to the latest entry*. Impossible without the HMAC
 key. Tamper-evidence becomes structural, not a matter of trust.
 
-On the AWS side, `AUDIT_HMAC_SECRET_KEY` lives in SSM Parameter
+On the AWS side, the audit-signing key lives in SSM Parameter
 Store (SecureString) and is only reachable by Lambda roles at
 runtime. Key exposure is catastrophic — it breaks the entire chain
 — so this is one of MRM oversight's *individual verification
@@ -236,7 +236,7 @@ Still human work:
 - Whether the seven-way table split remains correct (new
   regulation might require a new table or a schema change).
 - Meta-audit — is the AuditAgent's nightly job actually running.
-- Whether `AUDIT_HMAC_SECRET_KEY` management satisfies SR 11-7
+- Whether the audit-signing key management satisfies SR 11-7
   Pillar 4 (governance) standards.
 
 The misreading "audit is automated so the MRM committee is
@@ -256,6 +256,5 @@ of doing so.
 
 Source material:
 [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052) §4
-"Audit infrastructure". Implementation lives in
-`core/monitoring/audit_logger.py` and the `core/compliance/`
-submodules.
+"Audit infrastructure"; implementation lives in the
+[open-source repo](https://github.com/bluethestyle/aws_ple_for_financial).

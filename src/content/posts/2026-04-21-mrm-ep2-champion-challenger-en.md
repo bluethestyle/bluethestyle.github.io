@@ -252,7 +252,5 @@ EU AI Act Article 13-14 (transparency, human oversight) and KFCPA
 paths rather than checklists.
 
 Source material:
-[Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052) §4-5.
-Implementation lives in `scripts/submit_pipeline.py`,
-`core/evaluation/model_competition.py`, and
-`core/monitoring/audit_logger.py`.
+[Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052) §4-5,
+and the [open-source repo](https://github.com/bluethestyle/aws_ple_for_financial).
