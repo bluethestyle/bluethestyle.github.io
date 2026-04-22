@@ -17,7 +17,7 @@ source_label: "Development Story (EN, PDF)"
 
 *Part 1 of "Building a Financial AI in Three Months" — a series on
 building a financial recommendation system with Claude Code, on
-consumer hardware, as three people on personal time.*
+consumer hardware, as a three-person team.*
 
 ## What we were replacing
 

@@ -130,9 +130,9 @@ export const EXCERPTS = {
   "/2026/04/18/mrm-ep1-architecture-en/":
     "Part 1 of 'The MRM Thread' — a short parallel series on regulatory compliance and model risk management for AI recommendation systems, written from a GARP FRM practitioner perspective.",
   "/2026/04/18/ep1-premise-ko/":
-    "시리즈 '3개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.",
+    "시리즈 '3개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명 팀이 금융 추천 시스템을 만든 이야기.",
   "/2026/04/18/ep1-premise-en/":
-    "Part 1 of 'Building a Financial AI in Three Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as three people on personal time.",
+    "Part 1 of 'Building a Financial AI in Three Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
 };
 
 /**

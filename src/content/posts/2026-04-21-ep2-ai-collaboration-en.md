@@ -23,7 +23,7 @@ Code was the non-substitutable one in the implementation phase.*
 
 ## Phase-tool pairing as a frame
 
-The constraints from Ep 1 — three people, one GPU, personal time —
+The constraints from Ep 1 — three people, one GPU, limited resources —
 did not only force the architecture. They also forced *how the
 AI collaboration itself was organized*. The "one Claude
 subscription covers everything" mindset collapsed within the first

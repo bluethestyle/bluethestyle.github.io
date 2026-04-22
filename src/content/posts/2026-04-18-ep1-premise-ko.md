@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "개발 스토리 (KO, PDF)"
 ---
 
-*시리즈 "3개월간의 금융 AI 개발기" 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명이 개인 시간에 금융 추천 시스템을 만든 이야기.*
+*시리즈 "3개월간의 금융 AI 개발기" 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명 팀이 금융 추천 시스템을 만든 이야기.*
 
 ## 우리가 대체하려 한 것
 
