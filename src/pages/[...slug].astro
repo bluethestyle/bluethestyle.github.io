@@ -88,7 +88,16 @@ const T = isKo
       source: "Source",
     };
 ---
-<Base title={post.data.title} tab="" altLang={post.data.alt_lang} currentLang={post.data.lang}>
+<Base
+  title={post.data.title}
+  tab=""
+  altLang={post.data.alt_lang}
+  currentLang={post.data.lang}
+  description={post.data.excerpt}
+  ogType="article"
+  publishedTime={d.toISOString()}
+  tags={post.data.tags}
+>
   <article class="post">
     <div class="post-head">
       <div class="meta-line">

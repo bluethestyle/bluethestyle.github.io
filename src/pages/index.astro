@@ -4,6 +4,10 @@ import HomeView from "../components/HomeView.jsx";
 import { loadPosts } from "../lib/posts.js";
 const posts = await loadPosts();
 ---
-<Base title="bluethestyle / field notes" tab="home">
+<Base
+  title="bluethestyle / field notes"
+  tab="home"
+  description="Independent research notes on financial AI, model risk management, and agentic systems. Zenodo-archived papers, open-source code, and long-form decision journeys from a three-person team building in public."
+>
   <HomeView client:load lang="en" posts={posts} />
 </Base>

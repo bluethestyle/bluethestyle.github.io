@@ -2,7 +2,36 @@
 import "../styles/site.css";
 import { SITE, TAGS, CATEGORIES, SERIES } from "../data.js";
 import { loadPosts, loadRecent } from "../lib/posts.js";
-const { title = "bluethestyle", tab = "home", altLang, currentLang } = Astro.props;
+const {
+  title = "bluethestyle",
+  tab = "home",
+  altLang,
+  currentLang,
+  description,
+  ogImage,
+  ogType = "website",
+  publishedTime,
+  tags: pageTags,
+} = Astro.props;
+
+// Canonical URL for this page (uses Astro.site from astro.config.mjs).
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+
+// Default site-wide description. Specific pages override via the
+// `description` prop.
+const SITE_DESCRIPTION =
+  "Field notes on financial AI, model risk management, and agentic systems — " +
+  "papers, decisions, failed experiments. By Seonkyu Jeong (GARP FRM, Seoul).";
+
+const pageDescription = description ?? SITE_DESCRIPTION;
+
+// Default Open Graph image. Lives in /public so it is served at the
+// root of the deployed site.
+const DEFAULT_OG_IMAGE = "/og-default.png";
+const resolvedOgImage = new URL(
+  ogImage ?? DEFAULT_OG_IMAGE,
+  Astro.site,
+).toString();
 const trendingTags = [...TAGS].sort((a, b) => b.count - a.count).slice(0, 9);
 
 const posts = await loadPosts();
@@ -31,6 +60,30 @@ const seriesCurrent = Object.fromEntries(
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="author" content={SITE.owner} />
+    <link rel="canonical" href={canonicalUrl} />
+    {/* Open Graph */}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="bluethestyle / field notes" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={resolvedOgImage} />
+    {currentLang && <meta property="og:locale" content={currentLang === "ko" ? "ko_KR" : "en_US"} />}
+    {altLang && currentLang && (
+      <meta property="og:locale:alternate" content={currentLang === "ko" ? "en_US" : "ko_KR"} />
+    )}
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {pageTags && pageTags.map((t) => <meta property="article:tag" content={t} />)}
+    {/* Twitter Card (Twitter/X crawler + LinkedIn / Slack / Discord preview) */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+    {/* RSS alternate — discoverable by feed readers and Anthropic-style
+       automated content ingestion. */}
+    <link rel="alternate" type="application/rss+xml" title="bluethestyle / field notes" href="/rss.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -93,6 +146,28 @@ const seriesCurrent = Object.fromEntries(
           <a href="https://github.com/bluethestyle" rel="me"><span>GitHub</span><span class="arr">↗</span></a>
           <a href={`https://orcid.org/${SITE.orcid}`} rel="me"><span>ORCID</span><span class="arr">↗</span></a>
           <a href="https://zenodo.org/communities/bluethestyle" rel="me"><span>Zenodo</span><span class="arr">↗</span></a>
+        </div>
+
+        <div class="nav-label" data-i18n-ko="현재 프로젝트">Current project</div>
+        <div class="socials">
+          <a href="https://github.com/bluethestyle/aws_ple_for_financial" rel="me">
+            <span data-i18n-ko="레포 (코드)">Repo (code)</span><span class="arr">↗</span>
+          </a>
+          <a href="https://github.com/bluethestyle/aws_ple_for_financial/issues" rel="me">
+            <span data-i18n-ko="이슈">Issues</span><span class="arr">↗</span>
+          </a>
+          <a href="https://github.com/bluethestyle/bluethestyle.github.io/discussions" rel="me">
+            <span data-i18n-ko="토론 / 댓글">Discussions</span><span class="arr">↗</span>
+          </a>
+          <a href="https://doi.org/10.5281/zenodo.19621884" rel="me">
+            <span data-i18n-ko="Paper 1 DOI">Paper 1 · DOI</span><span class="arr">↗</span>
+          </a>
+          <a href="https://doi.org/10.5281/zenodo.19622052" rel="me">
+            <span data-i18n-ko="Paper 2 DOI">Paper 2 · DOI</span><span class="arr">↗</span>
+          </a>
+          <a href="/rss.xml">
+            <span data-i18n-ko="RSS 피드">RSS feed</span><span class="arr">↗</span>
+          </a>
         </div>
 
         <div class="nav-label" data-i18n-ko="진행중 시리즈">Series · active</div>
