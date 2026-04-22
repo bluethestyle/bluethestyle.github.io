@@ -3,3 +3,7 @@ dist
 .astro
 .env
 .DS_Store
+
+# Raw source assets kept locally (Nano Banana originals, Figma exports, etc).
+# Resized/optimized versions live in public/ and are committed normally.
+assets-source/
