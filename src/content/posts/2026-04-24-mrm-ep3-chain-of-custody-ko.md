@@ -10,7 +10,7 @@ part: 3
 alt_lang: /2026/04/24/mrm-ep3-chain-of-custody-en/
 next_title: "에피소드 4 — FRIA · AI 기본법 §35 가 코드로 산다"
 next_desc: "한국 AI 기본법 §35 의 7-차원 영향평가 · 5년 보존 의무 · EU AI Act Art 9 FRIAEvaluator 와 별도 관리되는 이유."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
@@ -57,37 +57,45 @@ source_label: "Paper 2 (Zenodo DOI)"
 권한이 다르다. 한 테이블로 묶으면 가장 엄격한 정책이 나머지를
 지배하게 되어 저장 비용이 폭등한다.
 
-## 한 고객 요청, 일곱 감사 기록
+## 한 요청이 7개 테이블을 어떻게 거치는가
 
-테이블들이 어떻게 협조하는지 보려면, 2026년 4월 어느 14:37:08 의 고객
-요청 하나를 따라가 보면 된다 — 2027년 감독 당국이 나중에 문의할
-바로 그 케이스.
+파트너 기관과의 실 트래픽 수집은 2026-04-30 에 시작됐으니, 위 재구성
+속성이 아직 대규모에서 검증된 건 아니다. 존재하는 건 설계다. 설계가
+어떻게 협조하는지를 보려면 한국 영업점의 전형적 시나리오를 따라가면
+된다 — 만기 정기예금 재예치를 위해 내점한 고객에게 추천 시스템이
+적금 + 예금 조합을 제안하는 케이스.
 
-14:37:08.112 — 영업점 직원이 고객을 대신해 추천 요청을 제출한다.
-Lambda 핸들러가 페이로드 검증. `log_data_access` 첫 번째 엔트리 —
-operator ID, 고객 ID, 접근 사유 "branch-initiated recommendation".
+추론 경로에서 4개 테이블이 순차적으로 건드려진다:
 
-14:37:08.241 — PLE 에서 증류한 LightGBM 이 추론 실행.
-`log_model_inference` 엔트리 — 13 태스크 각각의 예측 점수, 모델
-버전 포인터, 피처 텐서 해시.
+- `log_data_access` 가 먼저 발화한다. 영업점 직원이 인증 후 고객을
+  대신해 요청을 제출할 때. operator ID, 고객 ID, 접근 사유
+  ("영업점 발단 추천") — PIPA §37의2 감사 연결점.
+- `log_model_inference` — 증류된 LightGBM 이 13개 태스크를 실행해
+  점수를 산출할 때 발화. 모델 버전 포인터와 피처 텐서 해시가
+  기록되어 이후 재구성 시 "어느 모델이 어떤 입력을 봤는가" 가
+  pinning 된다.
+- `log_attribution` — 직후 발화, 상위 K 피처 기여도 + expert gate
+  가중치. EU AI Act Article 13 과 금소법 §17 의 "왜 이 고객에게 이
+  추천을" 에 답하는 자료.
+- `log_guardrail` — Safety Gate 에이전트가 설명을 규제·적합성·환각
+  ·어조·사실성 5개 기준으로 검토할 때 발화. 판정 (pass/modify/block)
+  과 기준별 점수가 결과 무관하게 기록된다.
 
-14:37:08.263 — 피처별 기여도 계산. `log_attribution` 엔트리 —
-상위 K 피처와 SHAP-like 점수, expert gate 가중치.
+추론 전체 경로는 sub-second. 4개 감사 쓰기는 오버헤드가 미미한데,
+각각이 작은 canonical JSON payload 를 append 하는 것이기 때문 (무거운
+네트워크 왕복이 아니다).
 
-14:37:08.305 — Safety Gate 에이전트가 생성된 설명을 규제·적합성·환각
-·어조·사실성 5개 기준으로 검토. 모두 통과. `log_guardrail` 엔트리
-— 판정 "pass", 기준별 점수.
+나머지 3개 테이블은 요청별로 건드리지 않는다. `log_operation` 은
+시스템 상태 전이 (야간 재학습 시작·종료, 서빙 매니페스트 교체) 시,
+`log_dimension_change` 는 피처 스키마 변화 (예: Phase 0 개정 후
+349D → 403D) 시, `log_model_promotion` 은 Champion-Challenger 판정
+(Ep 2) 시. 이들은 드문 이벤트라 매 요청 오버헤드에 들어가지 않는다.
 
-14:37:08.412 — 응답이 Lambda 핸들러를 떠나 영업점 직원 화면에 도달.
-
-300ms 안에 4개 테이블에 쓰기가 일어났다. 나머지 3개 (`log_operation`,
-`log_dimension_change`, `log_model_promotion`) 는 추론 경로에서는
-쓰이지 않는다 — 시스템 상태 전이 (재학습, 스키마 변경, 승격) 때만
-발화. 그 분리가 매 요청 오버헤드를 제한적으로 유지하는 이유다.
-
-1년 5개월 뒤 분쟁이 들어왔을 때, 위 4개 엔트리가 각 테이블에 그대로
-있고 `prev_hash` 링크가 온전하다. 조인 한 번으로 의사결정 경로 전체
-가 바이트 단위로 재구성된다.
+Ep 3 서두의 시나리오 — 15개월 뒤 감독 당국 쿼리 — 가 현실이 되면,
+재구성 조인은 위 4개 테이블에서 읽은 뒤 관련 `log_operation` /
+`log_model_promotion` 엔트리로 거슬러 올라가 "어느 시스템 버전이
+이 추천을 냈는가" 를 특정한다. 이 조인은 Parquet 아카이브에서 수초
+내 실행되지, 수 일의 수동 재구성이 아니다.
 
 ## HMAC 해시 체인 — 왜 "그냥 로그" 가 아닌가
 

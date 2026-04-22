@@ -10,7 +10,7 @@ part: 3
 alt_lang: /2026/04/24/mrm-ep3-chain-of-custody-ko/
 next_title: "Ep 4 — FRIA: How the Korean AI Basic Act §35 Lives in Code"
 next_desc: "Korea AI Basic Act §35 seven-dimension impact assessment, five-year retention, and why it's kept separate from the EU AI Act Article 9 FRIAEvaluator."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
@@ -67,44 +67,54 @@ A unified table collapses to the strictest policy across the set,
 which inflates storage cost without improving any individual
 audit.
 
-## One customer request, seven audit writes
+## How a single request flows through the seven tables
 
-To see how these tables coordinate, follow one 14:37:08 customer
-request from April 2026 — the kind the 2027 regulator will later
-ask about.
+Real-traffic collection started 2026-04-30 with partner
+institutions, so the reconstruction properties above haven't yet
+been tested at scale. What exists is the design. To see how the
+tables coordinate in that design, walk through a typical
+Korean-branch scenario — say, a customer visiting a branch to
+re-deposit a matured term deposit (만기 정기예금 재예치), and the
+recommendation system surfacing a 적금 + 예금 조합 suggestion.
 
-14:37:08.112 — a bank branch employee submits a recommendation
-request on behalf of the customer. The Lambda handler validates
-the payload. `log_data_access` entry #1: operator ID, customer
-ID, access reason "branch-initiated recommendation".
+Four tables touch the request during inference, in sequence:
 
-14:37:08.241 — the LightGBM model (distilled from PLE) runs
-inference. `log_model_inference` entry: prediction scores across
-13 tasks, model version pointer, feature-tensor hash.
+- `log_data_access` fires first, when the branch employee
+  authenticates and submits on behalf of the customer. Operator
+  ID, customer ID, access reason ("branch-initiated
+  recommendation") are recorded — the PIPA §37의2 audit hook.
+- `log_model_inference` fires when the distilled LightGBM runs
+  across thirteen tasks and produces scores. Model version
+  pointer and feature-tensor hash are written so later
+  reconstructions can pin "which model saw what inputs".
+- `log_attribution` fires right after, with the top-K feature
+  contributions and expert gate weights. This is what later
+  answers "why this recommendation for this customer" under EU
+  AI Act Article 13 and 금소법 §17.
+- `log_guardrail` fires when the Safety Gate agent reviews the
+  explanation for regulatory, suitability, hallucination, tone,
+  and factuality criteria. The decision (pass / modify / block)
+  and criteria scores are recorded regardless of outcome.
 
-14:37:08.263 — per-feature contributions computed.
-`log_attribution` entry: top-K features with SHAP-like scores,
-expert gate weights.
+The whole inference path is sub-second; the four audit writes
+add negligible overhead because each one is a small canonical
+JSON payload appended (not a heavy network round trip).
 
-14:37:08.305 — the Safety Gate agent reviews the generated
-explanation for regulatory, suitability, hallucination, tone,
-and factuality criteria. All pass. `log_guardrail` entry:
-decision "pass", criteria scores.
+The remaining three tables aren't touched per request.
+`log_operation` fires on system-state transitions (nightly
+retrain start/finish, serving-manifest swap);
+`log_dimension_change` fires when the feature schema evolves
+(e.g., 349D → 403D after a Phase 0 revision);
+`log_model_promotion` fires when a Champion-Challenger decision
+lands (Ep 2). Per-request overhead stays bounded because these
+are rare events, not per-call writes.
 
-14:37:08.412 — the response leaves the Lambda handler and
-reaches the branch employee's screen.
-
-That's four tables touched in ~300ms. The remaining three
-(`log_operation`, `log_dimension_change`, `log_model_promotion`)
-aren't touched during inference — they fire on system-state
-transitions (retrains, schema changes, promotions), not per
-request. That separation is why the per-request overhead stays
-bounded.
-
-One year and five months later, when the dispute arrives, all
-four entries are in their respective tables with their
-`prev_hash` links intact. A single join reconstructs the entire
-decision path, byte for byte.
+When the Ep 3 opening scenario plays out — a regulator query
+fifteen months later — the reconstruction join reads from the
+four tables plus traces back to the relevant `log_operation` /
+`log_model_promotion` entries to identify which version of the
+system produced the recommendation. That join runs in seconds
+against the Parquet archive, not days of manual reconstruction.
 
 ## HMAC hash chain — why this isn't "just a log"
 
