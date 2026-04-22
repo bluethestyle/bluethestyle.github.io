@@ -181,7 +181,7 @@ The serving stack above reads like something a team of AWS
 specialists shipped. In our case the specialist work happened in
 Claude Code sessions.
 
-The Lambda `handler.py` went through roughly thirty iterations.
+The Lambda handler went through roughly thirty iterations.
 Version 1 was a 60-line Claude Code draft that loaded a
 LightGBM model and returned predictions. Version 30 is 400 lines
 with three-layer fallback, audit logging, Bedrock agent
@@ -199,7 +199,7 @@ task without the distilled model. Layer 3 came after a broader
 incident where a Phase 0 schema change propagated incorrectly and
 the LGBM load itself failed for an afternoon; a pure-rules
 fallback meant customers still got recommendations, just
-conservative ones. Each layer is a fossil of a specific past
+conservative ones. Each layer is the imprint of a specific past
 failure.
 
 The 5-agent orchestration similarly grew incrementally. Feature
@@ -250,6 +250,6 @@ important part of the project.
 
 Source:
 [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052) §3
-"Serving architecture" + §8 "Agent design". Implementation lives
-in `core/distillation/`, `aws/lambda/handler.py`, and
-`core/agents/`.
+"Serving architecture" + §8 "Agent design"; implementation lives
+in the
+[open-source repo](https://github.com/bluethestyle/aws_ple_for_financial).

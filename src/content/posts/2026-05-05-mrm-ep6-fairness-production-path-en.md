@@ -78,16 +78,16 @@ PagerDuty and write a `log_operation` entry.
 
 ## Evidence accumulating as Parquet archive
 
-Every window's 15 metrics accumulate in an S3 Parquet archive.
-Path structure: `fairness_archive_v1/year={yyyy}/month={mm}/day={dd}/attribute={attr}/metric={metric}/`.
-Snappy compression, append-only.
+Every window's 15 metrics accumulate in an S3 Parquet archive,
+partitioned by date, protected attribute, and metric name,
+Snappy-compressed, append-only.
 
 Why a Parquet archive — three uses:
 
 1. **Regulatory audit evidence.** "Fairness trend from July through
    September 2026" answered in one query. DuckDB's httpfs extension
    queries S3 directly.
-2. **FRIA evidence_ref.** When Ep 4's `KoreanFRIAAssessor` computes
+2. **FRIA evidence_ref.** When Ep 4's Korean FRIA assessor computes
    the "discrimination" dimension score on new-model promotion, it
    reads from this archive. The assessment rests not on a static
    document but on *observations from the recent production stream*.
@@ -108,10 +108,8 @@ Self-Normalized IPS (SNIPS).
 The requirement: *logged propensities* from production (Champion's
 probability for each alternative product recommendation). When
 those are logged, the Challenger's hypothetical fairness can be
-reconstructed.
-`core/evaluation/counterfactual.py`'s
-`CounterfactualEvaluator.from_config(serving.counterfactual_cc)`
-reads the estimator (ips/snips), min_lift, and bootstrap CI
+reconstructed. The counterfactual evaluator reads its estimator
+choice (IPS / SNIPS), minimum lift threshold, and bootstrap CI
 settings from config and executes.
 
 This answers "is the Challenger better on fairness than the
@@ -124,13 +122,12 @@ split is operationally burdensome.
 The 4/5 rule (DI 0.8 threshold) is the US EEOC standard, but
 Korean Financial Consumer Protection Act and AI Basic Act §35 may
 demand stricter thresholds. Threshold decisions remain the fairness
-committee's job, managed config-driven in `pipeline.yaml` under
-`monitoring.fairness.thresholds`.
+committee's job, managed config-driven rather than baked into code.
 
 Threshold changes must flow through meeting minutes → PR → review →
-merge. Silent config edits are logged as
-`log_operation(event="threshold_change", ...)` in the audit chain,
-so who changed what when for which reason is traceable.
+merge. Silent config edits are caught because every change lands
+as a `threshold_change` entry in the audit chain — who changed
+what, when, and for which reason is traceable.
 
 The core of this structure — *the threshold decision itself is an
 audit subject*. The quarterly committee review covers not just
@@ -250,8 +247,6 @@ The MRM Thread closed its skeleton in six episodes. Subsequent
 pieces will appear irregularly as Commentary in response to
 specific incidents or issues (the Commentary category).
 
-Source material: [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052).
-Code: [github.com/bluethestyle/aws_ple_for_financial](https://github.com/bluethestyle/aws_ple_for_financial) —
-specifically `core/monitoring/fairness_monitor.py`,
-`core/evaluation/counterfactual.py`, and the `monitoring.fairness`
-section of `configs/pipeline.yaml`.
+Source material: [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052);
+implementation lives in the
+[open-source repo](https://github.com/bluethestyle/aws_ple_for_financial).

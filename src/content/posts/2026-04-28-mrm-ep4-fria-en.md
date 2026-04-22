@@ -39,9 +39,9 @@ five years.
 
 The codebase has two FRIA-related classes:
 
-- `core/compliance/fria_assessment.py::KoreanFRIAAssessor` — AI
-  Basic Act §35, seven dimensions, five-year retention.
-- `core/monitoring/fria_evaluator.py::FRIAEvaluator` — EU AI Act
+- `KoreanFRIAAssessor` — AI Basic Act §35, seven dimensions,
+  five-year retention.
+- `FRIAEvaluator` — EU AI Act
   Article 9, five dimensions, continuous monitoring.
 
 On the surface this looks redundant. Both are "impact assessment";
@@ -103,7 +103,7 @@ is what "FRIA lives in code" means in practice.
 §35 requires *five-year retention* of the assessment. Not just
 storage but tamper-evidence. Implementation:
 
-- FRIA results are persisted as a `fria_assessments_v1` Parquet
+- FRIA results are persisted as a the FRIA results table Parquet
   table in S3.
 - The bucket is in Object Lock (WORM) mode.
 - Each entry gets signed into Ep 3's HMAC chain once.
@@ -119,14 +119,15 @@ and their traces are preserved*.
 
 When a new model registers:
 
-1. Ep 2's `_decide_promotion()` gate runs.
-2. If promotion approved, `KoreanFRIAAssessor.assess()` runs →
-   seven-dimension evaluation → persisted to `fria_assessments_v1`.
-3. In parallel, `FRIAEvaluator.evaluate()` runs → five-dimension
-   evaluation → persisted to `fria_eu_v1`.
-4. `AnnexIVMapper.aggregate(korean_result, eu_result)` produces
-   the combined Article 11 technical-documentation report.
-5. The audit log gets `log_operation(event="fria_complete", ...)`.
+1. Ep 2's promotion gate runs.
+2. If promotion is approved, `KoreanFRIAAssessor` runs its
+   seven-dimension evaluation and persists to the Korean results
+   table.
+3. In parallel, `FRIAEvaluator` runs its five-dimension evaluation
+   and persists to a separate table.
+4. `AnnexIVMapper` combines both results into the Article 11
+   technical-documentation report.
+5. An FRIA-complete event is written to the audit log.
 
 Failures at any step do not fail the pipeline itself — this is a
 best-effort invocation (same principle as Ep 2's
@@ -137,7 +138,7 @@ entries for the AuditAgent to surface overnight.
 ## The FSS query's answer
 
 "Submit the FRIA results retained for five years." One query.
-Filter the `fria_assessments_v1` table by the model version at the
+Filter the the FRIA results table table by the model version at the
 moment of interest. The seven-dimension scores come back with
 per-dimension evidence pointers (rows in the audit tables) and
 mitigation records, as a set.
@@ -172,7 +173,5 @@ tier 2/3, and why `auto_promote=false` is enforced as a production
 posture.
 
 Source: [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052)
-§6 "Regulatory mapping". Implementation lives in
-`core/compliance/fria_assessment.py`,
-`core/monitoring/fria_evaluator.py`, and
-`core/compliance/annex_iv_mapper.py`.
+§6 "Regulatory mapping"; implementation lives in the
+[open-source repo](https://github.com/bluethestyle/aws_ple_for_financial).

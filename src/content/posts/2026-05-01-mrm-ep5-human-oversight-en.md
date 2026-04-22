@@ -123,18 +123,16 @@ Three tiers:
 
 The key property: tier assignment is *automatic*. A human does not
 classify "this is tier 2"; if one of the three conditions holds,
-the tier is raised. So the tier taxonomy is a rule set
-(`core/compliance/tier_evaluator.py`), and those rules themselves
-become the MRM committee's review target.
+the tier is raised. The tier taxonomy is a rule set, and those
+rules themselves become the MRM committee's review target.
 
 ## auto_promote=false — a production posture
 
-Ep 2 described `_decide_promotion()` as auto-promoting when all
-conditions pass. *Technically*, yes. But in production,
-`pipeline.yaml`'s `serving.competition.auto_promote: false` is
-enforced, so no Challenger auto-promotes even if it clears every
-metric. The current Champion stays unless a `--force-promote`
-operator override fires.
+Ep 2 described the promotion gate as auto-promoting when all
+conditions pass. *Technically*, yes. But in production, auto-promote
+is disabled by config, so no Challenger auto-promotes even if it
+clears every metric. The current Champion stays unless an
+operator-issued force-promote override fires.
 
 Why this matters — *the condition for auto-promotion* sits on the
 assumption that every gate is a structural invariant. In reality,
@@ -150,8 +148,7 @@ metrics stabilize, the latter posture is judged appropriate.
 
 ## Layer 4 — opt-in human fallback
 
-`core/serving/fallback_router.py` contains a three-layer serving
-fallback:
+The serving path has a three-layer fallback router:
 
 - **Layer 1** — PLE → LGBM distilled model (the normal path,
   99%+ of traffic).
@@ -161,8 +158,8 @@ fallback:
   fails).
 
 In the first half of 2026, a Layer 4 was added — **human
-fallback**. It activates only when `serving.review.tier_3_human_fallback:
-true` is set. When Layers 1-3 all have low confidence, no
+fallback**. It activates only when the tier-3 human-fallback flag
+is enabled in config. When Layers 1-3 all have low confidence, no
 recommendation is generated at all; instead the customer sees
 "connecting you to a representative".
 
@@ -216,7 +213,5 @@ Champion-Challenger in fairness judgments.
 
 Source:
 [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052) §7
-"Human-in-the-loop design". Implementation lives in
-`core/serving/fallback_router.py`,
-`core/compliance/human_review_queue.py`, and
-`scripts/kill_switch.py`.
+"Human-in-the-loop design"; implementation lives in the
+[open-source repo](https://github.com/bluethestyle/aws_ple_for_financial).

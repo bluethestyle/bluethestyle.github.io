@@ -161,7 +161,7 @@ chain 엔트리 N번에서 검증 실패" 같은 감사 관점.
 위 서빙 스택은 AWS 전문가 팀이 출시한 것처럼 읽힌다. 우리 경우
 그 전문가 작업은 *Claude Code 세션 안에서* 일어났다.
 
-Lambda `handler.py` 는 약 30 회 iteration 을 거쳤다. v1 은 60줄
+Lambda 핸들러 모듈은 약 30 회 iteration 을 거쳤다. v1 은 60줄
 짜리 Claude Code 초안 — LightGBM 모델 로드 + 예측 반환만. v30 은
 400줄 — 3계층 폴백, 감사 로깅, Bedrock 에이전트 오케스트레이션,
 결정론적 콜드 스타트 warming 까지 포함. 그 사이의 버전들은 실제
@@ -175,7 +175,7 @@ Layer 2 는 `task_churn` 의 증류 실패 (fidelity floor 위반, Ep 2 의
 필요했다. Layer 3 는 더 큰 incident 이후 — Phase 0 스키마 변경이
 잘못 전파되어 LGBM 로드 자체가 오후 내내 실패한 적이 있었고, pure
 rule 기반 폴백이 있으면 고객은 보수적이라도 추천을 받는다. 각 계층은
-특정 과거 실패의 화석이다.
+특정 과거 실패가 남긴 자국이다.
 
 5-에이전트 오케스트레이션도 점진적으로 자랐다. Feature Selector 와
 Reason Generator 가 먼저 — Paper 2 의 "고객에게 추천 근거 설명"
@@ -216,6 +216,4 @@ VRAM 문제로 미채택된 이유, Paper 3 (Loss Dynamics) 가 WIP 상태인
 honest negative results 가 프로젝트의 중요 부분인 이유로 마무리.
 
 원문 자료: [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052)
-§3 "서빙 아키텍처" + §8 "에이전트 설계". 구현은
-`core/distillation/`, `aws/lambda/handler.py`,
-`core/agents/` 하위 모듈.
+§3 "서빙 아키텍처" + §8 "에이전트 설계", 구현은 [오픈소스 레포](https://github.com/bluethestyle/aws_ple_for_financial).
