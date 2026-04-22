@@ -39,7 +39,7 @@ export const SERIES = [
     tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
-    ep: 3, total: 8,
+    ep: 4, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -51,7 +51,7 @@ export const SERIES = [
     tagKo: "MRM 스레드",
     desc: "Regulatory compliance and model risk management for AI recommendation systems, from a GARP FRM practitioner perspective.",
     descKo: "AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.",
-    ep: 3, total: 6,
+    ep: 4, total: 6,
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
   },
@@ -77,6 +77,14 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/04/28/ep4-seven-experts-ko/":
+    "왜 7명인가, 왜 이 7명인가. Gemini 와의 학제간 스캔에서 11개 분야를 훑고, Opus 와의 기술 검증에서 선 안으로 들어온 DeepFM·Temporal·HGCN·PersLay·Causal·LightGCN·OT 의 도출 과정.",
+  "/2026/04/28/ep4-seven-experts-en/":
+    "Why seven experts, why these seven. The cross-disciplinary scan with Gemini surfaced eleven fields; the feasibility review with Opus narrowed to DeepFM, Temporal Ensemble, HGCN, PersLay, Causal, LightGCN, and Optimal Transport.",
+  "/2026/04/28/mrm-ep4-fria-ko/":
+    "한국 AI 기본법 §35 의 7-차원 영향평가와 5년 보존 의무. EU AI Act Article 9 FRIAEvaluator 와 리포트는 통합하더라도 내부 저장은 왜 분리해야 하는가.",
+  "/2026/04/28/mrm-ep4-fria-en/":
+    "Seven-dimension impact assessment and five-year retention under Korea AI Basic Act §35. Why the KoreanFRIAAssessor is kept as a separate class from the EU AI Act Article 9 FRIAEvaluator even when the outputs are reported jointly.",
   "/2026/04/24/mrm-ep3-chain-of-custody-ko/":
     "14개월 전 추천 분쟁이 들어왔을 때 답의 형태를 결정하는 7개 감사 테이블과 HMAC 해시 체인. EU AI Act 13·14조와 KFCPA §17 을 체크리스트가 아니라 역구성 가능한 코드 경로로 만드는 방식.",
   "/2026/04/24/mrm-ep3-chain-of-custody-en/":
@@ -148,9 +156,7 @@ export const EXCERPTS = {
  * shown greyed in Archives.
  */
 export const DRAFTS = [
-  { date: "2026-04-28", title: "[FinAI Build] Ep 4 — The Seven Experts: Structural Isomorphism Across 11 Disciplines", cat: "FinAI Build", lang: "EN", ex: "How HGCN, PersLay, Causal, OT, Temporal Ensemble, DeepFM, and LightGCN became the seven.", tags: ["finai-build","architecture","ple"] },
-  { date: "2026-04-28", title: "[MRM Thread] Ep 4 — FRIA: How the Korean AI Basic Act §35 Lives in Code", cat: "MRM Thread", lang: "EN", ex: "Seven-dimension impact assessment, five-year retention, and why it's a separate class from the EU AI Act Art. 9 FRIAEvaluator.", tags: ["mrm","regulation","fria"] },
-  { date: "2026-05-01", title: "[FinAI Build] Ep 5 — The Data Integrity Hunt", cat: "FinAI Build", lang: "EN", ex: "Three chained label leakage detections, 18→13 task reduction, synthetic data v2→v3→v4 iterations.", tags: ["finai-build","data-integrity","leakage"] },
+{ date: "2026-05-01", title: "[FinAI Build] Ep 5 — The Data Integrity Hunt", cat: "FinAI Build", lang: "EN", ex: "Three chained label leakage detections, 18→13 task reduction, synthetic data v2→v3→v4 iterations.", tags: ["finai-build","data-integrity","leakage"] },
   { date: "2026-05-01", title: "[MRM Thread] Ep 5 — Human Oversight as an API, Not a Ticket Queue", cat: "MRM Thread", lang: "EN", ex: "EU AI Act Art. 14, kill-switch API, HumanReviewQueue tier 2/3, and auto_promote=false as a production posture.", tags: ["mrm","human-oversight","kill-switch"] },
   { date: "2026-05-05", title: "[FinAI Build] Ep 6 — The Bug That Overwhelmed All Architectural Decisions", cat: "FinAI Build", lang: "EN", ex: "Uncertainty weighting → softmax-sigmoid reversal. Methodological lesson: training bugs can corrupt architectural conclusions.", tags: ["finai-build","debugging","methodology"] },
   { date: "2026-05-05", title: "[MRM Thread] Ep 6 — Fairness as a Production Path", cat: "MRM Thread", lang: "EN", ex: "Five protected attributes, real-time DI/SPD/EOD on the production stream, counterfactual evaluation, Parquet archive.", tags: ["mrm","fairness","monitoring"] },

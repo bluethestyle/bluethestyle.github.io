@@ -10,7 +10,7 @@ part: 3
 alt_lang: /2026/04/24/ep3-guardrails-en/
 next_title: "에피소드 4 — 일곱 전문가: 11개 학문에서 구조적 동형사상을 수입하다"
 next_desc: "HGCN · PersLay · Causal · OT · Temporal Ensemble · DeepFM · LightGCN 일곱 선택이 어떻게 도출됐나 — 각 전문가가 메우는 수학적 빈틈과 기각된 후보들."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/development_story.pdf
 source_label: "개발 스토리 (KO, PDF) §3"
 ---
