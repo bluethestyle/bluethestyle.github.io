@@ -10,7 +10,7 @@ part: 5
 alt_lang: /2026/05/01/mrm-ep5-human-oversight-en/
 next_title: "에피소드 6 — Fairness as a Production Path"
 next_desc: "5개 보호 속성에 대한 Disparate Impact · Statistical Parity · Equal Opportunity 가 검증 샘플이 아닌 프로덕션 스트림에서 실시간 계산되는 구조와 Counterfactual C-C 의 역할."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---

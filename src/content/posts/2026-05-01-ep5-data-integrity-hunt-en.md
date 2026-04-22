@@ -10,7 +10,7 @@ part: 5
 alt_lang: /2026/05/01/ep5-data-integrity-hunt-ko/
 next_title: "Ep 6 — The Bug That Overwhelmed All Architectural Decisions"
 next_desc: "A fix to uncertainty-weighting flipped the softmax-vs-sigmoid result. The methodological lesson: training bugs can corrupt architectural conclusions."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf
 source_label: "Development Story (EN, PDF) §9"
 ---

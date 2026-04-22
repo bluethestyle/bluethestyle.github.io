@@ -39,7 +39,7 @@ export const SERIES = [
     tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
-    ep: 5, total: 8,
+    ep: 6, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -51,7 +51,7 @@ export const SERIES = [
     tagKo: "MRM 스레드",
     desc: "Regulatory compliance and model risk management for AI recommendation systems, from a GARP FRM practitioner perspective.",
     descKo: "AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.",
-    ep: 5, total: 6,
+    ep: 6, total: 6,
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
   },
@@ -77,6 +77,14 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/05/05/ep6-uncertainty-weighting-bug-ko/":
+    "몇 주 동안 sigmoid gate 가 softmax 를 이기는 것처럼 보였다. uncertainty weighting 구현 버그가 수정되자 결과가 뒤집혔다. 훈련 환경의 버그가 어떻게 아키텍처 결론을 오염시키는가의 사례 연구.",
+  "/2026/05/05/ep6-uncertainty-weighting-bug-en/":
+    "For weeks sigmoid gating seemed to beat softmax. Fixing an uncertainty-weighting implementation bug flipped the result. A case study in how a training-environment bug contaminates architectural conclusions.",
+  "/2026/05/05/mrm-ep6-fairness-production-path-ko/":
+    "5개 보호 속성에 대한 Disparate Impact · Statistical Parity · Equal Opportunity 가 검증 샘플이 아닌 프로덕션 스트림에서 실시간 계산되는 구조, Counterfactual Champion-Challenger 의 역할, 그리고 Parquet archive 로 흐르는 증거의 길.",
+  "/2026/05/05/mrm-ep6-fairness-production-path-en/":
+    "Disparate Impact, Statistical Parity, and Equal Opportunity across five protected attributes, computed on the production stream rather than a validation sample. The role of Counterfactual Champion-Challenger, and the Parquet archive where the evidence accumulates.",
   "/2026/05/01/ep5-data-integrity-hunt-ko/":
     "아키텍처 논쟁 전에 풀어야 했던 것 — label leakage 3건 연쇄 탐지, 18→13 태스크 축소의 결정론적 리키지 배경, 합성데이터 v2→v3→v4 iteration 에서 드러난 자기복제 피처.",
   "/2026/05/01/ep5-data-integrity-hunt-en/":
@@ -164,9 +172,7 @@ export const EXCERPTS = {
  * shown greyed in Archives.
  */
 export const DRAFTS = [
-  { date: "2026-05-05", title: "[FinAI Build] Ep 6 — The Bug That Overwhelmed All Architectural Decisions", cat: "FinAI Build", lang: "EN", ex: "Uncertainty weighting → softmax-sigmoid reversal. Methodological lesson: training bugs can corrupt architectural conclusions.", tags: ["finai-build","debugging","methodology"] },
-  { date: "2026-05-05", title: "[MRM Thread] Ep 6 — Fairness as a Production Path", cat: "MRM Thread", lang: "EN", ex: "Five protected attributes, real-time DI/SPD/EOD on the production stream, counterfactual evaluation, Parquet archive.", tags: ["mrm","fairness","monitoring"] },
-  { date: "2026-05-08", title: "[FinAI Build] Ep 7 — Distillation and Serving: PLE → LightGBM → Lambda + 5 Bedrock Agents", cat: "FinAI Build", lang: "EN", ex: "Teacher-student fidelity, why LightGBM for serving, serverless cost profile, and the 5-agent Bedrock pipeline.", tags: ["finai-build","distillation","serving"] },
+{ date: "2026-05-08", title: "[FinAI Build] Ep 7 — Distillation and Serving: PLE → LightGBM → Lambda + 5 Bedrock Agents", cat: "FinAI Build", lang: "EN", ex: "Teacher-student fidelity, why LightGBM for serving, serverless cost profile, and the 5-agent Bedrock pipeline.", tags: ["finai-build","distillation","serving"] },
   { date: "2026-05-12", title: "[FinAI Build] Ep 8 — Honest Negative Results and What Comes Next", cat: "FinAI Build", lang: "EN", ex: "adaTT null effect, GradSurgery rejection, Paper 3 WIP, real-data metrics pending.", tags: ["finai-build","adatt","gradsurgery"] },
 ];
 

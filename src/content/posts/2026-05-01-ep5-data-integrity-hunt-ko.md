@@ -10,7 +10,7 @@ part: 5
 alt_lang: /2026/05/01/ep5-data-integrity-hunt-en/
 next_title: "에피소드 6 — 모든 아키텍처 결정을 압도한 버그"
 next_desc: "uncertainty weighting 구현 버그 수정 후 softmax 가 sigmoid 를 앞서는 역전. '훈련 환경의 버그가 아키텍처 결론을 오염시킬 수 있다' 는 방법론적 교훈."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/development_story.pdf
 source_label: "개발 스토리 (KO, PDF) §9"
 ---

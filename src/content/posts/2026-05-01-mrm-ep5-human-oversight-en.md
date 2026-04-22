@@ -10,7 +10,7 @@ part: 5
 alt_lang: /2026/05/01/mrm-ep5-human-oversight-ko/
 next_title: "Ep 6 — Fairness as a Production Path"
 next_desc: "Disparate Impact, Statistical Parity, and Equal Opportunity across five protected attributes, computed in real time on the production stream — not a validation sample — and the role of Counterfactual Champion-Challenger."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
