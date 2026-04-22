@@ -10,7 +10,7 @@ part: 2
 alt_lang: /2026/04/21/ep2-ai-collaboration-en/
 next_title: "에피소드 3 — 우리의 적응 방식: 가드레일, 메모리 뱅크, 계약 검증"
 next_desc: "3인 × AI 팀이 병렬로 굴러가면서도 일관성을 잃지 않았던 실제 장치들 — CLAUDE.md 헌법, 8개 컨텍스트 파일 메모리 뱅크, .claude/RULES.md ↔ .cursorrules 동기화, 매 병렬 작업 후 인터페이스 키 매칭 검증."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/development_story.pdf
 source_label: "개발 스토리 (KO, PDF) §2"
 ---

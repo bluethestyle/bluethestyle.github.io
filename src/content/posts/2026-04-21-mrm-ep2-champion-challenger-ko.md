@@ -10,7 +10,7 @@ part: 2
 alt_lang: /2026/04/21/mrm-ep2-champion-challenger-en/
 next_title: "에피소드 3 — 에이전트 파이프라인의 Chain of Custody"
 next_desc: "7개 감사 테이블, HMAC 해시 체인, 그리고 EU AI Act Article 13-14 / KFCPA §17 매핑이 체크리스트가 아니라 코드 경로가 되는 방식."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---

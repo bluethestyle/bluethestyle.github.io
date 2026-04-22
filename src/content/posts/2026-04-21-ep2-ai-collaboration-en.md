@@ -10,7 +10,7 @@ part: 2
 alt_lang: /2026/04/21/ep2-ai-collaboration-ko/
 next_title: "Ep 3 — How We Adapted: Guardrails, Memory Bank, Contract Verification"
 next_desc: "The actual mechanisms that kept three parallel AI agent teams coherent — the CLAUDE.md constitution, the 8-file memory bank, .claude/RULES.md synced with .cursorrules, and the interface-key matching that had to run after every parallel work session."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf
 source_label: "Development Story (EN, PDF) §2"
 ---

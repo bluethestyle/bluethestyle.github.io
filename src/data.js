@@ -39,7 +39,7 @@ export const SERIES = [
     tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
-    ep: 2, total: 8,
+    ep: 3, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -51,7 +51,7 @@ export const SERIES = [
     tagKo: "MRM 스레드",
     desc: "Regulatory compliance and model risk management for AI recommendation systems, from a GARP FRM practitioner perspective.",
     descKo: "AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.",
-    ep: 2, total: 6,
+    ep: 3, total: 6,
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
   },
@@ -77,6 +77,14 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/04/24/mrm-ep3-chain-of-custody-ko/":
+    "14개월 전 추천 분쟁이 들어왔을 때 답의 형태를 결정하는 7개 감사 테이블과 HMAC 해시 체인. EU AI Act 13·14조와 KFCPA §17 을 체크리스트가 아니라 역구성 가능한 코드 경로로 만드는 방식.",
+  "/2026/04/24/mrm-ep3-chain-of-custody-en/":
+    "Fifteen months after a recommendation, a customer disputes it. Seven audit tables and one HMAC hash chain determine the shape of the answer — making EU AI Act 13-14 and KFCPA §17 reconstructable code paths, not checklists.",
+  "/2026/04/24/ep3-guardrails-ko/":
+    "3인 × AI 팀이 병렬로 굴러가면서도 통합 지점에서 깨지지 않게 한 실제 장치들 — CLAUDE.md 헌법 4조, 8개 메모리 뱅크 파일, 매 병렬 작업 후 인터페이스 키 검증의 구체 모습.",
+  "/2026/04/24/ep3-guardrails-en/":
+    "The actual mechanisms that kept three parallel AI-agent teams from breaking at integration — the CLAUDE.md constitution's four clauses, the eight-file memory bank, and the interface-key diff check run after every parallel session.",
   "/2026/04/21/mrm-ep2-champion-challenger-ko/":
     "MRM 스레드 2편. Champion-Challenger 를 동기 코드 게이트로 구현한 이야기 — 4가지 판정 형태(force_promote / bootstrap / reject(fidelity) / promote·reject(competition)), 안전 플로어가 경쟁 이전에 오는 이유, 그리고 모든 판정이 HMAC 서명 감사 엔트리가 되는 SR 11-7 재구성 가능성.",
   "/2026/04/21/mrm-ep2-champion-challenger-en/":
@@ -140,8 +148,14 @@ export const EXCERPTS = {
  * shown greyed in Archives.
  */
 export const DRAFTS = [
-  { date: "2026-04-28", title: "[FinAI Build] Ep 3 — How We Adapted: Guardrails, Memory Bank, Contract Verification", cat: "FinAI Build",  lang: "EN", ex: "CLAUDE.md constitution, 8-file memory bank, .claude/RULES.md ↔ .cursorrules sync, interface contract checks.", tags: ["finai-build","claude-code"] },
-  { date: "2026-04-28", title: "[MRM Thread] Ep 3 — Chain of Custody for an Agent Pipeline", cat: "MRM Thread", lang: "EN", ex: "Seven audit tables, HMAC hash chain, EU AI Act & KFCPA mappings.", tags: ["mrm","sr-11-7","audit"] },
+  { date: "2026-04-28", title: "[FinAI Build] Ep 4 — The Seven Experts: Structural Isomorphism Across 11 Disciplines", cat: "FinAI Build", lang: "EN", ex: "How HGCN, PersLay, Causal, OT, Temporal Ensemble, DeepFM, and LightGCN became the seven.", tags: ["finai-build","architecture","ple"] },
+  { date: "2026-04-28", title: "[MRM Thread] Ep 4 — FRIA: How the Korean AI Basic Act §35 Lives in Code", cat: "MRM Thread", lang: "EN", ex: "Seven-dimension impact assessment, five-year retention, and why it's a separate class from the EU AI Act Art. 9 FRIAEvaluator.", tags: ["mrm","regulation","fria"] },
+  { date: "2026-05-01", title: "[FinAI Build] Ep 5 — The Data Integrity Hunt", cat: "FinAI Build", lang: "EN", ex: "Three chained label leakage detections, 18→13 task reduction, synthetic data v2→v3→v4 iterations.", tags: ["finai-build","data-integrity","leakage"] },
+  { date: "2026-05-01", title: "[MRM Thread] Ep 5 — Human Oversight as an API, Not a Ticket Queue", cat: "MRM Thread", lang: "EN", ex: "EU AI Act Art. 14, kill-switch API, HumanReviewQueue tier 2/3, and auto_promote=false as a production posture.", tags: ["mrm","human-oversight","kill-switch"] },
+  { date: "2026-05-05", title: "[FinAI Build] Ep 6 — The Bug That Overwhelmed All Architectural Decisions", cat: "FinAI Build", lang: "EN", ex: "Uncertainty weighting → softmax-sigmoid reversal. Methodological lesson: training bugs can corrupt architectural conclusions.", tags: ["finai-build","debugging","methodology"] },
+  { date: "2026-05-05", title: "[MRM Thread] Ep 6 — Fairness as a Production Path", cat: "MRM Thread", lang: "EN", ex: "Five protected attributes, real-time DI/SPD/EOD on the production stream, counterfactual evaluation, Parquet archive.", tags: ["mrm","fairness","monitoring"] },
+  { date: "2026-05-08", title: "[FinAI Build] Ep 7 — Distillation and Serving: PLE → LightGBM → Lambda + 5 Bedrock Agents", cat: "FinAI Build", lang: "EN", ex: "Teacher-student fidelity, why LightGBM for serving, serverless cost profile, and the 5-agent Bedrock pipeline.", tags: ["finai-build","distillation","serving"] },
+  { date: "2026-05-12", title: "[FinAI Build] Ep 8 — Honest Negative Results and What Comes Next", cat: "FinAI Build", lang: "EN", ex: "adaTT null effect, GradSurgery rejection, Paper 3 WIP, real-data metrics pending.", tags: ["finai-build","adatt","gradsurgery"] },
 ];
 
 export const TAGS = [

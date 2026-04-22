@@ -10,7 +10,7 @@ part: 2
 alt_lang: /2026/04/21/mrm-ep2-champion-challenger-ko/
 next_title: "Ep 3 — Chain of Custody for an Agent Pipeline"
 next_desc: "Seven audit tables, the HMAC hash chain, and how EU AI Act Article 13-14 / KFCPA §17 mappings become code paths rather than checklists."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
