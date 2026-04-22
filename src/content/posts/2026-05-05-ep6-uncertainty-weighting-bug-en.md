@@ -10,7 +10,7 @@ part: 6
 alt_lang: /2026/05/05/ep6-uncertainty-weighting-bug-ko/
 next_title: "Ep 7 — Distillation and Serving: PLE → LightGBM → Lambda + 5 Bedrock Agents"
 next_desc: "Teacher-student fidelity, why LightGBM for serving, the serverless cost profile, and the 5-agent Bedrock pipeline composition."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf
 source_label: "Development Story (EN, PDF) §11"
 ---

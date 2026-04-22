@@ -10,7 +10,7 @@ part: 6
 alt_lang: /2026/05/05/ep6-uncertainty-weighting-bug-en/
 next_title: "에피소드 7 — 증류와 서빙: PLE → LightGBM → Lambda + 5 Bedrock 에이전트"
 next_desc: "teacher-student fidelity, 왜 서빙은 LGBM 인가, serverless 비용 프로필, 그리고 AWS Bedrock 위 5-에이전트 파이프라인 구성."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/development_story.pdf
 source_label: "개발 스토리 (KO, PDF) §11"
 ---

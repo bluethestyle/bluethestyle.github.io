@@ -39,7 +39,7 @@ export const SERIES = [
     tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
-    ep: 6, total: 8,
+    ep: 7, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -77,6 +77,10 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/05/08/ep7-distillation-serving-ko/":
+    "teacher 는 PLE, student 는 task 별 LightGBM, 서빙은 AWS Lambda. 왜 이 조합인가, teacher-student fidelity 가 실패하면 어떻게 되는가, 그리고 Bedrock 위 5-에이전트 파이프라인의 역할 분담.",
+  "/2026/05/08/ep7-distillation-serving-en/":
+    "Teacher is PLE, student is per-task LightGBM, serving is AWS Lambda. Why this combination, what happens when teacher-student fidelity fails, and the role division across the 5-agent Bedrock pipeline.",
   "/2026/05/05/ep6-uncertainty-weighting-bug-ko/":
     "몇 주 동안 sigmoid gate 가 softmax 를 이기는 것처럼 보였다. uncertainty weighting 구현 버그가 수정되자 결과가 뒤집혔다. 훈련 환경의 버그가 어떻게 아키텍처 결론을 오염시키는가의 사례 연구.",
   "/2026/05/05/ep6-uncertainty-weighting-bug-en/":
@@ -172,7 +176,6 @@ export const EXCERPTS = {
  * shown greyed in Archives.
  */
 export const DRAFTS = [
-{ date: "2026-05-08", title: "[FinAI Build] Ep 7 — Distillation and Serving: PLE → LightGBM → Lambda + 5 Bedrock Agents", cat: "FinAI Build", lang: "EN", ex: "Teacher-student fidelity, why LightGBM for serving, serverless cost profile, and the 5-agent Bedrock pipeline.", tags: ["finai-build","distillation","serving"] },
   { date: "2026-05-12", title: "[FinAI Build] Ep 8 — Honest Negative Results and What Comes Next", cat: "FinAI Build", lang: "EN", ex: "adaTT null effect, GradSurgery rejection, Paper 3 WIP, real-data metrics pending.", tags: ["finai-build","adatt","gradsurgery"] },
 ];
 
