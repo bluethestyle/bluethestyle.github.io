@@ -4,6 +4,7 @@ date: 2026-04-20 12:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, attention, hypernetwork, mtl]
 lang: ko
+excerpt: "adaTT 서브스레드 시작 — 멀티태스크 학습에서 고정 타워가 닿는 한계, Transformer Attention 이 적응형 타워 문제를 재해석하는 방식, 그리고 조건부 계산·Hypernetwork 계보에서 adaTT 의 위치."
 series: study-thread
 part: 7
 alt_lang: /2026/04/20/adatt-1-adaptive-tower-motivation-en/

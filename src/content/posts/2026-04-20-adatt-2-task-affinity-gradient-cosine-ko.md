@@ -4,6 +4,7 @@ date: 2026-04-20 13:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, gradient, cosine-similarity, ema]
 lang: ko
+excerpt: "TaskAffinityComputer — 태스크 간 친화도를 실제로 측정하는 엔진. Gradient cosine similarity 수식과 EMA 평활화, 유클리드 거리 대신 코사인을 쓰는 이유, 그리고 `torch.compiler.disable` 로 처리한 gradient 추출 경로."
 series: study-thread
 part: 8
 alt_lang: /2026/04/20/adatt-2-task-affinity-gradient-cosine-en/

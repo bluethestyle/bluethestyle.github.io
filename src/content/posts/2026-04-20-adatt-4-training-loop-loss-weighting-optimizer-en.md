@@ -4,6 +4,7 @@ date: 2026-04-20 15:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, training-loop, loss-weighting, optimizer, specs]
 lang: en
+excerpt: "The adaTT sub-thread closes — 2-Phase Training Loop, Loss Weighting strategies (Uncertainty / GradNorm / DWA), Optimizer + Scheduler configuration, CGC–adaTT synchronization, memory and performance notes. With the adaTT tech reference PDF attached."
 series: study-thread
 part: 10
 alt_lang: /2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/

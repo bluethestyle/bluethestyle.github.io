@@ -4,6 +4,7 @@ date: 2026-04-20 13:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, gradient, cosine-similarity, ema]
 lang: en
+excerpt: "TaskAffinityComputer — the engine that actually measures task-to-task affinity. Gradient cosine similarity with EMA smoothing, why cosine over Euclidean, and the `torch.compiler.disable`-handled gradient extraction path."
 series: study-thread
 part: 8
 alt_lang: /2026/04/20/adatt-2-task-affinity-gradient-cosine-ko/

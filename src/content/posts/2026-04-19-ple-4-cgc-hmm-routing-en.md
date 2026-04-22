@@ -4,6 +4,7 @@ date: 2026-04-19 15:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, cgc, hmm, regularization]
 lang: en
+excerpt: "Two problems surface when the seven heterogeneous experts actually train — dim-asymmetry collapse toward the 128D expert, and customers not living at one time scale. The response: a two-stage CGC gate (CGCLayer + CGCAttention) plus HMM Triple-Mode routing."
 series: study-thread
 part: 4
 alt_lang: /2026/04/19/ple-4-cgc-hmm-routing-ko/

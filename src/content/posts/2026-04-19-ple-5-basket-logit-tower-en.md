@@ -4,6 +4,7 @@ date: 2026-04-19 16:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, logit-transfer, task-tower, group-encoder]
 lang: en
+excerpt: "Once routing is stable, three decisions remain on the task-private side — per-task expert memory (GroupTaskExpertBasket), explicit cross-task dependencies (Logit Transfer's three modes), and loss balance for the final Task Tower."
 series: study-thread
 part: 5
 alt_lang: /2026/04/19/ple-5-basket-logit-tower-ko/

@@ -4,6 +4,7 @@ date: 2026-04-20 15:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, training-loop, loss-weighting, optimizer, specs]
 lang: ko
+excerpt: "adaTT 서브스레드 마무리 — 2-Phase Training Loop, Loss Weighting 전략 (Uncertainty · GradNorm · DWA), Optimizer · Scheduler 설정, CGC ↔ adaTT 동기화, 메모리·성능 노트. adaTT 기술 참조서 PDF 첨부."
 series: study-thread
 part: 10
 alt_lang: /2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-en/

@@ -4,6 +4,7 @@ date: 2026-04-19 17:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, sae, uncertainty, evidential, specs]
 lang: en
+excerpt: "The PLE study sub-thread closes — Sparse Autoencoder for expert interpretability, Evidential Deep Learning for per-prediction uncertainty, the full 18-task spec and paper-vs-implementation comparison. With the full 56-page PLE tech reference PDF attached."
 series: study-thread
 part: 6
 alt_lang: /2026/04/19/ple-6-interpretability-uncertainty-specs-ko/

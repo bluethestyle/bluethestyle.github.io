@@ -4,6 +4,7 @@ date: 2026-04-19 14:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, expert-pool, hmm, shared-experts]
 lang: en
+excerpt: "Why seven experts, and why these seven — seat by seat, the mathematical gap each one fills (DeepFM · Temporal · HGCN · PersLay · LightGCN · Causal · Optimal Transport), the alternatives considered, and why each specific one won."
 series: study-thread
 part: 3
 alt_lang: /2026/04/19/ple-3-heterogeneous-expert-pool-ko/

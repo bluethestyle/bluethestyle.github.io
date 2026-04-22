@@ -4,6 +4,7 @@ date: 2026-04-19 12:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, mmoe, mtl, shared-bottom]
 lang: en
+excerpt: "Multi-task learning from the root motivation — why one recommender has to predict dozens of targets at once, the mathematical face of Negative Transfer, and where Shared-Bottom and MMoE each break down. Setup post for PLE's fix."
 series: study-thread
 part: 1
 alt_lang: /2026/04/19/ple-1-mtl-evolution-ko/

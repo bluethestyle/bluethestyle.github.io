@@ -4,6 +4,7 @@ date: 2026-04-20 12:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, attention, hypernetwork, mtl]
 lang: en
+excerpt: "The adaTT sub-thread opens — why fixed task towers hit a ceiling in multi-task learning, how Transformer Attention reframes the adaptive-tower problem, and where adaTT sits in the lineage of conditional computation and hypernetworks."
 series: study-thread
 part: 7
 alt_lang: /2026/04/20/adatt-1-adaptive-tower-motivation-ko/

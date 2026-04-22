@@ -4,6 +4,7 @@ date: 2026-04-19 17:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, sae, uncertainty, evidential, specs]
 lang: ko
+excerpt: "PLE 서브스레드 마지막 — 전문가 해석성을 위한 Sparse Autoencoder, 예측별 불확실성을 정량화하는 Evidential Deep Learning, 18개 태스크 전체 사양과 논문 대 구현 비교. 56쪽 PLE 기술 참조서 PDF 첨부."
 series: study-thread
 part: 6
 alt_lang: /2026/04/19/ple-6-interpretability-uncertainty-specs-en/

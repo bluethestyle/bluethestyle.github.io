@@ -4,6 +4,7 @@ date: 2026-04-21 12:00:00 +0900
 categories: [MRM Thread]
 tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: ko
+excerpt: "월요일 새벽 3시 `_decide_promotion()` 안에서 일어나는 일 — 4단계 단락 평가 사다리(force-promote · bootstrap · fidelity floor · competition)가 2-4주짜리 MRM 위원회 주기를 수초로 대체하고, 모든 판정이 HMAC 서명 감사 엔트리를 남긴다."
 series: mrm-thread
 part: 2
 alt_lang: /2026/04/21/mrm-ep2-champion-challenger-en/

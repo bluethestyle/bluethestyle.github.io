@@ -4,6 +4,7 @@ date: 2026-04-21 12:00:00 +0900
 categories: [MRM Thread]
 tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: en
+excerpt: "A Monday-3am walkthrough of `_decide_promotion()` — the 4-step short-circuit ladder (force-promote, bootstrap, fidelity floor, competition) that replaces a 2-to-4-week MRM committee cycle with seconds, and every outcome writes one HMAC-signed audit entry."
 series: mrm-thread
 part: 2
 alt_lang: /2026/04/21/mrm-ep2-champion-challenger-ko/

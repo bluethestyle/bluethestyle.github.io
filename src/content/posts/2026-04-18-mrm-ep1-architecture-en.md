@@ -4,6 +4,7 @@ date: 2026-04-18 12:00:00 +0900
 categories: [MRM Thread]
 tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: en
+excerpt: "The validation-first view of Model Risk Management breaks once the model becomes an LLM agent pipeline — multi-step attack surface, non-traditional failure modes, drift between validation cycles. Push MRM into the architecture itself, not the review calendar."
 series: mrm-thread
 part: 1
 alt_lang: /2026/04/18/mrm-ep1-architecture-ko/

@@ -4,6 +4,7 @@ date: 2026-04-19 14:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, expert-pool, hmm, shared-experts]
 lang: ko
+excerpt: "왜 7명인가, 왜 이 7명인가 — 자리별로 어떤 수학적 빈틈을 메우는지 (DeepFM · Temporal · HGCN · PersLay · LightGCN · Causal · Optimal Transport), 어떤 후보들을 밀어냈고 왜 이 사람이 뽑혔는지 하나씩."
 series: study-thread
 part: 3
 alt_lang: /2026/04/19/ple-3-heterogeneous-expert-pool-en/

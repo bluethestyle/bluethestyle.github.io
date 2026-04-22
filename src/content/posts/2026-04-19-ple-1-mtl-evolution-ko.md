@@ -4,6 +4,7 @@ date: 2026-04-19 12:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, mmoe, mtl, shared-bottom]
 lang: ko
+excerpt: "멀티태스크 학습의 뿌리 — 추천 시스템이 왜 수십 개 타겟을 동시에 예측해야 하는가, Negative Transfer 의 수식적 모습, Shared-Bottom 과 MMoE 가 각각 어디서 무너지는가. PLE 가 풀어낸 지점으로 가기 전의 도입편."
 series: study-thread
 part: 1
 alt_lang: /2026/04/19/ple-1-mtl-evolution-en/

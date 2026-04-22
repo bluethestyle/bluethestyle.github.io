@@ -4,6 +4,7 @@ date: 2026-04-21 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, claude-code, architecture, financial-ai]
 lang: en
+excerpt: "Five phases, four tools — how Gemini, Claude Opus, Cursor, and Claude Code each took a specific slot (ideation / technical validation / scaffolding / implementation / paper writing). Why tool separation beat tool uniformity on both speed and quality."
 series: three-months
 part: 2
 alt_lang: /2026/04/21/ep2-ai-collaboration-ko/

@@ -4,6 +4,7 @@ date: 2026-04-21 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, claude-code, architecture, financial-ai]
 lang: ko
+excerpt: "Gemini · Claude Opus · Cursor · Claude Code 를 프로젝트 5 단계에 어떻게 분업시켰나 — 아이디에이션·기술 검증·코드 환경·구현·논문 작성. 도구 균일보다 의도적 분리가 속도와 품질 양쪽에서 나았던 이유."
 series: three-months
 part: 2
 alt_lang: /2026/04/21/ep2-ai-collaboration-en/

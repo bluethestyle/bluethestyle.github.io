@@ -4,6 +4,7 @@ date: 2026-04-20 14:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, adatt, transfer-loss, group-prior, schedule, negative-transfer]
 lang: en
+excerpt: "adaTT's Transfer Loss in full — transfer weights with the G-01 clamp and target-task masking, task-group Prior matrix with Prior Blend Annealing, the 3-Phase Schedule (Warmup → Dynamic → Frozen), and the Negative Transfer detection-and-block mechanism."
 series: study-thread
 part: 9
 alt_lang: /2026/04/20/adatt-3-transfer-loss-group-prior-schedule-ko/

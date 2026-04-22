@@ -4,6 +4,7 @@ date: 2026-04-18 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, architecture, claude-code, financial-ai, ple]
 lang: en
+excerpt: "What three people with one desktop GPU set out to replace — an 80-DAG ALS recommender that could not explain itself and could not scale past one task — and how that starting constraint shaped every later architectural choice."
 series: three-months
 part: 1
 alt_lang: /2026/04/18/ep1-premise-ko/

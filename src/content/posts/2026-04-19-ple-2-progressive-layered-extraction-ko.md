@@ -4,6 +4,7 @@ date: 2026-04-19 13:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, cgc, tang2020, mtl]
 lang: ko
+excerpt: "MMoE 의 Expert Collapse 가 끝난 지점에서 시작 — PLE 가 이어서 내린 세 가지 결정: Shared/Task Expert 명시적 분리, 이종 Shared Expert 풀, 태스크마다 각 전문가를 얼마나 쓸지 학습하는 CGC 게이트."
 series: study-thread
 part: 2
 alt_lang: /2026/04/19/ple-2-progressive-layered-extraction-en/

@@ -4,6 +4,7 @@ date: 2026-04-19 16:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, logit-transfer, task-tower, group-encoder]
 lang: ko
+excerpt: "라우팅이 안정된 뒤 task-private 쪽에 남는 세 결정 — 태스크별 전용 전문가 메모리(GroupTaskExpertBasket), 태스크 간 명시적 의존(Logit Transfer 3 모드), 그리고 최종 Task Tower 의 손실 균형."
 series: study-thread
 part: 5
 alt_lang: /2026/04/19/ple-5-basket-logit-tower-en/

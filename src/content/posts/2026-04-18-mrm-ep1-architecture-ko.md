@@ -4,6 +4,7 @@ date: 2026-04-18 12:00:00 +0900
 categories: [MRM Thread]
 tags: [mrm, sr-11-7, regulation, financial-ai, audit]
 lang: ko
+excerpt: "검증 우선의 MRM 그림은 모델이 LLM 에이전트 파이프라인이 되는 순간 무너진다 — 다단계 공격 표면, 비전통적 실패 모드, 검증 주기 내 드리프트. MRM 의무를 검토 캘린더가 아니라 아키텍처 자체에 박아넣어야 한다."
 series: mrm-thread
 part: 1
 alt_lang: /2026/04/18/mrm-ep1-architecture-en/

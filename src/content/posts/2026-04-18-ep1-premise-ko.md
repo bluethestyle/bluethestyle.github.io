@@ -4,6 +4,7 @@ date: 2026-04-18 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, architecture, claude-code, financial-ai, ple]
 lang: ko
+excerpt: "Airflow DAG 80개짜리 ALS 추천기를 3명과 데스크톱 GPU 한 대가 대체하려 한 출발점. 설명 못 하고 태스크 다양성을 감당 못 하던 기존 시스템과, 그 제약이 이후 아키텍처 선택을 어떻게 규정했는지."
 series: three-months
 part: 1
 alt_lang: /2026/04/18/ep1-premise-en/

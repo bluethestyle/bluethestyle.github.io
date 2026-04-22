@@ -4,6 +4,7 @@ date: 2026-04-19 13:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, cgc, tang2020, mtl]
 lang: en
+excerpt: "Picking up from MMoE's Expert Collapse — PLE's three chained decisions: explicit Shared/Task expert separation, the heterogeneous Shared Expert pool, and the CGC gate that learns how much of each expert to use per task."
 series: study-thread
 part: 2
 alt_lang: /2026/04/19/ple-2-progressive-layered-extraction-ko/

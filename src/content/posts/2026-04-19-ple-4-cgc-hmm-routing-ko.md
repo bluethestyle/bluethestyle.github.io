@@ -4,6 +4,7 @@ date: 2026-04-19 15:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, cgc, hmm, regularization]
 lang: ko
+excerpt: "7명 이종 전문가를 실제로 학습시키면 동시에 두 문제가 드러난다 — 128D 전문가로 쏠리는 dim-asymmetry collapse 와 고객이 단일 시간 스케일에 살지 않는다는 사실. 해법은 2단계 CGC 게이트 (CGCLayer + CGCAttention) 와 HMM Triple-Mode 라우팅."
 series: study-thread
 part: 4
 alt_lang: /2026/04/19/ple-4-cgc-hmm-routing-en/
