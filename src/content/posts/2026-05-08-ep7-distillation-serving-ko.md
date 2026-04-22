@@ -10,7 +10,7 @@ part: 7
 alt_lang: /2026/05/08/ep7-distillation-serving-en/
 next_title: "에피소드 8 — Honest Negative Results & What Comes Next"
 next_desc: "adaTT null 효과, GradSurgery 기각, Paper 3 WIP, 그리고 2026-04-30 이후 실데이터 메트릭 대기 — 3개월의 작업에서 *작동하지 않은 것* 의 기록."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---

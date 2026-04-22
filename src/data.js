@@ -39,7 +39,7 @@ export const SERIES = [
     tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
-    ep: 7, total: 8,
+    ep: 8, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -77,6 +77,10 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/05/12/ep8-honest-negatives-ko/":
+    "3개월의 기록 — adaTT 가 13-task 에서 null 로 수렴한 과정, GradSurgery 가 VRAM 오버헤드로 미채택된 이유, Paper 3 WIP 상태, 2026-04-30 이후 실데이터 메트릭 대기. 작동하지 않은 것이 작동한 것만큼 중요한 이유.",
+  "/2026/05/12/ep8-honest-negatives-en/":
+    "Record from three months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 WIP status, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did.",
   "/2026/05/08/ep7-distillation-serving-ko/":
     "teacher 는 PLE, student 는 task 별 LightGBM, 서빙은 AWS Lambda. 왜 이 조합인가, teacher-student fidelity 가 실패하면 어떻게 되는가, 그리고 Bedrock 위 5-에이전트 파이프라인의 역할 분담.",
   "/2026/05/08/ep7-distillation-serving-en/":
@@ -175,9 +179,7 @@ export const EXCERPTS = {
  * Planned-but-unpublished posts. These have no markdown file yet —
  * shown greyed in Archives.
  */
-export const DRAFTS = [
-  { date: "2026-05-12", title: "[FinAI Build] Ep 8 — Honest Negative Results and What Comes Next", cat: "FinAI Build", lang: "EN", ex: "adaTT null effect, GradSurgery rejection, Paper 3 WIP, real-data metrics pending.", tags: ["finai-build","adatt","gradsurgery"] },
-];
+export const DRAFTS = [];
 
 export const TAGS = [
   { slug: "adatt",              name: "adatt",              count: 8, hot: true },
