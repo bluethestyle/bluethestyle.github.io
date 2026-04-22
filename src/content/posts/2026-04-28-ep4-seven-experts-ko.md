@@ -10,7 +10,7 @@ part: 4
 alt_lang: /2026/04/28/ep4-seven-experts-en/
 next_title: "에피소드 5 — 데이터 무결성 사냥"
 next_desc: "label leakage 3연쇄 탐지, 18→13 태스크 축소, 합성데이터 v2→v3→v4 iteration — 모델 아키텍처보다 먼저 해결해야 했던 것."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/ko/expert_details.pdf
 source_label: "전문가 상세 (KO, PDF)"
 ---

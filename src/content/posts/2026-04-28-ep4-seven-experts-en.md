@@ -10,7 +10,7 @@ part: 4
 alt_lang: /2026/04/28/ep4-seven-experts-ko/
 next_title: "Ep 5 — The Data Integrity Hunt"
 next_desc: "Three chained label-leakage detections, the 18→13 task reduction, and synthetic-data iterations v2→v3→v4 — what had to be solved before the architecture could even be measured."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/expert_details_en.pdf
 source_label: "Expert Details (EN, PDF)"
 ---

@@ -10,7 +10,7 @@ part: 4
 alt_lang: /2026/04/28/mrm-ep4-fria-en/
 next_title: "에피소드 5 — 티켓 큐가 아니라 API 인 Human Oversight"
 next_desc: "EU AI Act Art 14, kill switch API, HumanReviewQueue tier 2/3, 그리고 auto_promote=false 가 production posture 로 강제되는 이유."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---

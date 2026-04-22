@@ -10,7 +10,7 @@ part: 4
 alt_lang: /2026/04/28/mrm-ep4-fria-ko/
 next_title: "Ep 5 — Human Oversight as an API, Not a Ticket Queue"
 next_desc: "EU AI Act Article 14, kill-switch API, HumanReviewQueue tier 2/3, and why auto_promote=false is forced as a production posture."
-next_status: draft
+next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---

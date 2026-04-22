@@ -39,7 +39,7 @@ export const SERIES = [
     tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
-    ep: 4, total: 8,
+    ep: 5, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -51,7 +51,7 @@ export const SERIES = [
     tagKo: "MRM 스레드",
     desc: "Regulatory compliance and model risk management for AI recommendation systems, from a GARP FRM practitioner perspective.",
     descKo: "AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.",
-    ep: 4, total: 6,
+    ep: 5, total: 6,
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
   },
@@ -77,6 +77,14 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/05/01/ep5-data-integrity-hunt-ko/":
+    "아키텍처 논쟁 전에 풀어야 했던 것 — label leakage 3건 연쇄 탐지, 18→13 태스크 축소의 결정론적 리키지 배경, 합성데이터 v2→v3→v4 iteration 에서 드러난 자기복제 피처.",
+  "/2026/05/01/ep5-data-integrity-hunt-en/":
+    "Before any architecture debate — three chained label-leakage detections, the deterministic-leakage rationale behind the 18→13 task reduction, and the self-replicating features that surfaced across synthetic-data iterations v2→v3→v4.",
+  "/2026/05/01/mrm-ep5-human-oversight-ko/":
+    "EU AI Act Article 14 의 인간 감독 요구를 티켓 큐가 아니라 API 엔드포인트로 구현한 방식 — kill switch, HumanReviewQueue tier 2/3, 그리고 auto_promote=false 가 production posture 로 강제되는 이유.",
+  "/2026/05/01/mrm-ep5-human-oversight-en/":
+    "EU AI Act Article 14's human-oversight requirement implemented as API endpoints rather than a ticket queue — kill switch, HumanReviewQueue tiers 2/3, and why auto_promote=false is enforced as a production posture.",
   "/2026/04/28/ep4-seven-experts-ko/":
     "왜 7명인가, 왜 이 7명인가. Gemini 와의 학제간 스캔에서 11개 분야를 훑고, Opus 와의 기술 검증에서 선 안으로 들어온 DeepFM·Temporal·HGCN·PersLay·Causal·LightGCN·OT 의 도출 과정.",
   "/2026/04/28/ep4-seven-experts-en/":
@@ -156,8 +164,6 @@ export const EXCERPTS = {
  * shown greyed in Archives.
  */
 export const DRAFTS = [
-{ date: "2026-05-01", title: "[FinAI Build] Ep 5 — The Data Integrity Hunt", cat: "FinAI Build", lang: "EN", ex: "Three chained label leakage detections, 18→13 task reduction, synthetic data v2→v3→v4 iterations.", tags: ["finai-build","data-integrity","leakage"] },
-  { date: "2026-05-01", title: "[MRM Thread] Ep 5 — Human Oversight as an API, Not a Ticket Queue", cat: "MRM Thread", lang: "EN", ex: "EU AI Act Art. 14, kill-switch API, HumanReviewQueue tier 2/3, and auto_promote=false as a production posture.", tags: ["mrm","human-oversight","kill-switch"] },
   { date: "2026-05-05", title: "[FinAI Build] Ep 6 — The Bug That Overwhelmed All Architectural Decisions", cat: "FinAI Build", lang: "EN", ex: "Uncertainty weighting → softmax-sigmoid reversal. Methodological lesson: training bugs can corrupt architectural conclusions.", tags: ["finai-build","debugging","methodology"] },
   { date: "2026-05-05", title: "[MRM Thread] Ep 6 — Fairness as a Production Path", cat: "MRM Thread", lang: "EN", ex: "Five protected attributes, real-time DI/SPD/EOD on the production stream, counterfactual evaluation, Parquet archive.", tags: ["mrm","fairness","monitoring"] },
   { date: "2026-05-08", title: "[FinAI Build] Ep 7 — Distillation and Serving: PLE → LightGBM → Lambda + 5 Bedrock Agents", cat: "FinAI Build", lang: "EN", ex: "Teacher-student fidelity, why LightGBM for serving, serverless cost profile, and the 5-agent Bedrock pipeline.", tags: ["finai-build","distillation","serving"] },
