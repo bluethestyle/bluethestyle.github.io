@@ -108,6 +108,32 @@ and storage. And occasional team meals.
 Looking back, this sounds grim. At the time it just felt like the
 starting condition. Something to work within, not cry about.
 
+## Why Claude Code changed what three people could attempt
+
+The constraints alone would not have been enough. Three people on
+an RTX 4070, even with ten years of combined experience, cannot
+ship an 80-DAG ALS replacement in three months through willpower.
+What made this project possible as a *scope*, not just an
+*ambition*, was Claude Code sitting in the loop from day one.
+
+This is not a promotional claim; it is a scoping claim. Before
+Claude Code, a project of this shape would have required a team of
+eight to fifteen. With Claude Code as the primary development
+partner — writing boilerplate, drafting expert implementations,
+tracing bugs across the codebase, maintaining context across days
+of parallel work — the same effort fit into three people. The
+series from Ep 2 onward is about how that actually worked in
+practice: which phases got which tools, how three humans each led
+an AI agent team, and which failure modes emerged from that
+pattern.
+
+The point of naming this up front — a Korean financial-services
+team of three to five people at a mid-size institution can now
+consider projects that used to require a dedicated ML organization.
+The constraints remain (consumer GPU, personal wallet for
+subscriptions, small team), but the ceiling on what those
+constraints can ship has moved.
+
 ## The architecture decision journey
 
 Here is where it gets interesting. The final architecture — seven
@@ -163,6 +189,20 @@ experts, each chosen to represent a structurally distinct
 temporal dynamics, topological shape, causal inference, and so
 on). A shared bottom that lets them cross-fertilize. Gates that
 are *the* explanation, not an artifact of post-hoc analysis.
+
+None of this was a single moment. The Black-Litterman rejection
+happened in a whiteboard session. The ensemble rejection happened
+over two weeks of cost-modeling. The PLE reframe happened while
+the PM was reading papers one Saturday and typed a line into a
+Claude conversation: "what if the experts aren't independent
+models but differentiable pieces of one model?" That line was
+the hinge. What followed was three weeks of Claude Code sessions
+taking the reframe into code — first a minimal PLE prototype on
+synthetic data to see whether the gates were actually
+interpretable, then iterative expansion to seven experts, then
+the full 13-task setup. The "architecture decision" is easy to
+write about in hindsight as a clean logical sequence; in real
+time it was weeks of implementation, failure, reimplementation.
 
 ## Why the constraints were a gift
 
