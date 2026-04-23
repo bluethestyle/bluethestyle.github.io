@@ -84,10 +84,11 @@ const enriched = entries.map((entry) => {
         <div class="year">2026</div>
         <div>
           {enriched.map((p) => {
+            const dateIso = p.data.date.toISOString().slice(0, 10);
             const dateShort = p.data.date.toISOString().slice(5, 10).replace("-", " · ");
             const langUp = p.data.lang.toUpperCase();
             return (
-              <a class="post-row" href={p._url} data-lang-post={(p.data.lang || "").toLowerCase()}>
+              <a class="post-row" href={p._url} data-lang-post={(p.data.lang || "").toLowerCase()} data-post-date={dateIso}>
                 <div>
                   <div class="meta-line">
                     <span class="cat">EP {p.data.part ?? "?"}</span>
@@ -115,4 +116,13 @@ const enriched = entries.map((entry) => {
       </div>
     )}
   </section>
+
+  <script is:inline>
+    (function () {
+      const today = new Date().toISOString().slice(0, 10);
+      document.querySelectorAll(".post-row[data-post-date]").forEach((el) => {
+        if (el.dataset.postDate > today) el.style.display = "none";
+      });
+    })();
+  </script>
 </Base>
