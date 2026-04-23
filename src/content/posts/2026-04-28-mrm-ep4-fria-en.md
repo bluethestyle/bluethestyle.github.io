@@ -20,11 +20,20 @@ structure. This episode goes one layer up — a *regulatory artifact*
 that lives on top of that log: the FRIA (Fundamental Rights Impact
 Assessment).*
 
-## April 2026, the first FSS request
+## What AI Basic Act §35 can ask for
 
-Korea AI Basic Act took effect 2026-01-22. Financial product
-recommendation is classified §35 high-impact AI. One day in April,
-an auditor from the Financial Supervisory Service files a request:
+Korea AI Basic Act took effect 2026-01-22. §35 defines "high-impact
+AI" (고영향 AI) as systems that may materially affect life, bodily
+safety, or fundamental rights. Classification is determined by
+usage context and the scope/severity/frequency of risk, and is
+self-assessed by the operator. Given that financial product
+recommendation directly affects customer financial decisions and
+suitability rights, we assessed the system as likely to fall under
+§35 high-impact AI and built the FRIA (Fundamental Rights Impact
+Assessment) architecture preemptively on that premise. Consider an
+illustrative scenario of what a supervisor might ask under this
+classification:
+
 "Has your recommendation AI performed the seven-dimension impact
 assessment required by §35? Submit the evaluation result and
 mitigation measures in a form that can be retained for five years."

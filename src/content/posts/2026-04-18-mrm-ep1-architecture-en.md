@@ -202,11 +202,14 @@ conditions still met."
 
 Three regulatory developments converge this year:
 
-- **Korean AI Basic Act** (effective 2026-01-22). Classifies
-  financial product recommendation as high-risk AI. Requires
-  impact assessment, transparency obligations, and human
-  oversight. The domestic FSS guidelines are expected to issue
-  concrete implementation rules in Q2 2026.
+- **Korean AI Basic Act** (effective 2026-01-22). Financial AI
+  that materially affects customer financial decisions is likely
+  to fall under §35 "high-impact AI" (고영향 AI), triggering
+  impact assessment, transparency obligations, and human oversight.
+  Classification is determined by context and the scope/severity/
+  frequency of risk, and is self-assessed by the operator. The
+  domestic FSS guidelines are expected to issue concrete
+  implementation rules in Q2 2026.
 
 - **EU AI Act Title III, Chapter 2**. Article 13 (transparency),
   Article 14 (human oversight), Article 15 (accuracy &
