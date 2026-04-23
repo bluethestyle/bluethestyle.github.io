@@ -24,7 +24,7 @@ next_status: published
 실시간으로 업데이트되는 $[-1, 1]$ 범위의 친화도 행렬 $\mathbf{A}$ 가
 있다. 이걸로 무엇을 할 것인가. 이 질문은 네 개의 작은 결정으로 풀린다.
 
-1. 친화도를 *loss 신호* 로 어떻게 바꾸는가 — Transfer Loss
+1. 친화도를 *loss 신호* 로 어떻게 전환하는가 — Transfer Loss
 2. 학습 초기의 *비어 있는* 친화도를 어떻게 채우는가 — Group Prior
 3. 학습 단계에 따라 전이 강도를 어떻게 조절하는가 — 3-Phase Schedule
 4. 음의 친화도, 즉 *해로운 전이* 를 어떻게 다루는가 — Negative Transfer 차단
@@ -33,7 +33,7 @@ next_status: published
 
 ## 결정 1 — Transfer Loss, 왜 이 형태인가
 
-친화도를 loss 신호로 바꾸는 방법은 여러 가지다. 세 후보를 놓고 비교해
+친화도를 loss 신호로 전환하는 방법은 여러 가지다. 세 후보를 놓고 비교해
 보자.
 
 - *(a) 가중 합산 증류* — 다른 태스크의 loss 를 친화도로 가중 합산해
@@ -63,7 +63,7 @@ $$\mathcal{L}_i^{\text{adaTT}} = \mathcal{L}_i + \lambda \cdot \sum_{j \neq i} w
 
 $w_{i \rightarrow j}$ 자체는 학습 가능 가중치 $\mathbf{W}$, 측정된 친화도
 $\mathbf{A}$, 도메인 Prior $\mathbf{P}$ 를 섞은 뒤 softmax 로 정규화한
-결과다 — 이 절차의 전개는 결정 2 의 Prior Blend 에서 함께 풀린다.
+값이다 — 이 절차의 구체적인 내용은 결정 2 의 Prior Blend 에서 함께 풀린다.
 
 ### G-01 FIX — Transfer Loss Clamp
 
@@ -82,7 +82,7 @@ $$\text{transfer}_i \leftarrow \min(\lambda \cdot \text{transfer}_i,\ \text{max\
 
 모든 배치에 모든 태스크의 target 이 있는 건 아니다. 단순히 "0.0 loss"
 를 넣으면 softmax 가중치가 해당 태스크로 여전히 일부 흐르므로 잘못된
-전이가 발생한다. 해결은 `loss_mask_tensor` 로 곱해 해당 전이 경로를
+전이가 발생한다. 해결은 `loss_mask_tensor` 로 곱해 해당 전이 흐름을
 *완전히 차단* 하는 것 — softmax 이후에 곱해 가중치 자체가 0 이 되게 한다.
 배치별 target 구성이 가변적인 실환경에 안전하다.
 
@@ -94,7 +94,7 @@ $$\text{transfer}_i \leftarrow \min(\lambda \cdot \text{transfer}_i,\ \text{max\
 transfer 로 망가진다.
 
 Group Prior 는 이 공백을 도메인 지식으로 채운다 — CTR, CVR, engagement,
-uplift 는 참여 / 전환 계열이니 서로 강하게 연결되고, churn, retention,
+uplift 는 참여 / 전환 계열이라 서로 강하게 연결되고, churn, retention,
 life_stage, ltv 는 생애주기 계열로 묶인다. 같은 그룹 내는 `intra_strength`
 (0.6–0.8), 다른 그룹 간은 `inter_group_strength` (0.3) 로 설정한다.
 
@@ -115,9 +115,9 @@ life_stage, ltv 는 생애주기 계열로 묶인다. 같은 그룹 내는 `intr
 ### Prior Blend Annealing
 
 $\mathbf{A}$ 와 $\mathbf{P}$ 를 어떻게 섞을 것인가. 고정 비율은 답이
-아니다 — 초기엔 $\mathbf{A}$ 가 노이즈지만, 학습이 진행되며 $\mathbf{A}$
-는 진짜 관측이 되고 $\mathbf{P}$ 의 휴리스틱은 오히려 방해가 된다.
-해결은 *선형 감소* annealing.
+아니다 — 초기엔 $\mathbf{A}$ 가 노이즈지만, 학습이 진행되면 $\mathbf{A}$
+는 실제 관측값이 되고 $\mathbf{P}$ 의 휴리스틱은 오히려 방해가 된다.
+해결은 *선형 감소* annealing 이다.
 
 $$r(e) = r_{\text{start}} - (r_{\text{start}} - r_{\text{end}}) \cdot \min\left(\frac{e - e_{\text{warmup}}}{e_{\text{freeze}} - e_{\text{warmup}}}, 1.0\right)$$
 
@@ -140,7 +140,7 @@ $$\mathbf{R} = (\mathbf{W} + \mathbf{A}) \cdot (1 - r) + \mathbf{P} \cdot r$$
 
 ## 결정 3 — 3-Phase Schedule, 왜 세 단계인가
 
-Transfer 의 "시점" 도 결정해야 한다. 매 step 전이가 맞는가? 아니다. 학습
+전이를 *언제* 적용할지도 결정해야 한다. 매 step 전이가 맞는가? 아니다. 학습
 상태에 따라 전이가 *정반대 역할* 을 한다.
 
 *Phase 1 — Warmup (친화도 측정만, 전이 없음).* 학습 시작 시 네트워크의
@@ -210,8 +210,8 @@ gradient 를 건드리지 않는 것이다.
 
 차단만 하는 게 아니라 *진단* 도 제공한다. `detect_negative_transfer()`
 메서드는 $\{$태스크 $i$: 친화도가 $\tau_{neg}$ 미만인 $j$ 리스트$\}$
-형태의 dict 을 반환하여, MLflow 로깅 등에서 "어떤 쌍이 실제로 충돌하고
-있는가" 를 사후 분석할 수 있게 한다. 예: `{"churn": ["ctr", "engagement"],
+형태의 dict 를 반환해, MLflow 로깅 등에서 "어떤 쌍이 실제로 충돌하고
+있는가" 를 사후 분석할 수 있다. 예: `{"churn": ["ctr", "engagement"],
 "ltv": ["brand_prediction"]}`.
 
 | 설정 | 결과 |
@@ -240,12 +240,12 @@ Transfer Loss, Group Prior, 3-Phase Schedule, Negative Transfer 차단
 — 네 결정이 서로 맞물린다. Prior 는 초기의 빈 친화도 공간을 도메인
 지식으로 채우고, Phase 스케줄은 "관찰 → 전이 → 고정" 의 curriculum 을
 강제하며, Negative Transfer 차단은 측정된 친화도가 음수로 꺾이는
-구간에서 해로운 경로를 끊는다. G-01 FIX Clamp 는 이 모든 것이 원본
+구간에서 해로운 전이를 끊는다. G-01 FIX Clamp 는 이 모든 것이 원본
 손실을 덮지 않게 비율 상한을 건다.
 
 하지만 이 구조는 혼자 돌지 않는다. 실제 학습 루프에는 2-Phase Training
 (Shared Pretrain → Cluster Finetune), 16 태스크 Uncertainty Weighting,
 AdamW + SequentialLR, 그리고 CGC 의 gate dynamic 이 함께 있다. adaTT 의
 3-Phase 친화도 스케줄이 Trainer 의 2-Phase 학습 루프와 어떻게 맞물리는지,
-CGC gate freeze 와 왜 동기화해야 하는지 — 이 엔지니어링 계약이
+CGC gate freeze 와 왜 동기화해야 하는지 — 이 엔지니어링 설계가
 **ADATT-4** 의 주제다.

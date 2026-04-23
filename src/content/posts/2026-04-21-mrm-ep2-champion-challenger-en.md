@@ -27,13 +27,16 @@ Challenger lands in the registry, waiting. What happens between
 this moment and a customer getting a new recommendation is where
 the old process and ours diverge completely.
 
-In the conventional flow: a duty officer reads the email Tuesday
-morning. A comparison report is requested, drafted on Wednesday,
-submitted, and reviewed at the MRM committee's monthly meeting
-next week. If approved, an engineer files a deployment ticket for
-the next release window. Training-end to production: *two to four
-weeks*; the rationale lives scattered across spreadsheets, slides,
-and meeting minutes.
+In the conventional flow: a duty officer checks the retraining
+completion notice Tuesday morning and forwards it to the model
+risk team. The validation team spends several days drafting a
+report — KS statistic, PSI, Gini coefficient — and routes it to
+the Risk Management Committee or up the approval chain to the
+responsible executive. Once approved, a deployment request is
+filed through IT change management and lands in the next release
+window. Training-end to production: *two to four weeks*; the
+rationale lives scattered across validation reports and approval
+documents.
 
 In our flow: the registration event fires `_decide_promotion()`
 synchronously. Within seconds of the training job finishing, a
