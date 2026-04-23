@@ -94,7 +94,7 @@ results are in, Study Thread will cover them in detail.
 
 All of this work is ultimately validated against real-data results.
 From 2026-04-30, production-traffic AUC / F1-macro / MAE / NDCG /
-fairness indicators have been collected from five financial-institution
+fairness indicators have been collected from financial-institution
 partners. At the time of writing (mid-May), initial early-May
 metrics are coming in but volume is still not meaningful.
 
