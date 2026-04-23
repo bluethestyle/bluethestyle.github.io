@@ -90,29 +90,41 @@ Still at abstract-draft stage. Experimental design complete,
 execution in progress, Zenodo upload targeted at Q3 2026. When
 results are in, Study Thread will cover them in detail.
 
-## Real-data metrics after 2026-04-30 — pending
+## From synthetic to production data — the validation window isn't open yet
 
-All of this work is ultimately validated against real-data results.
-From 2026-04-30, production-traffic AUC / F1-macro / MAE / NDCG /
-fairness indicators have been collected from financial-institution
-partners. At the time of writing (mid-May), initial early-May
-metrics are coming in but volume is still not meaningful.
+All three months of design and experimentation ran on synthetic
+data. No matter how faithfully the 1M-row synthetic set reproduces
+the statistical properties of real customer data, there is no
+guarantee that the same architectural conclusions will hold under
+production traffic. Whether that gap closes can only be confirmed
+on real data.
 
-The publishable-vs-non-publishable boundary is clear. *Publishable*
-— model performance metrics (per-task AUC, etc.), fairness
-indicators (DI per protected attribute), drift trends, incident
-statistics. *Not publishable* — customer segment distributions,
-specific-group characteristics, partner institution identifying
-information, internal operational details. The latter is under NDA
-and *only the former appears on the blog*.
+Production-traffic collection for per-task AUC, F1-macro, MAE, NDCG,
+and fairness indicators across five protected attributes began on
+2026-04-30. At the time of writing (mid-May), the early-May
+metrics accumulated so far are well short of statistically
+meaningful volume. A few days of data cannot decide whether the
+sigmoid-softmax reversal (Ep 6) reproduces in production.
 
-Whether the real-data metrics reproduce the synthetic-data
-conclusions is an open question. Particularly whether the
-sigmoid-softmax reversal (Ep 6) reproduces on real data, and
-which seven-expert configurations are robust in production. If
-they reproduce, the methodological claims strengthen; if not, it
-opens new questions. Either way, follow-ups will appear in Study
-Thread or Commentary.
+The line between what appears on this blog and what does not is
+clear.
+* **Publishable:** per-task AUC, DI per protected attribute, drift
+  trends, incident statistics — aggregated technical indicators.
+* **Not publishable:** customer segment distributions, individual
+  customer characteristics, internal operational policies — any
+  information that could identify customers or business specifics.
+
+The latter sits under the institution's internal information-
+protection rules; only aggregated technical numbers appear here.
+
+Whether our synthetic-data conclusions reproduce in production
+remains open. Whether the sigmoid-softmax reversal (Ep 6) holds on
+real data, which of the seven heterogeneous experts wobbles first
+under production distributions — these depend on months of
+accumulated metrics. If they reproduce, the methodological claims
+are supported by real data; if not, the divergence itself becomes
+the starting point for the next paper. Either way, follow-ups will
+appear in Study Thread or Commentary.
 
 ## Things tried in three months that did not make the record
 
