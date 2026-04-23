@@ -29,7 +29,7 @@ PLE-2 의 결정은 "Shared Expert 를 이종으로 구성한다" 였다. 하지
 
 **고려한 대안들.** Wide & Deep (Cheng et al., 2016) 은 wide 쪽에 cross 를 손으로 넣어야 했다. xDeepFM 은 FM 위에 CIN 을 추가해 고차 교차를 명시적으로 다루지만, 파라미터 부담이 2배 이상이다. GDCN (2023) 은 더 최근 모델이지만 우리 규모 (644D 정규화 입력) 에서 벤치마크된 적이 없다.
 
-**왜 DeepFM 인가.** FM 부분이 $O(nk)$ 로 안정적으로 스케일하고 (Rendle 2010), Deep 부분이 저렴한 비선형 고차 항을 얹는다. 그리고 FM 교차의 해석성이 살아 있다 — "피처 A 와 피처 B 의 쌍 $\langle v_A, v_B \rangle$ 이 크다" 가 학습된 교차의 sanity check 가 된다. 이종 pool 에서 *유일하게 피처 이름 수준의 해석이 가능한* 자리다.
+**왜 DeepFM 인가.** FM 부분이 $O(nk)$ 로 안정적으로 스케일하고 (Rendle 2010), Deep 부분이 저렴한 비선형 고차 항을 얹는다. FM 교차의 해석성도 살아 있다 — "피처 A 와 피처 B 의 쌍 $\langle v_A, v_B \rangle$ 이 크다" 가 학습된 교차의 sanity check 가 된다. 이종 pool 에서 *유일하게 피처 이름 수준의 해석이 가능한* 자리다.
 
 ```mermaid
 flowchart LR
@@ -63,7 +63,7 @@ $$\hat{y}_{FM} = w_0 + \sum_{i=1}^{n} w_i x_i + \sum_{i=1}^{n} \sum_{j=i+1}^{n} 
 
 **고려한 대안들.** 표준 GCN (Kipf & Welling 2017) 은 feature transformation 행렬과 nonlinearity 가 있어 추천용으로는 과적합되기 쉽다. NGCF (He et al., SIGIR 2019) 가 정확히 이 문제를 겪었다. GraphSAGE 나 GAT 는 이웃 샘플링이나 attention 으로 복잡도를 더 얹지만, 우리의 bipartite 협업 구조에서는 그 복잡도가 이득보다 비용이 크다.
 
-**왜 LightGCN 인가.** He et al. (SIGIR 2020) 이 GCN 에서 feature transformation 과 nonlinearity 를 뺀 극단적 단순화로, 오히려 NGCF 보다 더 잘 됐다 — "Deep 이 항상 좋은 것은 아니다" 의 교과서적 예시다. 사전 계산이 가능하고 (오프라인 배치 학습), 수렴이 빠르고, overfitting 이 적다. 이분 그래프 협업 신호라는 단일 역할에 최적화된 도구를 골랐다.
+**왜 LightGCN 인가.** He et al. (SIGIR 2020) 이 GCN 에서 feature transformation 과 nonlinearity 를 뺀 극단적 단순화로, 오히려 NGCF 보다 더 잘 됐다 — "Deep 이 항상 좋은 것은 아니다" 의 교과서적 예시다. 사전 계산이 가능하고 (오프라인 배치 학습), 학습이 빠르고, overfitting 이 적다. 이분 그래프 협업 신호라는 단일 역할에 최적화된 도구를 골랐다.
 
 ```mermaid
 flowchart LR
@@ -173,9 +173,9 @@ $$\text{PersLay}(D) = \sum_{(b, d) \in D} \phi(b, d) \cdot \psi(d - b)$$
 
 **메우려는 빈틈.** 상관관계는 대칭이다. $\text{corr}(X, Y) = \text{corr}(Y, X)$. 하지만 "소득이 늘면 소비가 증가" 와 "소비가 늘면 소득이 증가" 는 완전히 다른 주장이며, 특히 금융 · 정책 개입 의사결정에서는 방향이 결정적이다. 피처 간 방향성과 교란 변수 제거를 다루는 전용 자리가 필요했다.
 
-**고려한 대안들.** SHAP · LIME 은 post-hoc 해석이라 구조적 인과가 아니라 상관성의 분해일 뿐이다. 베이지안 네트워크는 DAG 학습이 조합 최적화 ($2^{n^2}$) 라 GPU 친화적이지 않다. Instrumental variable 은 실제 개입 도구가 있어야만 쓸 수 있다.
+**고려한 대안들.** SHAP · LIME 은 사후 해석 방식이라 구조적 인과가 아니라 상관성을 분해할 뿐이다. 베이지안 네트워크는 DAG 학습이 조합 최적화 ($2^{n^2}$) 라 GPU 친화적이지 않다. Instrumental variable 은 실제 개입 도구가 있어야만 쓸 수 있다.
 
-**왜 NOTEARS 계열 Causal 인가.** Zheng et al. (NeurIPS 2018) 이 DAG 학습을 조합 최적화에서 *연속 최적화* 로 바꿨다 — acyclicity 제약을 trace($e^W$) 같은 미분 가능한 형태로 표현해 GPU 에서 풀 수 있게. 이것이 644D 입력에서 인과 DAG 를 학습하고 교란 변수를 제거한 인과 표현을 뽑아내는 기반이 된다. 다른 Expert 가 "고객은 어떻게 생겼는가" 를 보는 동안, Causal 은 "이 피처를 바꾸면 결과가 어떻게 움직이는가" 를 시뮬레이션할 재료를 제공한다.
+**왜 NOTEARS 계열 Causal 인가.** Zheng et al. (NeurIPS 2018) 이 DAG 학습을 조합 최적화에서 *연속 최적화* 로 전환했다 — acyclicity 제약을 trace($e^W$) 같은 미분 가능한 형태로 표현해 GPU 에서 풀 수 있게. 이것이 644D 입력에서 인과 DAG 를 학습하고 교란 변수를 제거한 인과 표현을 뽑아내는 기반이 된다. 다른 Expert 가 "고객은 어떻게 생겼는가" 를 보는 동안, Causal 은 "이 피처를 바꾸면 결과가 어떻게 움직이는가" 를 시뮬레이션할 재료를 제공한다.
 
 ```mermaid
 flowchart LR
@@ -228,7 +228,7 @@ DeepFM, Causal, OT 는 **정확히 같은 644D 정규화 피처 벡터** 를 입
 
 같은 피처 집합에서 뽑는 세 구조가 수학적으로 *교환 불가능* 하다는 것 — 하나가 다른 둘을 대체할 수 없다는 것 — 이 이종 pool 의 핵심 정당화다. 나머지 4명 (LightGCN, Unified HGCN, Temporal, PersLay) 은 각자 고유한 도메인 입력 — 그래프, 쌍곡 좌표, 시퀀스, persistence diagram — 을 받아 단일 피처 벡터로는 볼 수 없는 단면들을 본다.
 
-CGC 게이트가 태스크별로 "이 태스크에는 어떤 렌즈가 필요한가" 를 학습해 가중치를 배분한다. 그 게이팅의 수식을 **PLE-4** 에서 두 단계 (CGCLayer + CGCAttention) 로 나눠 따라간다. 그리고 이 이종 출력이 만드는 새 문제 — 64D vs 128D 의 비대칭, 랜덤 초기화의 collapse 위험, 시간 스케일의 분리 — 도 거기서 하나씩 해결한다.
+CGC 게이트가 태스크별로 "이 태스크에는 어떤 렌즈가 필요한가" 를 학습해 가중치를 배분한다. 그 게이팅 수식은 **PLE-4** 에서 두 단계 (CGCLayer + CGCAttention) 로 나눠 따라간다. 이종 출력이 만드는 새 문제 — 64D vs 128D 의 비대칭, 랜덤 초기화의 collapse 위험, 시간 스케일의 분리 — 도 거기서 하나씩 해결한다.
 
 | # | Expert | 한 줄 역할 | 출력 |
 |---|---|---|---|
