@@ -35,7 +35,7 @@ Expert 가 약간 더 유용해지면 모든 태스크의 gate 가 그쪽으로 
 기울고, 그 Expert 가 더 많은 gradient 를 받고, 점점 더 유용해진다.
 승자독식의 양의 피드백 루프 — *Expert Collapse* — 다. 결국 모든 태스크가
 같은 Expert 를 쓰고, 다른 Expert 들의 파라미터는 거의 업데이트되지
-않는다. Shared-Bottom 으로 다시 수렴한 것이다.
+않는다. Shared-Bottom 으로 다시 돌아간 셈이다.
 
 문제의 진단은 분명하다. Expert pool 이 *대칭적* 이다. 모든 Expert 가
 같은 구조, 같은 입력, 같은 초기화를 공유한다. 이 대칭 안에서 gate
@@ -120,12 +120,12 @@ VTR, Share Rate) 은 본질적으로 같은 종류의 사용자-아이템 상호
 
 **설명 가능성을 구조적으로 확보한다.** "unified_hgcn 이 35%, temporal
 이 28% 기여했다" 는 SHAP 근사가 아니라 *실제로 계산된 gate 가중치*
-이고, 각 Expert 이름이 비즈니스적으로 읽힌다 ("계층 관계", "시간
+이고, 각 Expert 이름이 비즈니스 언어로 읽힌다 ("계층 관계", "시간
 패턴"). 동종 MLP 앙상블에서는 "MLP-3 이 28%" 가 고객에게도 감독
-당국에게도 설명이 되지 않는다.
+당국에게도 납득이 되지 않는다.
 
 **태스크 간 역할 분화가 강해진다.** 동종 Expert 들은 학습 과정에서
-비슷한 특성으로 수렴하기 쉽다 (Expert Collapse 의 또 다른 얼굴). 이종
+비슷한 특성으로 쏠리기 쉽다 (Expert Collapse 의 또 다른 얼굴). 이종
 Expert 는 각자 고유한 구조적 편향을 갖기 때문에 자연스럽게 분화된다.
 gate 가 "어떤 관점의 Expert 를 선택할지" 결정할 때, 실제로 구분 가능한
 관점 공간 안에서 선택하게 된다.
@@ -264,25 +264,25 @@ $\pi_i(\mathbf{x})$ 가 gate, $p_i$ 가 Expert 에 대응한다. 각 Expert 가
 ## 그런데 이 설계는 또 다른 문제를 낳는다
 
 세 결정 — 명시적 분리, 이종 구성, Softmax gate — 이 작동하면 MMoE 의
-Collapse 는 막힌다. 그러나 새 문제들이 생긴다.
+Collapse 는 막힌다. 하지만 새 문제들이 생긴다.
 
 **첫째, 이종 출력 차원.** unified_hgcn 이 128D 이고 나머지 6개가 64D
-라서, gate 가중치가 같아도 L2 기여가 2배 다르다. 학습이 큰 Expert 로
+라서, gate 가중치가 같아도 L2 기여가 2배 차이 난다. 학습이 큰 Expert 로
 편향되는 미묘한 collapse 가 여전히 가능하다. 이건 PLE-4 의
-`dim_normalize` 로 풀린다.
+`dim_normalize` 로 해결된다.
 
 **둘째, Shared concat 을 태스크별로 다르게 재조합해야 한다.** CGCLayer
 원형은 Shared + Task Expert 를 한 축에서 가중합하지만, 우리 설정에서는
-Shared concat (512D) 을 각 태스크가 *다르게 색칠* 할 필요도 있다. 그래서
+Shared concat (512D) 을 각 태스크가 *다르게 재조합* 할 필요도 있다. 그래서
 CGCAttention 을 원형 위에 직교하게 얹는다 — 이것도 PLE-4 의 주제다.
 
 **셋째, 초기 gate 는 아무것도 모른다.** 랜덤 초기화 상태에서 한 Expert
-가 우연히 앞서 나가면 다시 collapse 로 수렴할 수 있다. 그래서
+가 우연히 앞서 나가면 다시 collapse 로 빠질 수 있다. 그래서
 `domain_experts` 기반의 bias 초기화 (CTR → PersLay + Temporal + UHGCN,
 Brand_prediction → UHGCN) 와 **entropy 정규화** 로 추가 방어선을 친다 —
 역시 PLE-4.
 
-**넷째, 태스크 간 의존성은 아직 gate 에 표현되지 않았다.** CTR 이 CVR
+**넷째, 태스크 간 의존성은 아직 gate 에 담겨 있지 않다.** CTR 이 CVR
 에 영향을 줘야 하고 Churn 이 Retention 에 영향을 줘야 하지만, CGC gate
 는 "Expert 를 어떻게 섞을지" 만 다룬다. 태스크 간 signal 전달은 별도
 경로 — Logit Transfer — 가 담당한다. 이건 PLE-5 에서.
@@ -308,8 +308,8 @@ GroupTaskExpertBasket → Logit Transfer → Task Tower* 라는 4단계
 파이프라인이 Progressive 한 정보 정제의 역할을 나눠 가진다. CGC 가 공유
 표현을 재조합하고, GroupTaskExpertBasket 이 태스크 전용 정제를 수행하고,
 Logit Transfer 가 태스크 간 의존성을 전달하고, Task Tower 가 최종
-예측으로 압축한다. 깊이를 층에 넣지 않고 *파이프라인의 단계별 분업* 으로
-흩뜨린 구조다.
+예측으로 압축한다. 깊이를 층에 쌓는 대신 *파이프라인의 단계별 분업* 으로
+분산한 구조다.
 
 ## PLE-1 → PLE-2 요약, 그리고 다음 편
 

@@ -33,8 +33,8 @@ like this:
 5. Post-deployment, the validation team reviews monitoring outputs
    on a schedule.
 
-This is the *validation-first* picture. MRM is a gate, applied
-*after* the model is built. It is the dominant mental model in
+This is the *validation-first* picture. MRM is a gate that sits
+*after* the model is built. It is the standard approach in
 Basel-style risk management, and it has served credit and market
 risk modeling well for twenty years.
 
@@ -77,14 +77,14 @@ several things happen at once:
    modes. "Validation" has to decompose into per-agent validation
    *plus* pipeline-level interaction validation.
 
-2. **The failure modes are not the old failure modes.** AUC drift
-   is still there, but the dominant risks become: prompt
-   injection, instruction-following failure under distribution
-   shift, refusal-to-respond on valid queries, confidence-signal
+2. **The failure modes have changed.** AUC drift is still there,
+   but the real risks are different — prompt injection,
+   instruction-following failure under distribution shift,
+   refusal-to-respond on valid queries, confidence-signal
    miscalibration in customer-facing text. Most MRM frameworks
    have no vocabulary for these.
 
-3. **Temporal assumptions collapse.** Traditional MRM assumes the
+3. **The stability assumption breaks down.** Traditional MRM assumes the
    model is stable between validation runs. An agent pipeline
    calling a hosted LLM inherits model-provider updates whose
    timing is not controlled by the financial institution. "The
@@ -98,8 +98,8 @@ including ours, do not.
 ## The architectural alternative
 
 The alternative is to push MRM obligations into the *architecture*
-itself, so that compliance properties are structural invariants
-rather than things checked after the fact. This is not a new idea
+itself, so that compliance properties are built into the system
+rather than checked after the fact. This is not a new idea
 in software engineering — it is the same principle as "parse,
 don't validate" or "make illegal states unrepresentable" — but it
 is relatively new in financial AI.
@@ -144,27 +144,26 @@ system is not dependent on a ticket queue.
 
 ## How we arrived at this approach
 
-None of the five properties above were in the original project
-plan. The original plan was the conventional one — build the
-model, write the validation report, hand it to the MRM team
-quarterly. What changed it was running into specific failure
-modes as the agent pipeline took shape. The first Reason
-Generator we tested produced a plausible-but-factually-wrong
-recommendation, and we asked "how would the MRM team have caught
-this if we'd shipped it?" — the honest answer was "they wouldn't,
-because they see outputs, not the process that generated them".
-That's where the "explainability as structural output" property
-came from.
+None of the five properties were in the original plan. The plan
+was simple — build the model, write the validation report
+quarterly, submit it for review, deploy. As the pipeline took
+shape, failure cases surfaced one by one and changed the plan
+each time. The first Reason Generator we tested produced a
+plausible-but-factually-wrong recommendation, and we asked "how
+would the reviewers have caught this if we'd shipped it?" — the
+honest answer was "they wouldn't, because they see outputs, not
+the process that generated them". That's where the
+"explainability as structural output" property came from.
 
 Each of the other four properties followed a similar route — a
-concrete failure mode or regulatory question that the
-validation-first template couldn't answer, and a structural
+concrete failure case or regulatory question that the
+validation-first approach couldn't answer, and a structural
 change that made the question *not require* an out-of-band
 process to answer. This episode frames the outcome, but the
 subsequent episodes walk through the specific scenes that forced
 each property into existence.
 
-## Why the architectural approach is not "MRM is dead"
+## Why the architectural approach is not an argument against MRM
 
 There is a lazy reading of this argument: "if the architecture
 takes care of it, we don't need MRM." That is wrong and regulators
@@ -181,23 +180,23 @@ What the architectural approach *does*:
 
 What MRM oversight *still has to do*:
 
-- Validate that the architectural properties are *actually*
-  invariants — the gate weights really are the explanation, the
+- Verify that the architectural properties are *actually*
+  holding — the gate weights really are the explanation, the
   hash chain really is verified, the kill switch really works
-- Challenge the architecture itself — is the Safety Gate
-  calibrated for the failure modes we care about?
-- Review incidents, not healthy operation
-- Own the model inventory, governance reporting, and regulatory
-  correspondence
+- Review the architecture itself — is the Safety Gate
+  calibrated for the failure cases we actually care about?
+- Review incidents and investigate root causes, not healthy operation
+- Take responsibility for model inventory, governance reporting,
+  and regulatory correspondence
 - Second-guess the development team on design decisions that
   affect risk
 
 The architectural approach does not remove MRM oversight. It
 *changes what MRM oversight is auditing*. Instead of validating
-model outputs after training, MRM is validating architectural
-invariants continuously. The work shifts from "did the model pass
-the tests" to "are the compliance-critical invariants still
-holding."
+model outputs after training, MRM is continuously checking
+whether the architectural conditions still hold. The work shifts
+from "did the model pass the tests" to "are the compliance
+conditions still met."
 
 ## Why this matters more in 2026
 
@@ -219,8 +218,8 @@ Three regulatory developments converge this year:
   against AI recommendation systems in customer dispute cases.
 
 The common thread: regulators expect compliance to be
-*architecturally legible*, not merely *documented after the
-fact*. "We run validation quarterly" is not sufficient when the
+*verifiable from the system itself*, not merely *documented
+after the fact*. "We run validation quarterly" is not sufficient when the
 model is making real-time decisions at customer-facing points.
 
 The architectural MRM approach matches this expectation

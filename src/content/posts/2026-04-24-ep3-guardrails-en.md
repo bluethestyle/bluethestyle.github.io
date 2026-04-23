@@ -10,7 +10,7 @@ part: 3
 alt_lang: /2026/04/24/ep3-guardrails-ko/
 next_title: "Ep 4 — The Seven Experts: Importing Structural Isomorphism Across Eleven Disciplines"
 next_desc: "How HGCN, PersLay, Causal, OT, Temporal Ensemble, DeepFM, and LightGCN became the seven — which mathematical gaps each fills, and what alternatives got rejected."
-next_status: draft
+next_status: published
 source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs/typst/en/development_story_en.pdf
 source_label: "Development Story (EN, PDF) §3"
 ---

@@ -39,7 +39,7 @@ export const SERIES = [
     tagKo: "3개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
-    ep: 3, total: 8,
+    ep: 8, total: 8,
     ko: "/series/three-months-ko/",
     en: "/series/three-months/",
   },
@@ -51,7 +51,7 @@ export const SERIES = [
     tagKo: "MRM 스레드",
     desc: "Regulatory compliance and model risk management for AI recommendation systems, from a GARP FRM practitioner perspective.",
     descKo: "AI 추천 시스템의 규제 준수와 모델 리스크 관리를 GARP FRM 실무자 관점에서 다룬다.",
-    ep: 3, total: 6,
+    ep: 6, total: 6,
     ko: "/series/mrm-thread-ko/",
     en: "/series/mrm-thread/",
   },
@@ -77,6 +77,38 @@ export const SERIES = [
  * frontmatter override the entry below.
  */
 export const EXCERPTS = {
+  "/2026/05/12/ep8-honest-negatives-ko/":
+    "3개월의 기록 — adaTT 가 13-task 에서 null 로 수렴한 과정, GradSurgery 가 VRAM 오버헤드로 미채택된 이유, Paper 3 WIP 상태, 2026-04-30 이후 실데이터 메트릭 대기. 작동하지 않은 것이 작동한 것만큼 중요한 이유.",
+  "/2026/05/12/ep8-honest-negatives-en/":
+    "Record from three months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 WIP status, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did.",
+  "/2026/05/08/ep7-distillation-serving-ko/":
+    "teacher 는 PLE, student 는 task 별 LightGBM, 서빙은 AWS Lambda. 왜 이 조합인가, teacher-student fidelity 가 실패하면 어떻게 되는가, 그리고 Bedrock 위 5-에이전트 파이프라인의 역할 분담.",
+  "/2026/05/08/ep7-distillation-serving-en/":
+    "Teacher is PLE, student is per-task LightGBM, serving is AWS Lambda. Why this combination, what happens when teacher-student fidelity fails, and the role division across the 5-agent Bedrock pipeline.",
+  "/2026/05/05/ep6-uncertainty-weighting-bug-ko/":
+    "몇 주 동안 sigmoid gate 가 softmax 를 이기는 것처럼 보였다. uncertainty weighting 구현 버그가 수정되자 결과가 뒤집혔다. 훈련 환경의 버그가 어떻게 아키텍처 결론을 오염시키는가의 사례 연구.",
+  "/2026/05/05/ep6-uncertainty-weighting-bug-en/":
+    "For weeks sigmoid gating seemed to beat softmax. Fixing an uncertainty-weighting implementation bug flipped the result. A case study in how a training-environment bug contaminates architectural conclusions.",
+  "/2026/05/05/mrm-ep6-fairness-production-path-ko/":
+    "5개 보호 속성에 대한 Disparate Impact · Statistical Parity · Equal Opportunity 가 검증 샘플이 아닌 프로덕션 스트림에서 실시간 계산되는 구조, Counterfactual Champion-Challenger 의 역할, 그리고 Parquet archive 로 흐르는 증거의 길.",
+  "/2026/05/05/mrm-ep6-fairness-production-path-en/":
+    "Disparate Impact, Statistical Parity, and Equal Opportunity across five protected attributes, computed on the production stream rather than a validation sample. The role of Counterfactual Champion-Challenger, and the Parquet archive where the evidence accumulates.",
+  "/2026/05/01/ep5-data-integrity-hunt-ko/":
+    "아키텍처 논쟁 전에 풀어야 했던 것 — label leakage 3건 연쇄 탐지, 18→13 태스크 축소의 결정론적 리키지 배경, 합성데이터 v2→v3→v4 iteration 에서 드러난 자기복제 피처.",
+  "/2026/05/01/ep5-data-integrity-hunt-en/":
+    "Before any architecture debate — three chained label-leakage detections, the deterministic-leakage rationale behind the 18→13 task reduction, and the self-replicating features that surfaced across synthetic-data iterations v2→v3→v4.",
+  "/2026/05/01/mrm-ep5-human-oversight-ko/":
+    "EU AI Act Article 14 의 인간 감독 요구를 티켓 큐가 아니라 API 엔드포인트로 구현한 방식 — kill switch, HumanReviewQueue tier 2/3, 그리고 auto_promote=false 가 production posture 로 강제되는 이유.",
+  "/2026/05/01/mrm-ep5-human-oversight-en/":
+    "EU AI Act Article 14's human-oversight requirement implemented as API endpoints rather than a ticket queue — kill switch, HumanReviewQueue tiers 2/3, and why auto_promote=false is enforced as a production posture.",
+  "/2026/04/28/ep4-seven-experts-ko/":
+    "왜 7명인가, 왜 이 7명인가. Gemini 와의 학제간 스캔에서 11개 분야를 훑고, Opus 와의 기술 검증에서 선 안으로 들어온 DeepFM·Temporal·HGCN·PersLay·Causal·LightGCN·OT 의 도출 과정.",
+  "/2026/04/28/ep4-seven-experts-en/":
+    "Why seven experts, why these seven. The cross-disciplinary scan with Gemini surfaced eleven fields; the feasibility review with Opus narrowed to DeepFM, Temporal Ensemble, HGCN, PersLay, Causal, LightGCN, and Optimal Transport.",
+  "/2026/04/28/mrm-ep4-fria-ko/":
+    "한국 AI 기본법 §35 의 7-차원 영향평가와 5년 보존 의무. EU AI Act Article 9 FRIAEvaluator 와 리포트는 통합하더라도 내부 저장은 왜 분리해야 하는가.",
+  "/2026/04/28/mrm-ep4-fria-en/":
+    "Seven-dimension impact assessment and five-year retention under Korea AI Basic Act §35. Why the KoreanFRIAAssessor is kept as a separate class from the EU AI Act Article 9 FRIAEvaluator even when the outputs are reported jointly.",
   "/2026/04/24/mrm-ep3-chain-of-custody-ko/":
     "14개월 전 추천 분쟁이 들어왔을 때 답의 형태를 결정하는 7개 감사 테이블과 HMAC 해시 체인. EU AI Act 13·14조와 KFCPA §17 을 체크리스트가 아니라 역구성 가능한 코드 경로로 만드는 방식.",
   "/2026/04/24/mrm-ep3-chain-of-custody-en/":
@@ -147,16 +179,7 @@ export const EXCERPTS = {
  * Planned-but-unpublished posts. These have no markdown file yet —
  * shown greyed in Archives.
  */
-export const DRAFTS = [
-  { date: "2026-04-28", title: "[FinAI Build] Ep 4 — The Seven Experts: Structural Isomorphism Across 11 Disciplines", cat: "FinAI Build", lang: "EN", ex: "How HGCN, PersLay, Causal, OT, Temporal Ensemble, DeepFM, and LightGCN became the seven.", tags: ["finai-build","architecture","ple"] },
-  { date: "2026-04-28", title: "[MRM Thread] Ep 4 — FRIA: How the Korean AI Basic Act §35 Lives in Code", cat: "MRM Thread", lang: "EN", ex: "Seven-dimension impact assessment, five-year retention, and why it's a separate class from the EU AI Act Art. 9 FRIAEvaluator.", tags: ["mrm","regulation","fria"] },
-  { date: "2026-05-01", title: "[FinAI Build] Ep 5 — The Data Integrity Hunt", cat: "FinAI Build", lang: "EN", ex: "Three chained label leakage detections, 18→13 task reduction, synthetic data v2→v3→v4 iterations.", tags: ["finai-build","data-integrity","leakage"] },
-  { date: "2026-05-01", title: "[MRM Thread] Ep 5 — Human Oversight as an API, Not a Ticket Queue", cat: "MRM Thread", lang: "EN", ex: "EU AI Act Art. 14, kill-switch API, HumanReviewQueue tier 2/3, and auto_promote=false as a production posture.", tags: ["mrm","human-oversight","kill-switch"] },
-  { date: "2026-05-05", title: "[FinAI Build] Ep 6 — The Bug That Overwhelmed All Architectural Decisions", cat: "FinAI Build", lang: "EN", ex: "Uncertainty weighting → softmax-sigmoid reversal. Methodological lesson: training bugs can corrupt architectural conclusions.", tags: ["finai-build","debugging","methodology"] },
-  { date: "2026-05-05", title: "[MRM Thread] Ep 6 — Fairness as a Production Path", cat: "MRM Thread", lang: "EN", ex: "Five protected attributes, real-time DI/SPD/EOD on the production stream, counterfactual evaluation, Parquet archive.", tags: ["mrm","fairness","monitoring"] },
-  { date: "2026-05-08", title: "[FinAI Build] Ep 7 — Distillation and Serving: PLE → LightGBM → Lambda + 5 Bedrock Agents", cat: "FinAI Build", lang: "EN", ex: "Teacher-student fidelity, why LightGBM for serving, serverless cost profile, and the 5-agent Bedrock pipeline.", tags: ["finai-build","distillation","serving"] },
-  { date: "2026-05-12", title: "[FinAI Build] Ep 8 — Honest Negative Results and What Comes Next", cat: "FinAI Build", lang: "EN", ex: "adaTT null effect, GradSurgery rejection, Paper 3 WIP, real-data metrics pending.", tags: ["finai-build","adatt","gradsurgery"] },
-];
+export const DRAFTS = [];
 
 export const TAGS = [
   { slug: "adatt",              name: "adatt",              count: 8, hot: true },

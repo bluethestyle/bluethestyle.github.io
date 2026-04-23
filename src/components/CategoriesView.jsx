@@ -38,7 +38,7 @@ function CategoriesView({ posts = [] }) {
           </div>
         </div>
 
-        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:14}}>
+        <div className="cats-grid">
           {cats.map((c,i) => {
             const cvar = "var(--c" + c.color + ")";
             const cs = "var(--c" + c.color + "s)";
