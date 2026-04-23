@@ -75,38 +75,23 @@ meant.
 
 ## Who we were
 
-Three people. One data scientist serving as PM / lead architect,
-and two engineers. That was the team.
-
-The two engineers were not formally contracted employees.
-They were recent graduates participating as "youth advisory
-supporters" while preparing for full-time employment — a Korean
-program that lets new graduates work on real projects without
-formal contracts, for a modest stipend.
-
-So: three people, part-time commitment, and a nominal program
-budget. No institutional backing beyond that.
+Three people total. One data scientist serving as PM / lead
+architect, and two engineers. No large-scale headcount or
+dedicated server allocation was available at the start.
 
 ## What we had
 
-One RTX 4070. Twelve gigabytes of VRAM. A desktop card, not a
-datacenter card. Installed in a local PC in an unventilated room
-next to the server room — no adequate cooling, because the
-proper facility was reserved for "real" projects.
+One RTX 4070 consumer desktop GPU. Twelve gigabytes of VRAM. That
+was the training infrastructure.
 
-That was the infrastructure.
+The data layer had to stay on the existing HIVE environment, so
+we wrote parallel query logic designed around the network-bandwidth
+ceiling.
 
-We requested a GPU server. "There is nothing we can do."
-We requested migrating off HIVE to Spark or Impala for data
-processing. Denied. So we stayed on HIVE and wrote parallel query
-logic from scratch to saturate what network bandwidth we could get.
-
-The AI tool subscriptions — Claude Code, Gemini, Cursor — came
-out of the PM's personal wallet. So did AWS spot instance costs
-and storage. And occasional team meals.
-
-Looking back, this sounds grim. At the time it just felt like the
-starting condition. Something to work within, not cry about.
+AI tool subscriptions (Claude Code, Gemini, Cursor) and AWS spot
+instance / S3 costs were operated within a constrained budget. We
+took these as given conditions rather than as blockers, and looked
+for alternatives inside them.
 
 ## Why Claude Code changed what three people could attempt
 

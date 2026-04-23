@@ -100,10 +100,13 @@ not an architectural superiority.
 
 ## Homogeneous MTL vs. heterogeneous MTL — the literature trap
 
-The NeurIPS 2024 sigmoid gate paper showed sigmoid's advantage in a
-2-4 task, same-task-type setting. Under the *homogeneous MTL*
-assumption of that paper, competitive softmax does induce collapse
-among structurally similar experts, and sigmoid is genuinely better.
+The NeurIPS 2024 sigmoid gate paper ("Sigmoid Gating is More Sample
+Efficient than Softmax Gating in Mixture of Experts") established
+sigmoid's theoretical advantage under MoE sample-efficiency analysis
+on small-scale, relatively homogeneous experimental conditions —
+not the large heterogeneous MTL regime we were operating in. In
+that kind of setting, competitive softmax induces collapse among
+structurally similar experts, and sigmoid is genuinely better.
 
 Our project is *13 tasks, 3 task types (binary · multiclass ·
 regression)* — heterogeneous MTL. In this regime competitive

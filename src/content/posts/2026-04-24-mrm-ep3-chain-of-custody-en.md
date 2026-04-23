@@ -199,11 +199,12 @@ not been tampered with*.
 
 ## Structure, not checklist
 
-The standard failure mode of MRM compliance is *documentation
-dependency*. "We maintain a compliance document for Article 13."
-But regulators ask not for documentation; they ask for
-*reconstruction*. A document is a document; whether it holds for a
-specific customer case is a separate verification question.
+MRM compliance is usually handled through *documentation*. "We
+maintain a compliance document for Article 13." Supervisors,
+though, ask not only for the document's existence but for
+*reconstruction* of what actually happened — a document is a
+document, and whether it held for a specific customer case needs
+a separate evidence path.
 
 Code paths answer this differently. The `log_*` methods are
 invoked as a *byproduct* of normal operation, so Article 13
@@ -213,10 +214,10 @@ generates its own audit entry. It's a closed loop.
 
 This is the reason the audit infrastructure is wired into the hot
 path rather than built as a "separate" subsystem. A separate
-subsystem drops to second-priority maintenance and a few months
-later its cron job is silently failing. A wired-in one can't stop
-without the main system also stopping, so it recovers by the same
-recovery path.
+subsystem can drop to second-priority maintenance, and a cron job
+can stop being noticed. A wired-in one can't stop without the
+main system also stopping, so it recovers by the same recovery
+path.
 
 ## Still the MRM committee's job
 

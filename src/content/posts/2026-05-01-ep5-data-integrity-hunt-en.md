@@ -75,8 +75,9 @@ and the label accidentally remained in that select list.
 AUC 0.66 → 0.62. Over three chained detections, a total of 0.25
 AUC was revealed to be a mirage. One session, a few days of work.
 If each leakage had been debugged separately, it would have taken
-weeks — Claude Code's 1M-token context keeping "the context of
-prior fixes alive as we pursued the next suspicion" was decisive.
+weeks — Claude Code holding the full session context and carrying
+"the context of prior fixes alive as we pursued the next suspicion"
+was decisive.
 
 ## The 18→13 task reduction — deterministic leakage
 
@@ -102,9 +103,12 @@ from the start.
 
 ## Synthetic-data iteration v2 → v3 → v4
 
-We ran parallel experiments on a million-customer synthetic
-dataset. A model trained on initial v1 synthetic data didn't
-transfer to real data — synthetic AUC 0.82, real-data AUC 0.54.
+For benchmarking we used Kaggle's Santander Customer Transaction
+Prediction public dataset (roughly 940K rows) alongside a 1M-row
+synthetic dataset generated to mimic its distribution. A model
+trained on the initial v1 synthetic data didn't transfer to the
+Santander real data — synthetic AUC 0.82, Santander real-data AUC
+0.54.
 
 v2 improved feature-distribution matching. Still no transfer.
 v3 added inter-feature correlation matching. Partial improvement.

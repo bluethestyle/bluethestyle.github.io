@@ -205,19 +205,25 @@ Parity Difference, and Equal Opportunity Difference on the
 production stream in real time. The drift monitor aggregates PSI
 and KL on feature and prediction distributions nightly.
 
-When drift exceeds its threshold, the orchestrator automatically
-triggers the next retraining job. When that job finishes, the
+When drift exceeds its threshold, the operator is notified that
+retraining is advisable. In our current setup the orchestrator does
+*not* auto-trigger retraining — the on-call engineer reviews the
+online-gate evaluation and then kicks off the next retraining job
+manually or on a scheduled trigger. When that job finishes, the
 flow returns to the early-morning `_decide_promotion()`. Offline
-gate → production monitors → retrain trigger → offline gate — a
-closed loop.
+gate → production monitors → retrain judgment → offline gate. The
+first and last halves are automated; the middle retrain-judgment
+remains in human hands.
 
-What's interesting about this loop is that the human role inside
-it is *not surveillance*. The loop runs itself. Human intervention
-concentrates in two places: (1) emergency force-promote, and (2)
-the meta-judgment about whether the loop's parameters —
-`min_improvement`, `max_degradation`, the fidelity floor values,
-drift thresholds — are still appropriate. The first falls to
-engineers; the second to the MRM committee.
+Human intervention concentrates in two places. First, because
+`auto_promote=false` is enforced in the production config (SR 11-7
++ EU AI Act Art. 14), even a Challenger that clears every gate
+requires an explicit force-promote sign-off — that final decision
+stays with a human. Second, the meta-judgment about whether the
+loop's parameters — `min_improvement`, `max_degradation`, the
+fidelity floor values, drift thresholds — are still appropriate for
+the current business context. The first falls to engineers; the
+second to the MRM committee.
 
 ## What this flow changes about MRM
 
