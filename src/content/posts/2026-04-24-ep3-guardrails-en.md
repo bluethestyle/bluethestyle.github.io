@@ -111,7 +111,7 @@ multi-tool workflows meant each tool had its own rules file, and
 drift between them produced divergent agent outputs that
 compounded at integration points.
 
-**Mid-2026 — after Claude Code auto-memory.** In April 2026
+**Early Q2 2026 — after Claude Code auto-memory.** In April 2026
 Claude Code v2.1.59+ introduced auto-memory, accumulating
 session-to-session knowledge automatically — build commands,
 debugging insights, architecture notes, code-style preferences,
