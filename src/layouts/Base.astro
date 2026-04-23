@@ -53,6 +53,18 @@ for (const p of published) {
 const seriesCurrent = Object.fromEntries(
   Object.entries(seriesEpCount).map(([k, v]) => [k, v.size]),
 );
+
+// Per-series (part → date) + all post dates for client-side "today" re-count.
+const seriesDates = {};
+for (const p of published) {
+  if (!p.series || typeof p.part !== "number") continue;
+  if (!seriesDates[p.series]) seriesDates[p.series] = {};
+  // Keep earliest date per part (one KO + one EN often share a date; either works).
+  if (!seriesDates[p.series][p.part] || p.date < seriesDates[p.series][p.part]) {
+    seriesDates[p.series][p.part] = p.date;
+  }
+}
+const allDates = published.map((p) => p.date);
 ---
 <!doctype html>
 <html lang="en">
@@ -137,7 +149,7 @@ const seriesCurrent = Object.fromEntries(
           <li><a href="/" class={tab === "home" ? "on" : ""}><span class="nav-inner"><span class="num">01</span><span class="lbl" data-i18n-ko="홈">HOME</span></span></a></li>
           <li><a href="/categories/" class={tab === "categories" ? "on" : ""}><span class="nav-inner"><span class="num">02</span><span class="lbl" data-i18n-ko="카테고리">CATEGORIES</span></span><span class="n">{CATEGORIES.length}</span></a></li>
           <li><a href="/tags/" class={tab === "tags" ? "on" : ""}><span class="nav-inner"><span class="num">03</span><span class="lbl" data-i18n-ko="태그">TAGS</span></span><span class="n">{TAGS.length}</span></a></li>
-          <li><a href="/archives/" class={tab === "archives" ? "on" : ""}><span class="nav-inner"><span class="num">04</span><span class="lbl" data-i18n-ko="아카이브">ARCHIVES</span></span><span class="n">{publishedCount}</span></a></li>
+          <li><a href="/archives/" class={tab === "archives" ? "on" : ""}><span class="nav-inner"><span class="num">04</span><span class="lbl" data-i18n-ko="아카이브">ARCHIVES</span></span><span class="n" data-published-count>{publishedCount}</span></a></li>
         </ul>
 
         <div class="nav-label" data-i18n-ko="다른 곳">Elsewhere</div>
@@ -177,7 +189,7 @@ const seriesCurrent = Object.fromEntries(
             return (
               <a href={s.en} class="series-row">
                 <span class="cat">[{s.tag}]</span>
-                <span class="prog">ep {n}{s.total ? `/${s.total}` : ""}</span>
+                <span class="prog" data-series-slug={s.slug} data-series-total={s.total ?? ""}>ep {n}{s.total ? `/${s.total}` : ""}</span>
               </a>
             );
           })}
@@ -186,8 +198,8 @@ const seriesCurrent = Object.fromEntries(
         <div class="kv">
           <div><span class="k">build</span>idx.2026.04</div>
           <div><span class="k">stack</span>astro · react</div>
-          <div><span class="k" data-i18n-ko="최근">last</span>{lastLabel}</div>
-          <div><span class="k" data-i18n-ko="글 수">posts</span>{publishedCount}</div>
+          <div><span class="k" data-i18n-ko="최근">last</span><span data-last-label>{lastLabel}</span></div>
+          <div><span class="k" data-i18n-ko="글 수">posts</span><span data-published-count>{publishedCount}</span></div>
           <div><span class="k" data-i18n-ko="라이선스">lic</span>cc by-nc 4.0</div>
         </div>
       </aside>
@@ -198,7 +210,7 @@ const seriesCurrent = Object.fromEntries(
         <div class="widget">
           <div class="w-head"><h3 data-i18n-ko="인덱스">Index</h3><span class="n">live</span></div>
           <div class="stats">
-            <div class="stat"><div class="v">{publishedCount}</div><div class="l" data-i18n-ko="글">posts</div></div>
+            <div class="stat"><div class="v" data-published-count>{publishedCount}</div><div class="l" data-i18n-ko="글">posts</div></div>
             <div class="stat"><div class="v">{CATEGORIES.length}</div><div class="l" data-i18n-ko="카테고리">categories</div></div>
             <div class="stat"><div class="v">{TAGS.length}</div><div class="l" data-i18n-ko="태그">tags</div></div>
             <div class="stat"><div class="v">{SITE.counts.years}</div><div class="l" data-i18n-ko="년">years</div></div>
@@ -211,7 +223,7 @@ const seriesCurrent = Object.fromEntries(
             {RECENT.map((r) => {
               const isKo = /[\uac00-\ud7af]/.test(r.title);
               return (
-                <a href={r.url || "#"}>
+                <a href={r.url || "#"} data-recent-date={r.date}>
                   <div class="r-top">
                     <span data-i18n-ko="오늘">today</span>
                     <span>{r.date}</span>
@@ -396,6 +408,58 @@ const seriesCurrent = Object.fromEntries(
             const target = el.getAttribute("data-set-lang") || "";
             setPref(target || null);
           });
+        });
+      })();
+    </script>
+
+    <script is:inline define:vars={{ seriesDates, allDates }}>
+      (function () {
+        const today = new Date().toISOString().slice(0, 10);
+
+        // 1) Series ep count — count parts whose date <= today (per series)
+        const seriesCurrent = {};
+        for (const slug of Object.keys(seriesDates)) {
+          let n = 0;
+          for (const part of Object.keys(seriesDates[slug])) {
+            if (seriesDates[slug][part] <= today) n += 1;
+          }
+          seriesCurrent[slug] = n;
+        }
+        document.querySelectorAll("[data-series-slug]").forEach((el) => {
+          const slug = el.getAttribute("data-series-slug");
+          const total = el.getAttribute("data-series-total") || "";
+          const n = seriesCurrent[slug] ?? 0;
+          el.textContent = `ep ${n}${total ? `/${total}` : ""}`;
+        });
+
+        // 2) Published count — all post dates <= today
+        const visibleDates = allDates.filter((d) => d <= today);
+        const publishedCount = visibleDates.length;
+        document.querySelectorAll("[data-published-count]").forEach((el) => {
+          el.textContent = String(publishedCount);
+        });
+
+        // 3) Last label — latest visible date formatted like "23 apr 2026"
+        if (visibleDates.length) {
+          const latestIso = visibleDates.slice().sort().pop();
+          const labelEl = document.querySelector("[data-last-label]");
+          if (labelEl) {
+            const [y, m, d] = latestIso.split("-").map((s) => parseInt(s, 10));
+            const date = new Date(Date.UTC(y, m - 1, d));
+            labelEl.textContent = date
+              .toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                timeZone: "UTC",
+              })
+              .toLowerCase();
+          }
+        }
+
+        // 4) Recent widget — hide items whose date > today
+        document.querySelectorAll("[data-recent-date]").forEach((el) => {
+          if (el.dataset.recentDate > today) el.style.display = "none";
         });
       })();
     </script>

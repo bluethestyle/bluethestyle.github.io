@@ -72,6 +72,18 @@ function HomeView({ lang, posts = [] }) {
   const KO = lang === "ko";
   const latest = POSTS.filter(p => !p.draft).slice(0, 4);
 
+  // Episode counts per series, based on browser date (matches date filter)
+  const seriesEpCount = {};
+  for (const p of POSTS) {
+    if (p.draft || !p.series || typeof p.part !== "number") continue;
+    if (!seriesEpCount[p.series]) seriesEpCount[p.series] = new Set();
+    seriesEpCount[p.series].add(p.part);
+  }
+  const currentEp = (slug, fallback) => {
+    const s = seriesEpCount[slug];
+    return s ? s.size : (fallback || 0);
+  };
+
   return (
     <>
       {/* HERO */}
@@ -189,25 +201,29 @@ function HomeView({ lang, posts = [] }) {
           </div>
         </div>
         <div className="series-grid">
-          {SERIES.map(s => (
+          {SERIES.map(s => {
+            const ep = currentEp(s.slug, s.ep);
+            const total = s.total || s.ep || ep;
+            return (
             <div key={s.slug} className="series">
               <div className="top">
                 <span className="cat" data-lang-ui="en">[{s.tag}]</span>
                 <span className="cat" data-lang-ui="ko">[{s.tagKo || s.tag}]</span>
-                <span className="prog">{s.total ? <><span data-i18n-ko="에피소드">ep</span> {s.ep} <span data-i18n-ko="/">of</span> {s.total}</> : <><span data-i18n-ko="에피소드">ep</span> {s.ep}</>}</span>
+                <span className="prog">{s.total ? <><span data-i18n-ko="에피소드">ep</span> {ep} <span data-i18n-ko="/">of</span> {s.total}</> : <><span data-i18n-ko="에피소드">ep</span> {ep}</>}</span>
               </div>
               <h4 data-lang-ui="en">{s.title}</h4>
               <h4 className="kr" data-lang-ui="ko">{s.titleKo || s.title}</h4>
               <p data-lang-ui="en">{s.desc}</p>
               <p className="kr" data-lang-ui="ko">{s.descKo || s.desc}</p>
-              <div className="bar"><span style={{width: (s.ep/(s.total||s.ep)*100) + "%"}}></span></div>
+              <div className="bar"><span style={{width: (ep/(total||ep||1)*100) + "%"}}></span></div>
               <div className="lang">
                 <a href={s.en} data-i18n-ko="한국어로 읽기 ↗">read · english ↗</a>
                 <span className="sep">·</span>
                 <a href={s.ko} data-i18n-ko="영어로 읽기 ↗">한국어로 읽기 ↗</a>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
