@@ -4,8 +4,9 @@ import { CATEGORIES } from "../data.js";
 // ========= CATEGORIES TAB =========
 
 function CategoriesView({ posts = [] }) {
+  const today = new Date().toISOString().slice(0, 10);
   const cats = CATEGORIES;
-  const POSTS = posts;
+  const POSTS = posts.filter(p => p.draft || p.date <= today);
   return (
     <>
       <section className="hero" style={{paddingBottom:32, marginBottom:32}}>
