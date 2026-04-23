@@ -37,8 +37,10 @@ function entryUrl(entry) {
   return `/${y}/${m}/${day}/${base}/`;
 }
 let nextUrl = null;
+let nextDate = null;
 let prevUrl = null;
 let prevTitle = null;
+let prevDate = null;
 if (post.data.series && post.data.part) {
   const allPosts = await getCollection("posts");
   if (post.data.next_title && post.data.next_status !== "draft") {
@@ -47,7 +49,10 @@ if (post.data.series && post.data.part) {
       p.data.part === post.data.part + 1 &&
       p.data.lang === post.data.lang,
     );
-    if (next) nextUrl = entryUrl(next);
+    if (next) {
+      nextUrl = entryUrl(next);
+      nextDate = next.data.date.toISOString().slice(0, 10);
+    }
   }
   const prev = allPosts.find((p) =>
     p.data.series === post.data.series &&
@@ -57,8 +62,10 @@ if (post.data.series && post.data.part) {
   if (prev) {
     prevUrl = entryUrl(prev);
     prevTitle = prev.data.title;
+    prevDate = prev.data.date.toISOString().slice(0, 10);
   }
 }
+const postDateIso = d.toISOString().slice(0, 10);
 
 const T = isKo
   ? {
@@ -145,7 +152,7 @@ const T = isKo
 
       {post.data.next_title && (
         nextUrl ? (
-          <a class="next-card clickable" href={nextUrl}>
+          <a class="next-card clickable" href={nextUrl} data-next-date={nextDate}>
             <div class="next-label">
               <span class="pulse"></span>
               {T.next_label}
@@ -244,6 +251,58 @@ const T = isKo
       </section>
     </aside>
   </article>
+
+  <script is:inline define:vars={{ postDateIso, isKo }}>
+    (function () {
+      const today = new Date().toISOString().slice(0, 10);
+
+      // (1) Block direct access to posts whose publish date is in the future
+      if (postDateIso > today) {
+        const msg = isKo
+          ? "준비 중인 에피소드입니다. 공개 예정일 이후에 다시 찾아와 주세요."
+          : "This episode isn't published yet. Please come back on or after its publication date.";
+        document.body.innerHTML =
+          '<div style="max-width:560px;margin:12vh auto;padding:32px;font-family:' +
+          (isKo ? "var(--kr)" : "var(--display)") +
+          ';color:var(--ink);">' +
+          '<p style="font-family:var(--mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin:0 0 16px;">' +
+          (isKo ? "준비 중" : "Not yet published") +
+          '</p>' +
+          '<h1 style="font-size:28px;font-weight:400;letter-spacing:-0.015em;margin:0 0 14px;">' +
+          (isKo ? "이 글은 아직 공개되지 않았습니다" : "This post isn't live yet") +
+          '</h1>' +
+          '<p style="font-size:15px;line-height:1.7;color:var(--ink-2);margin:0 0 28px;">' +
+          msg +
+          '</p>' +
+          '<a href="/" style="font-family:var(--mono);font-size:13px;color:var(--accent-ink);">' +
+          (isKo ? "← 홈으로" : "← Home") +
+          '</a>' +
+          '</div>';
+        return;
+      }
+
+      // (2) Convert future-dated "next" card to non-clickable "coming soon" state
+      const nextCard = document.querySelector(".next-card.clickable[data-next-date]");
+      if (nextCard && nextCard.dataset.nextDate > today) {
+        const href = nextCard.getAttribute("href");
+        const div = document.createElement("div");
+        div.className = "next-card";
+        div.innerHTML = nextCard.innerHTML;
+        // Drop the arrow (no navigation)
+        const arr = div.querySelector(".next-arr");
+        if (arr) arr.remove();
+        // Add a 준비 중 / draft pill into the label
+        const label = div.querySelector(".next-label");
+        if (label) {
+          const tag = document.createElement("span");
+          tag.className = "draft-tag";
+          tag.textContent = isKo ? "준비 중" : "draft · coming soon";
+          label.appendChild(tag);
+        }
+        nextCard.parentNode.replaceChild(div, nextCard);
+      }
+    })();
+  </script>
 </Base>
 
 <style is:global>
