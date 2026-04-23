@@ -655,4 +655,34 @@ const T = isKo
   }
   .giscus, .giscus-frame { width: 100%; }
   .giscus-frame { border: 0; }
+
+  /* Table scroll wrapper — applied by JS on mobile */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 32px 0;
+    border-radius: 10px;
+    border: 1px solid var(--hair);
+    box-shadow: 0 1px 2px rgba(20,20,20,0.03), 0 4px 14px rgba(20,20,20,0.04);
+  }
+  .table-scroll .post-body table {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    width: max-content;
+    min-width: 100%;
+  }
 </style>
+
+<script is:inline>
+  (function () {
+    if (window.innerWidth > 768) return;
+    document.querySelectorAll('.post-body table').forEach(function (table) {
+      var wrap = document.createElement('div');
+      wrap.className = 'table-scroll';
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    });
+  })();
+</script>

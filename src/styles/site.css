@@ -1225,9 +1225,6 @@ html[data-lang-pref="ko"] [data-lang-ui="en"] {
   }
   .post-body table {
     font-size: 12.5px;
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
   }
   .next-card { padding: 18px 20px; }
   .next-card h3 { font-size: 18px; }
