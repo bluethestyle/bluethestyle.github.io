@@ -65,7 +65,7 @@ model. It is a pipeline of five agents on AWS Bedrock:
   against regulatory, suitability, hallucination, tone, and
   factuality criteria before it leaves the Lambda handler
 - **OpsAgent** (Sonnet) — interprets monitoring and drift reports
-- **AuditAgent** (Haiku) — chain-of-custody verification over
+- **AuditAgent** (Sonnet) — chain-of-custody verification over
   audit logs
 
 If an MRM team tries to "validate" this as if it were one model,

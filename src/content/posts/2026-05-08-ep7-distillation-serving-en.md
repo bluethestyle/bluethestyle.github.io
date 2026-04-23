@@ -124,7 +124,7 @@ Lambda (Python 3.11, 1GB memory)
 
 Async paths:
   OpsAgent (Bedrock Sonnet) — interprets CloudWatch logs
-  AuditAgent (Bedrock Haiku) — nightly hash-chain verification
+  AuditAgent (Bedrock Sonnet) — nightly hash-chain verification
 ```
 
 The division of labor across the five agents:
@@ -155,9 +155,9 @@ Interprets drift-monitor and fairness-monitor output as a summary
 for SRE / MLOps / business-team consumption. Drafts incident
 tickets when a kill switch fires.
 
-**5. AuditAgent (Haiku)** — mentioned in Ep 3. Verifies the HMAC
-hash chain nightly. The computation is light enough that Haiku
-suffices.
+**5. AuditAgent (Sonnet)** — mentioned in Ep 3. Verifies the HMAC
+hash chain nightly over the full 24-hour entry stream, and
+escalates any break to OpsAgent.
 
 ## Ops vs. Audit separation — why two agents
 

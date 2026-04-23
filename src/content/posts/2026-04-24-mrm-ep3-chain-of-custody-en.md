@@ -144,7 +144,7 @@ separate rotation policy".
 
 Having a log doesn't make the log correct. Who confirms the hash
 chain has not been broken this week? That's the role of the
-AuditAgent (Haiku-based).
+AuditAgent (Sonnet-based).
 
 The AuditAgent runs nightly. For every entry written in the last
 24 hours it checks:
