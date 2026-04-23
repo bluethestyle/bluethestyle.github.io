@@ -213,7 +213,7 @@ Three regulatory developments converge this year:
   robustness), Article 9 (risk management). Applicable to
   Korean-origin AI if deployed to EU customers.
 
-- **Korean Financial Consumer Protection Act (KFCPA)** Article 19
+- **Korean Financial Consumer Protection Act (KFCPA)** Article 17
   (suitability principle) — unchanged but increasingly tested
   against AI recommendation systems in customer dispute cases.
 
