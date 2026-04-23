@@ -67,7 +67,8 @@ function PLEDiagram() {
 }
 
 function HomeView({ lang, posts = [] }) {
-  const POSTS = posts;
+  const today = new Date().toISOString().slice(0, 10);
+  const POSTS = posts.filter(p => p.draft || p.date <= today);
   const KO = lang === "ko";
   const latest = POSTS.filter(p => !p.draft).slice(0, 4);
 

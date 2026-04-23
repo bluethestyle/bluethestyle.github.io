@@ -3,8 +3,11 @@ import React from "react";
 // ========= ARCHIVES TAB =========
 
 function ArchivesView({ posts = [] }) {
-  // group posts (all, including drafts) by year-month
-  const all = posts.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const today = new Date().toISOString().slice(0, 10);
+  // group posts (all, including drafts) by year-month; hide future published posts
+  const all = posts
+    .filter(p => p.draft || p.date <= today)
+    .sort((a,b)=>b.date.localeCompare(a.date));
   const byMonth = {};
   all.forEach(p => {
     const ym = p.date.slice(0,7);
