@@ -127,12 +127,12 @@ practice: which phases got which tools, how three humans each led
 an AI agent team, and which failure modes emerged from that
 pattern.
 
-The point of naming this up front — a Korean financial-services
-team of three to five people at a mid-size institution can now
-consider projects that used to require a dedicated ML organization.
-The constraints remain (consumer GPU, personal wallet for
-subscriptions, small team), but the ceiling on what those
-constraints can ship has moved.
+That is why the opening keeps hammering the same line: at a
+mid-size Korean financial institution, a team of three to five can
+now pull projects into realistic scope that once assumed a dedicated
+ML organization. The constraints are unchanged — consumer GPU,
+subscriptions paid from a personal wallet, a small team — but the
+ceiling on what is shippable inside that envelope has risen.
 
 ## The architecture decision journey
 
