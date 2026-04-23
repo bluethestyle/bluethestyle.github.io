@@ -92,12 +92,13 @@ results are in, Study Thread will cover them in detail.
 
 ## From synthetic to production data — the validation window isn't open yet
 
-All three months of design and experimentation ran on synthetic
-data. No matter how faithfully the 1M-row synthetic set reproduces
-the statistical properties of real customer data, there is no
-guarantee that the same architectural conclusions will hold under
+All three months of design and experimentation ran on a public
+benchmark (Santander Customer Transaction Prediction) and a 1M-row
+synthetic dataset generated to mimic its distribution. No matter
+how rigorously the two paths were validated, there is no guarantee
+that the same architectural conclusions will hold under actual
 production traffic. Whether that gap closes can only be confirmed
-on real data.
+on real production data.
 
 Production-traffic collection for per-task AUC, F1-macro, MAE, NDCG,
 and fairness indicators across five protected attributes began on
