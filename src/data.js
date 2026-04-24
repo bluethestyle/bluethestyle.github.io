@@ -4,7 +4,7 @@ export const SITE = {
   role: "Independent researcher — Seoul",
   bio: "Notes, working papers, and long-form thinking on financial AI, model risk management, and agentic systems. GARP Financial Risk Manager (FRM).",
   bio2: "This site collects what does not fit into a journal paper or a GitHub README — decisions and their reasons, failed experiments, what collaborating with an AI system for four months actually looked like.",
-  contact: "jsk320098 [at] gmail [dot] com",
+  contact: "jsk320098@gmail.com",
   orcid: "0009-0005-3291-9112",
   github: "bluethestyle",
   counts: { posts: 44, cats: 4, tags: 39, years: 1 }

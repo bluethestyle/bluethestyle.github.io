@@ -270,7 +270,7 @@ function HomeView({ lang, posts = [] }) {
 
         {/* Contact strip */}
         <div className="contact-bar">
-          <span><span className="k" data-i18n-ko="연락처">contact</span> &nbsp; <span className="v">{SITE.contact}</span></span>
+          <span><span className="k" data-i18n-ko="연락처">contact</span> &nbsp; <a href={`mailto:${SITE.contact}`}>{SITE.contact}</a></span>
           <span className="sep">·</span>
           <span><span className="k">orcid</span> &nbsp; <a>{SITE.orcid} ↗</a></span>
           <span className="sep">·</span>
