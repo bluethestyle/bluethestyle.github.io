@@ -1,5 +1,5 @@
 ---
-title: "[3개월 개발기] 에피소드 2 — AI 에이전트 조직화"
+title: "[4개월 개발기] 에피소드 2 — AI 에이전트 조직화"
 date: 2026-04-21 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, claude-code, architecture, financial-ai]
@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "개발 스토리 (KO, PDF) §2"
 ---
 
-*"3개월간의 금융 AI 개발기" 2편. 3명의 팀원이 여러 AI 도구(Gemini, Claude Opus, Cursor, Claude Code)를 개발 단계별로 어떻게 조직하고 분업시켰는지 다룬다.*
+*"4개월간의 금융 AI 개발기" 2편. 3명의 팀원이 여러 AI 도구(Gemini, Claude Opus, Cursor, Claude Code)를 개발 단계별로 어떻게 조직하고 분업시켰는지 다룬다.*
 
 ## 단계별 도구 페어링(Pairing) 전략
 

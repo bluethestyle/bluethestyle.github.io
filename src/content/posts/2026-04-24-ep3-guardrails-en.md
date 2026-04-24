@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "Development Story (EN, PDF) §3"
 ---
 
-*Part 3 of "Building a Financial AI in Three Months". Ep 2 said
+*Part 3 of "Building a Financial AI in Four Months". Ep 2 said
 three humans × AI teams built modules in parallel. This episode is
 about the machinery that kept the parallel work from breaking at
 integration — the CLAUDE.md constitution, the memory bank, and

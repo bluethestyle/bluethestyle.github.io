@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "Development Story (EN, PDF) §2"
 ---
 
-*Part 2 of "Building a Financial AI in Three Months". How three
+*Part 2 of "Building a Financial AI in Four Months". How three
 people divided the work across Gemini, Claude Opus, Cursor, and
 Claude Code across five project phases — which tool did what,
 where the structural-isomorphism insight came from, and why Claude

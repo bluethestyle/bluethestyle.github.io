@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "Development Story (EN, PDF)"
 ---
 
-*Part 1 of "Building a Financial AI in Three Months" — a series on
+*Part 1 of "Building a Financial AI in Four Months" — a series on
 building a financial recommendation system with Claude Code, on
 consumer hardware, as a three-person team.*
 
@@ -97,7 +97,7 @@ for alternatives inside them.
 
 The constraints alone would not have been enough. Three people on
 an RTX 4070, even with ten years of combined experience, cannot
-ship an 80-DAG ALS replacement in three months through willpower.
+ship an 80-DAG ALS replacement in four months through willpower.
 What made this project possible as a *scope*, not just an
 *ambition*, was Claude Code sitting in the loop from day one.
 

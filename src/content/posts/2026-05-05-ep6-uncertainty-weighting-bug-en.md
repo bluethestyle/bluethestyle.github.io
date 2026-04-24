@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "Development Story (EN, PDF) §11"
 ---
 
-*Part 6 of "Building a Financial AI in Three Months". What
+*Part 6 of "Building a Financial AI in Four Months". What
 survived data-integrity cleanup from Ep 5 — the training
 environment itself harboring a bug that *silently* contaminated
 architectural conclusions we made for weeks. This episode is the

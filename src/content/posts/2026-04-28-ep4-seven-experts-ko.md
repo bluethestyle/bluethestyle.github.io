@@ -1,5 +1,5 @@
 ---
-title: "[3개월 개발기] 에피소드 4 — 일곱 전문가: 11개 학문에서 구조적 동형사상을 차용하다"
+title: "[4개월 개발기] 에피소드 4 — 일곱 전문가: 11개 학문에서 구조적 동형사상을 차용하다"
 date: 2026-04-28 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, architecture, ple, expert-pool, financial-ai]
@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "전문가 상세 (KO, PDF)"
 ---
 
-*"3개월간의 금융 AI 개발기" 4편. 에피소드 1에서 '이종 전문가 네트워크'라는 뼈대가 PLE(Progressive Layered Extraction) 구조로의 발상의 전환에서 비롯되었다고 언급했다. 에피소드 2에서는 이 과정에서 '구조적 동형사상'이라는 빛나는 아이디어가 도출되었음을 다루었다. 이번 편에서는 그 추상적이었던 개념들이 구체적으로 어떻게 7개의 전문가 네트워크로 귀착되었는지, 그 치열한 선택의 과정을 낱낱이 분석한다.*
+*"4개월간의 금융 AI 개발기" 4편. 에피소드 1에서 '이종 전문가 네트워크'라는 뼈대가 PLE(Progressive Layered Extraction) 구조로의 발상의 전환에서 비롯되었다고 언급했다. 에피소드 2에서는 이 과정에서 '구조적 동형사상'이라는 빛나는 아이디어가 도출되었음을 다루었다. 이번 편에서는 그 추상적이었던 개념들이 구체적으로 어떻게 7개의 전문가 네트워크로 귀착되었는지, 그 치열한 선택의 과정을 낱낱이 분석한다.*
 
 ## 왜 하필 7명인가
 

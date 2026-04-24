@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "Expert Details (EN, PDF)"
 ---
 
-*Part 4 of "Building a Financial AI in Three Months". Ep 1 named
+*Part 4 of "Building a Financial AI in Four Months". Ep 1 named
 "heterogeneous expert networks" as a decision that emerged from the
 PLE reframe. Ep 2 named "structural isomorphism" as a concept that
 surfaced in Gemini dialogue. This episode is how those abstract

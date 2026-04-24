@@ -4,7 +4,7 @@ date: 2026-05-12 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, adatt, gradsurgery, negative-results, financial-ai]
 lang: en
-excerpt: "Record from three months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 WIP status, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did."
+excerpt: "Record from four months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 WIP status, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did."
 series: three-months
 part: 8
 alt_lang: /2026/05/12/ep8-honest-negatives-ko/
@@ -12,13 +12,13 @@ source_url: https://doi.org/10.5281/zenodo.19621884
 source_label: "Paper 1 (Zenodo DOI)"
 ---
 
-*The final episode of "Building a Financial AI in Three Months".
+*The final episode of "Building a Financial AI in Four Months".
 Seven episodes covered what worked — the ALS-replacement motivation
 (Ep 1), AI collaboration organization (Ep 2), guardrails (Ep 3),
 the seven experts (Ep 4), data-integrity hunting (Ep 5), the bug
 that contaminated an architectural conclusion (Ep 6), distillation
 and serving (Ep 7). This one is the record of *what did not work*
-over the same three months.*
+over the same four months.*
 
 ## adaTT — a null effect at 13-task scale
 
@@ -92,7 +92,7 @@ results are in, Study Thread will cover them in detail.
 
 ## From synthetic to production data — the validation window isn't open yet
 
-All three months of design and experimentation ran on a public
+All four months of design and experimentation ran on a public
 benchmark (Santander Customer Transaction Prediction) and a 1M-row
 synthetic dataset generated to mimic its distribution. No matter
 how rigorously the two paths were validated, there is no guarantee
@@ -127,10 +127,10 @@ are supported by real data; if not, the divergence itself becomes
 the starting point for the next paper. Either way, follow-ups will
 appear in Study Thread or Commentary.
 
-## Things tried in three months that did not make the record
+## Things tried in four months that did not make the record
 
 A few more. Not included in the paper drafts but attempted within
-the three months:
+the four months:
 
 - **9-expert configuration trial.** Added Gaussian Process expert
   and Dropout Bayesian expert on top of the seven. No performance
@@ -185,7 +185,7 @@ about *AI making the re-investigation cost low enough that
 engineers actually do it*. The three-person team's willingness
 to revisit past conclusions — a habit of honesty — was the human
 contribution. Claude Code made the cost of that honesty
-affordable under three-month timelines.
+affordable under four-month timelines.
 
 ## Why negative results matter
 
@@ -198,7 +198,7 @@ public "sigmoid won then turned out to be the bug" record, so we
 rediscovered it from scratch.
 
 This blog is an attempt to break that pattern, even slightly. If
-"three months of work that didn't pan out" saves another team
+"four months of work that didn't pan out" saves another team
 *weeks*, the cost-benefit of documenting negatives is high.
 
 ## Closing the series
@@ -216,7 +216,7 @@ department, with Claude Code as the partner. In exchange, every
 step needs its reasoning — why this architecture, why this tool,
 why this verification step.
 
-Three months out, *more mistakes are visible than successes*. The
+Four months out, *more mistakes are visible than successes*. The
 uncertainty-weighting sign bug, the initial "adaTT structurally
 fails" misreading, v1 synthetic data's GAN limitations, the three
 chained label leakages. Every mistake tightened the project's

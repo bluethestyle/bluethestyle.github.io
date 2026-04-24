@@ -3,7 +3,7 @@ export const SITE = {
   owner: "Seonkyu Jeong",
   role: "Independent researcher — Seoul",
   bio: "Notes, working papers, and long-form thinking on financial AI, model risk management, and agentic systems. GARP Financial Risk Manager (FRM).",
-  bio2: "This site collects what does not fit into a journal paper or a GitHub README — decisions and their reasons, failed experiments, what collaborating with an AI system for three months actually looked like.",
+  bio2: "This site collects what does not fit into a journal paper or a GitHub README — decisions and their reasons, failed experiments, what collaborating with an AI system for four months actually looked like.",
   contact: "jsk320098 [at] gmail [dot] com",
   orcid: "0009-0005-3291-9112",
   github: "bluethestyle",
@@ -33,10 +33,10 @@ export const COAUTHORS = [
 export const SERIES = [
   {
     slug: "three-months",
-    title: "Building a Financial AI in Three Months",
-    titleKo: "3개월간의 금융 AI 개발기",
+    title: "Building a Financial AI in Four Months",
+    titleKo: "4개월간의 금융 AI 개발기",
     tag: "FinAI Build",
-    tagKo: "3개월 개발기",
+    tagKo: "4개월 개발기",
     desc: "Building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
     descKo: "3명 팀이 소비자용 GPU 한 대와 Claude Code 만으로 금융 추천 시스템을 만들어낸 기록.",
     ep: 8, total: 8,
@@ -78,9 +78,9 @@ export const SERIES = [
  */
 export const EXCERPTS = {
   "/2026/05/12/ep8-honest-negatives-ko/":
-    "3개월의 기록 — adaTT 가 13-task 에서 null 로 수렴한 과정, GradSurgery 가 VRAM 오버헤드로 미채택된 이유, Paper 3 WIP 상태, 2026-04-30 이후 실데이터 메트릭 대기. 작동하지 않은 것이 작동한 것만큼 중요한 이유.",
+    "4개월의 기록 — adaTT 가 13-task 에서 null 로 수렴한 과정, GradSurgery 가 VRAM 오버헤드로 미채택된 이유, Paper 3 WIP 상태, 2026-04-30 이후 실데이터 메트릭 대기. 작동하지 않은 것이 작동한 것만큼 중요한 이유.",
   "/2026/05/12/ep8-honest-negatives-en/":
-    "Record from three months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 WIP status, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did.",
+    "Record from four months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 WIP status, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did.",
   "/2026/05/08/ep7-distillation-serving-ko/":
     "teacher 는 PLE, student 는 task 별 LightGBM, 서빙은 AWS Lambda. 왜 이 조합인가, teacher-student fidelity 가 실패하면 어떻게 되는가, 그리고 Bedrock 위 5-에이전트 파이프라인의 역할 분담.",
   "/2026/05/08/ep7-distillation-serving-en/":
@@ -122,7 +122,7 @@ export const EXCERPTS = {
   "/2026/04/21/mrm-ep2-champion-challenger-en/":
     "MRM Thread ep 2. Champion-Challenger implemented as a synchronous code gate — the four verdict shapes (force_promote / bootstrap / reject(fidelity) / promote·reject(competition)), why the safety floor comes before competition, and how every verdict becomes an HMAC-signed audit entry for SR 11-7 reconstruction.",
   "/2026/04/21/ep2-ai-collaboration-ko/":
-    "3개월 개발기 2편. Phase A-E 로 나뉜 단계-도구 페어링 — Gemini (아이디에이션) → Claude Opus (기술 검증, 19편 기술 참조 공동 작성) → Cursor (환경·CLAUDE.md 가드레일) → Claude Code Opus/Sonnet (3인×AI 팀 병렬 구현) → Claude Code Extension (ablation 모니터링·논문). 왜 Claude Code 가 구현 단계에서 대체 불가능했는지 구체적 예 3가지 (leakage 3연쇄, FP16 NaN 4동시 진단, sigmoid 관찰→가설→문헌→구현 플로우).",
+    "4개월 개발기 2편. Phase A-E 로 나뉜 단계-도구 페어링 — Gemini (아이디에이션) → Claude Opus (기술 검증, 19편 기술 참조 공동 작성) → Cursor (환경·CLAUDE.md 가드레일) → Claude Code Opus/Sonnet (3인×AI 팀 병렬 구현) → Claude Code Extension (ablation 모니터링·논문). 왜 Claude Code 가 구현 단계에서 대체 불가능했는지 구체적 예 3가지 (leakage 3연쇄, FP16 NaN 4동시 진단, sigmoid 관찰→가설→문헌→구현 플로우).",
   "/2026/04/21/ep2-ai-collaboration-en/":
     "FinAI Build ep 2. The five phase-tool pairings (A-E) — Gemini for ideation, Claude Opus for technical validation and 19 co-authored tech reference docs, Cursor for environment and CLAUDE.md guardrails, Claude Code Opus/Sonnet for three-person × AI-team parallel implementation, Claude Code extension for ablation monitoring and papers. Why Claude Code was non-substitutable in implementation: three concrete examples (chained leakage tracing, simultaneous FP16 NaN diagnosis, sigmoid-gate observation→hypothesis→literature→implementation flow).",
   "/2026/04/20/adatt-4-training-loop-loss-weighting-optimizer-ko/":
@@ -170,9 +170,9 @@ export const EXCERPTS = {
   "/2026/04/18/mrm-ep1-architecture-en/":
     "Part 1 of 'The MRM Thread' — a short parallel series on regulatory compliance and model risk management for AI recommendation systems, written from a GARP FRM practitioner perspective.",
   "/2026/04/18/ep1-premise-ko/":
-    "시리즈 '3개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명 팀이 금융 추천 시스템을 만든 이야기.",
+    "시리즈 '4개월간의 금융 AI 개발기' 1편. Claude Code 를 주 개발 파트너로, 소비자용 GPU 한 대로, 3명 팀이 금융 추천 시스템을 만든 이야기.",
   "/2026/04/18/ep1-premise-en/":
-    "Part 1 of 'Building a Financial AI in Three Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
+    "Part 1 of 'Building a Financial AI in Four Months' — a series on building a financial recommendation system with Claude Code, on consumer hardware, as a three-person team.",
 };
 
 /**
@@ -224,7 +224,7 @@ export const TAGS = [
 ];
 
 export const CATEGORIES = [
-  { slug: "finai-build",  name: "FinAI Build",   ko: "3개월 개발기",  count: 2,  desc: "Building a financial AI in three months — engineering notes.",                                                descKo: "3개월간의 금융 AI 개발 기록 — 엔지니어링 노트.",                                                            color: "1" },
+  { slug: "finai-build",  name: "FinAI Build",   ko: "4개월 개발기",  count: 2,  desc: "Building a financial AI in four months — engineering notes.",                                                descKo: "4개월간의 금융 AI 개발 기록 — 엔지니어링 노트.",                                                            color: "1" },
   { slug: "mrm-thread",   name: "MRM Thread",    ko: "MRM 스레드",    count: 2,  desc: "Model risk management for AI recommendation systems.",                                                         descKo: "AI 추천 시스템의 모델 리스크 관리.",                                                                       color: "2" },
   { slug: "study-thread", name: "Study Thread",  ko: "스터디 스레드", count: 20, desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized.",      descKo: "PLE 아키텍처의 배경이 되는 논문·수학 기초·참고 문헌을 학습하며 정리한 노트.",                               color: "3" },
   { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 2,  desc: "Readings of regulatory drafts, architecture patterns, and paper findings adjacent to the main threads.",       descKo: "규제 초안·아키텍처 패턴·논문 발견을 메인 스레드 옆에서 짚는 글.",                                              color: "4" },

@@ -9,13 +9,13 @@ series: three-months
 part: 7
 alt_lang: /2026/05/08/ep7-distillation-serving-ko/
 next_title: "Ep 8 — Honest Negative Results and What Comes Next"
-next_desc: "The adaTT null effect, GradSurgery rejection, Paper 3 WIP, and the real-data metrics pending after 2026-04-30 — a record of *what did not work* across three months."
+next_desc: "The adaTT null effect, GradSurgery rejection, Paper 3 WIP, and the real-data metrics pending after 2026-04-30 — a record of *what did not work* across four months."
 next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
 
-*Part 7 of "Building a Financial AI in Three Months". Eps 4-6
+*Part 7 of "Building a Financial AI in Four Months". Eps 4-6
 settled the model architecture; this episode is about the path
 the model takes *to actually reach a customer* — distillation and
 serving. How a three-person team ends up serving real-time
@@ -217,7 +217,7 @@ specific observed problem, and Claude Code wrote the
 implementation while Opus argued the design. That's the pattern
 — observation → Opus dialogue → Claude Code implementation →
 production → next observation — that produced this stack over
-three months of 3-person work.
+four months of 3-person work.
 
 ## Lambda cost — why serverless is the answer
 
@@ -242,7 +242,7 @@ without large infrastructure.
 ## Next
 
 Ep 8 (FinAI Build finale) — a record of *what did not work* across
-the three months. The adaTT null effect at 13-task scale,
+the four months. The adaTT null effect at 13-task scale,
 GradSurgery rejected on VRAM grounds, Paper 3 (Loss Dynamics) in
 WIP, and the current state of awaiting real-data metrics after
 2026-04-30. Closing with why honest negative results are an

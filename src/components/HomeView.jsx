@@ -113,7 +113,7 @@ function HomeView({ lang, posts = [] }) {
             <span className="hl">금융&nbsp;AI</span>, 모델 리스크, 그리고 규제 안에서 에이전트를 천천히 제자리에 앉혀 가는 이야기.
           </h1>
           <p className="kr">
-            <b>금융 AI 연구자 · 서울.</b> 논문이나 GitHub README 에는 담기지 않는 것들을 모은다 — 어떤 결정을 왜 내렸는지, 실패한 실험들, 그리고 3개월간 AI 와 한 팀처럼 일한 실제 풍경.
+            <b>금융 AI 연구자 · 서울.</b> 논문이나 GitHub README 에는 담기지 않는 것들을 모은다 — 어떤 결정을 왜 내렸는지, 실패한 실험들, 그리고 4개월간 AI 와 한 팀처럼 일한 실제 풍경.
           </p>
           <p className="kr">금융 AI, 모델 리스크 관리, 에이전트 시스템에 대한 작업 노트와 긴 호흡의 사고 기록. GARP FRM.</p>
           <div>

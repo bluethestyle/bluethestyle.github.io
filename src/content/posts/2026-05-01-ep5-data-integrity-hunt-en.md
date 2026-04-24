@@ -15,7 +15,7 @@ source_url: https://github.com/bluethestyle/aws_ple_for_financial/blob/main/docs
 source_label: "Development Story (EN, PDF) §9"
 ---
 
-*Part 5 of "Building a Financial AI in Three Months". Through Ep 4
+*Part 5 of "Building a Financial AI in Four Months". Through Ep 4
 we covered which architectures got picked and why. This episode is
 about confirming the *inputs* are correct — the unavoidable boring
 work that, after three iterations, settled into something useful.*
