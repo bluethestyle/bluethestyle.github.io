@@ -254,7 +254,7 @@ $$\mathcal{L}_{entropy} = \lambda_{ent} \cdot \left( -\frac{1}{|\mathcal{T}|} \r
 
 음의 엔트로피를 *최소화* 하면 엔트로피가 *증가* 하여 분산이 유도된다.
 $\lambda_{ent}$ 는 튜닝 포인트다 — 0 으로 두면 collapse, 0.1 이면 모든
-태스크가 완전 균등해져 특화 자체가 사라진다. 안정 범위는 0.005~0.02,
+태스크가 완전 균등해져 특화 자체가 사라진다. 안정 범위는 0.005–0.02,
 기본값 0.01.
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" style="max-width:520px;width:100%;margin:24px auto;display:block;" font-family="JetBrains Mono, SUIT Variable, Pretendard Variable, ui-monospace, sans-serif">

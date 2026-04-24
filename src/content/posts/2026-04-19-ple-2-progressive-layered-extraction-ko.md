@@ -157,7 +157,7 @@ $$\mathbf{w}_k = \text{Softmax}(\mathbf{W}_k \cdot \mathbf{h}_{shared} + \mathbf
   가볍지만 미분 불가능해서 straight-through estimator 같은 우회 필요.
   더 중요한 건 "태스크 A 는 60% Shared, 40% Task" 같은 자연스러운
   혼합을 표현 못 한다.
-- **Sigmoid 독립 가중치**: "Expert 마다 독립적으로 0~1 점수." 총합 제약이
+- **Sigmoid 독립 가중치**: "Expert 마다 독립적으로 0–1 점수." 총합 제약이
   없어서 모두가 1 로 가거나 모두가 0 으로 가는 degenerate solution 을
   막기 어렵다.
 - **Attention (Q·K/√d)**: "쿼리와 키의 내적으로 점수." CGC 가 본질적으로
