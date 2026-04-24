@@ -74,8 +74,54 @@ other. The dimensional composition differs subtly too:
 A combined external report is possible — the common components are
 substantial. But *internal storage is separate*. If one class
 served both laws, one law's amendment would break the other's
-compliance posture. Two separate classes, joined through an
-`AnnexIVMapper` aggregator, is the stable structure.
+compliance posture. Two separate classes, each owning its own
+pipeline, is the stable structure.
+
+## And a third axis — EU AI Act Article 11 (Annex IV)
+
+That's the "two-class story". But EU compliance doesn't end at
+Article 9. High-risk AI-system providers must also prepare a
+**technical documentation package** under **Article 11 + Annex IV**
+*before* placing the system on the market. That's a *different*
+obligation from Article 9's risk assessment — one is ongoing
+evidence that "the risk management process is operating", the
+other is a *pre-market technical file* submitted to the
+conformity-assessment authority.
+
+Annex IV enumerates 12 sections — general system description,
+design details, monitoring and control techniques, training-data
+provenance and attributes, test and validation results, human
+oversight measures, post-market monitoring plans, and so on.
+Each section demands *verifiable evidence* that can be produced
+on request. Not a prose "we comply", but a concrete artefact —
+a code path, a config key, a document path.
+
+In our implementation this obligation is owned by `AnnexIVMapper`,
+a class independent from the two FRIA classes. Its job is to map
+each of the 12 sections to the **actual evidence source** in the
+repository — Ep 3's seven audit tables, Ep 2's promotion-gate
+config, `KoreanFRIAAssessor`'s seven-dimension output,
+`FRIAEvaluator`'s five-dimension risk record, training-data
+snapshot hashes, and so on, all registered as candidate evidence
+for the relevant section. When a conformity assessor asks for
+"Annex IV Section 5 (training data attributes)", the mapper
+pulls the evidence bundle immediately.
+
+So on the compliance side we actually manage **three independent
+artefacts**, not two.
+
+- `KoreanFRIAAssessor` — Korea AI Basic Act §35, seven-dimension
+  impact assessment, five-year WORM retention.
+- `FRIAEvaluator` — EU AI Act Art. 9, five-dimension risk-
+  management process record.
+- `AnnexIVMapper` — EU AI Act Art. 11 + Annex IV, twelve-section
+  technical-documentation evidence mapping.
+
+The reason we don't merge them is the same as before. Different
+legal bases, different submission formats and timings, and a
+change in one jurisdiction must not ripple into another. Each
+class owns its own obligation; any combined report sits *above*
+them as a separate aggregator layer.
 
 ## The seven-dimension assessment
 
@@ -133,10 +179,18 @@ When a new model registers:
    seven-dimension evaluation and persists to the Korean results
    table.
 3. In parallel, `FRIAEvaluator` runs its five-dimension evaluation
-   and persists to a separate table.
-4. `AnnexIVMapper` combines both results into the Article 11
-   technical-documentation report.
-5. An FRIA-complete event is written to the audit log.
+   and persists to its own separate table.
+4. `AnnexIVMapper` runs evidence checks against each of the 12
+   Annex IV sections — verifying that required artefacts (audit
+   logs, config values, FRIA outputs, training-data hashes) exist
+   in the repository, are accessible, and are current, and writes
+   the results to an Annex IV evidence table. When an Art. 11
+   submission is requested, this table becomes the evidence
+   pointer set directly.
+5. A FRIA-complete event lands in the audit log, and separately
+   an Annex IV evidence-check-complete event is written. A
+   combined submission, if needed, is assembled above these by a
+   separate aggregator — the three stores remain independent.
 
 Failures at any step do not fail the pipeline itself — this is a
 best-effort invocation (same principle as Ep 2's

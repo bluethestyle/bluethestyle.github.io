@@ -355,6 +355,26 @@ report) is *not deleted*. Part of what humans used to verify gets
 automated — but the machine-vs-machine challenge leaves behind
 a *record* that humans review later.
 
+The next question is *where* that minority report lives and *how*
+it gets retrieved later. Each session's full reasoning (500–800
+tokens) is encoded as an embedding and written, permanently, to
+a **LanceDB case store**. Metadata travels with the embedding —
+`consensus_type`, `final_verdict`, `timestamp`, and a pointer
+back to the associated `log_operation` entry. When a new
+WARN/FAIL verdict arrives, the case store pulls similar past
+cases by vector similarity and injects them into the current
+verdict's context: "for this kind of anomaly signal, how did
+α/β/γ vote over the last six months, and how often did the
+minority turn out to be right in hindsight?" Current verdicts can
+then draw on *the cumulative history of past verdicts*. If
+ConsensusArbiter is a check between 3–7 sessions at a single
+point in time, the case store is the layer that **extends that
+check along the time axis**. The MRM committee's quarterly
+review materials also roll up from this store — "among this
+quarter's minority verdicts, were there similar past patterns?",
+"is a recurring minority type signalling an architecture-level
+redesign?".
+
 ## On-prem rule engine — the system must still work without LLMs
 
 One more concern. What happens if Sonnet calls fail, or the

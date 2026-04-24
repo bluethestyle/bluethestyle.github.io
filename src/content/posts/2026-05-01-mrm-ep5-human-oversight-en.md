@@ -71,6 +71,60 @@ Our approach is to deliver the oversight means as *API endpoints*
 rather than processes. A call, not a process. Calls are real-time
 and idempotent; they do not get buried in a queue.
 
+## Before the kill switch — code refuses first
+
+The sections that follow are about *how humans intervene*. The
+on-call engineer calls an API, tier-3 cases escalate to a human
+reviewer, an operator signs off a force-promote. All of these
+interventions happen *after* a signal has surfaced. Upstream of
+them, *before a human judges anything*, two filters sit inside
+the serving path and quietly drop candidates.
+
+**Institution-side rejection — the suitability filter.** KFCPA
+§17 (the suitability principle) requires that products not be
+recommended where customer risk tolerance and product risk grade
+don't match. In our pipeline that requirement doesn't live in a
+document; it lives as a **real-time filter inside the serving
+Lambda**. Each customer's risk tolerance and each candidate
+product's risk grade are compared on every request, and candidates
+over threshold are dropped. Hard caps — high-risk products for
+customers aged 65+, capital-market products for customers with
+annual income under 30M KRW — are locked such that not even an
+operator config can switch them off. Only candidates that survive
+this filter make it to ranking and the Reason Generator.
+
+**Customer-side rejection — opt-out and the right to object to
+profiling.** AI Basic Act Article 31 grants the customer the
+right to reject automated decisions. PIPA Article 37-2 separately
+grants the right to object to profiling. Both rights must take
+effect *immediately when exercised*. In our implementation, each
+customer's opt-out status and profiling-consent status are stored
+as a single **DynamoDB row**, and the serving Lambda reads them
+first on every request (single-digit milliseconds). The moment a
+customer toggles "don't use AI recommendations" in the mobile
+app, a write lands in DynamoDB, and from the next request onward
+that customer doesn't enter the AI recommendation path at all —
+they divert automatically to the rule-based Layer-3 fallback. The
+"paper request → processed over days → manual flag set" latency
+that the legacy structure carries is eliminated.
+
+What the two filters share is that **no human API call is
+required to trigger them**. The kill switch needs the on-call
+engineer; HumanReviewQueue needs Safety Gate to raise a tier.
+Suitability and opt-out, by contrast, live inside the *default
+path of every request*. The filter verdict is written to
+`log_guardrail`, the opt-out read is logged in `log_data_access`,
+but the decision itself closes without human involvement. From a
+regulatory-response standpoint this layer buys two things — *it
+reduces how often signals surface at all* (items pre-filtered
+never reach kill-switch territory) and *it removes lag in
+customer rights exercise* (a legal right is no longer tied to a
+paperwork cycle).
+
+The kill switch and HumanReviewQueue then sit on top of these two
+filters. Machine refuses first → for signals that still break
+through, humans intervene.
+
 ## Kill switch — one call to disable a specific task
 
 The simplest API is the kill switch. Disable the whole pipeline,

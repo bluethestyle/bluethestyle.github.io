@@ -64,6 +64,52 @@ Three metrics per attribute, simultaneously:
 single threshold breach triggers the automatic kill switch on the
 affected task.
 
+## Where 15 metrics still aren't enough — intersectional fairness
+
+15 metrics look exhaustive, but there's a class of cases where
+*every single-attribute metric passes* and the violation only
+surfaces at the intersection. A synthetic-data example from our
+testing, just in numbers:
+
+- Gender alone DI = 0.85 (pass)
+- Age band alone DI = 0.88 (pass)
+- Income tier alone DI = 0.91 (pass)
+- But **female × age 65+ × low-income** intersection DI = 0.62
+  (clear violation)
+
+Looking only at the marginal distributions, all three metrics are
+above the threshold. The bias only appears when the protected
+group clusters at the *intersection* of three axes. Marginal
+checks are structurally blind to this. A fairness report that
+reads "DI 0.85, 0.88, 0.91 — all passing" can hide a specific
+intersectional cohort that is being consistently discriminated
+against in the serving path.
+
+AI Basic Act §34 (explainability and fairness obligations)
+includes detecting exactly this kind of compound discrimination.
+Covering single attributes isn't enough to claim "we monitored
+protected groups adequately".
+
+In our implementation this layer lives in
+`core/agent/audit/intersectional_fairness.py`. It auto-scans
+2-way and 3-way combinations of the five protected attributes.
+The full space is combinatorially large (26 non-trivial
+intersections beyond the singletons), but in practice we
+evaluate **only the intersections whose sample size supports
+statistical significance**. When an intersectional cohort is too
+small, DI itself gets buried in noise. For each intersection we
+compute DI / SPD / EOD and write a `log_operation` entry with
+`event="intersectional_fairness"`. Threshold breaches flow into
+the same alert path as the original 15 metrics.
+
+This layer doesn't fire often. On synthetic data it's mostly
+quiet. Once real production traffic accumulates, meaningful
+intersectional biases may start to surface. A new line gets added
+to the MRM committee's quarterly review: "intersectional
+protected-cohort violations this quarter". When the single-
+attribute DI sits at a comfortable-looking 0.85, this layer is
+the thing that quietly catches 0.62 underneath.
+
 ## Sliding window, why that way
 
 Recomputing on every prediction is computationally heavy and
