@@ -5,8 +5,11 @@ import { CATEGORIES } from "../data.js";
 
 function CategoriesView({ posts = [] }) {
   const today = new Date().toISOString().slice(0, 10);
-  const cats = CATEGORIES;
   const POSTS = posts.filter(p => p.draft || p.date <= today);
+  const cats = CATEGORIES.map((c) => ({
+    ...c,
+    visibleCount: POSTS.filter(p => !p.draft && (p.cat === c.name || p.cat === c.ko)).length,
+  }));
   return (
     <>
       <section className="hero" style={{paddingBottom:32, marginBottom:32}}>
@@ -31,7 +34,7 @@ function CategoriesView({ posts = [] }) {
           <div className="sec-head-l">
             <div className="title" data-lang-ui="en">All <em>categories</em></div>
             <div className="title kr" data-lang-ui="ko">전체 <em>카테고리</em></div>
-            <div className="count">{cats.length} <span data-i18n-ko="개">total</span> · {cats.filter(c=>c.count).length} <span data-i18n-ko="활성">active</span></div>
+            <div className="count">{cats.length} <span data-i18n-ko="개">total</span> · {cats.filter(c=>c.visibleCount).length} <span data-i18n-ko="활성">active</span></div>
           </div>
           <div className="filters">
             <a className="on" data-i18n-ko="전체">all</a><a data-i18n-ko="활성">active</a><a data-i18n-ko="예정">planned</a>
@@ -42,7 +45,7 @@ function CategoriesView({ posts = [] }) {
           {cats.map((c,i) => {
             const cvar = "var(--c" + c.color + ")";
             const cs = "var(--c" + c.color + "s)";
-            const active = c.count > 0;
+            const active = c.visibleCount > 0;
             const Tag = active ? "a" : "div";
             const href = active ? `/categories/${c.slug}/` : undefined;
             return (
@@ -65,7 +68,7 @@ function CategoriesView({ posts = [] }) {
                     <span style={{fontFamily:"JetBrains Mono", fontSize:10, letterSpacing:".12em", textTransform:"uppercase", color:"var(--muted)"}}>cat {String(i+1).padStart(2,"0")}</span>
                   </div>
                   <span style={{fontFamily:"JetBrains Mono", fontSize:10, color: active?"var(--ink-2)":"var(--muted-2)", padding:"2px 8px", border:"1px solid var(--hair)", borderRadius:3}}>
-                    {active ? <><span>{c.count}</span> <span data-i18n-ko="글">posts</span></> : <span data-i18n-ko="비어있음">empty</span>}
+                    {active ? <><span>{c.visibleCount}</span> <span data-i18n-ko="글">posts</span></> : <span data-i18n-ko="비어있음">empty</span>}
                   </span>
                 </div>
                 <h3 data-lang-ui="en" style={{fontFamily:"var(--display)", fontSize:30, fontWeight:400, margin:"0 0 4px", letterSpacing:"-0.02em", lineHeight:1.05}}>{c.name}</h3>
@@ -98,17 +101,17 @@ function CategoriesView({ posts = [] }) {
         </div>
         <div style={{background:"var(--surface)", border:"1px solid var(--hair)", borderRadius:10, padding:22}}>
           <div style={{display:"flex", height:24, borderRadius:4, overflow:"hidden", marginBottom:14}}>
-            {cats.filter(c=>c.count).map(c => (
-              <div key={c.slug} style={{background:"var(--c"+c.color+")", flex:c.count, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"JetBrains Mono", fontSize:10, color:"#fff", letterSpacing:".08em"}}>
-                {c.count}
+            {cats.filter(c=>c.visibleCount).map(c => (
+              <div key={c.slug} style={{background:"var(--c"+c.color+")", flex:c.visibleCount, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"JetBrains Mono", fontSize:10, color:"#fff", letterSpacing:".08em"}}>
+                {c.visibleCount}
               </div>
             ))}
           </div>
           <div style={{display:"flex", gap:16, flexWrap:"wrap"}}>
-            {cats.filter(c=>c.count).map(c => (
+            {cats.filter(c=>c.visibleCount).map(c => (
               <div key={c.slug} style={{display:"inline-flex", alignItems:"center", gap:7, fontFamily:"JetBrains Mono", fontSize:11, color:"var(--muted)"}}>
                 <span style={{width:8, height:8, background:"var(--c"+c.color+")", borderRadius:2}}></span>
-                {c.name} · {c.count}
+                {c.name} · {c.visibleCount}
               </div>
             ))}
           </div>

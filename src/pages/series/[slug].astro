@@ -36,8 +36,8 @@ const { series, lang, entries } = Astro.props;
 const isKo = lang === "ko";
 const altLangUrl = isKo ? series.en : series.ko;
 const T = isKo
-  ? { published: (n) => `${n} 편 공개`, total_suffix: (t) => t ? ` · 총 ${t} 편 예정` : "", back: "← 시리즈", other_lang: "English", all_series: "시리즈 전체" }
-  : { published: (n) => `${n} post${n === 1 ? "" : "s"} published`, total_suffix: (t) => t ? ` · ${t} planned` : "", back: "← Series", other_lang: "한국어", all_series: "All series" };
+  ? { unit_suffix: " 편 공개", total_suffix: (t) => t ? ` · 총 ${t} 편 예정` : "", back: "← 시리즈", other_lang: "English", all_series: "시리즈 전체", empty: "아직 공개된 에피소드가 없습니다." }
+  : { unit_suffix: " posts published", total_suffix: (t) => t ? ` · ${t} planned` : "", back: "← Series", other_lang: "한국어", all_series: "All series", empty: "No episodes published yet." };
 
 // Enrich each entry with excerpt via URL lookup (loader merges
 // EXCERPTS map + frontmatter excerpt, so this is single-source).
@@ -57,7 +57,7 @@ const enriched = entries.map((entry) => {
   <section class="hero" style="padding-bottom:32px; margin-bottom:32px">
     <div class="label">
       <span class="pulse"></span>
-      Series · {T.published(entries.length)}{T.total_suffix(series.total)}
+      Series · <span data-visible-count>{entries.length}</span>{T.unit_suffix}{T.total_suffix(series.total)}
     </div>
     <h1 style="font-size:48px">
       <em>{series.tag}</em>
@@ -73,13 +73,12 @@ const enriched = entries.map((entry) => {
     <div class="sec-head">
       <div class="sec-head-l">
         <div class={"title" + (isKo ? " kr" : "")}>{isKo ? "에피소드 목록" : "Episodes"}</div>
-        <div class="count">{entries.length}{series.total ? ` / ${series.total}` : ""}</div>
+        <div class="count"><span data-visible-count>{entries.length}</span>{series.total ? ` / ${series.total}` : ""}</div>
       </div>
     </div>
 
-    {entries.length === 0 ? (
-      <p style={isKo ? "color:var(--muted)" : "color:var(--muted); font-style:italic"}>{isKo ? "아직 공개된 에피소드가 없습니다." : "No episodes published yet."}</p>
-    ) : (
+    <p data-empty-message style={isKo ? "color:var(--muted); display:" + (entries.length === 0 ? "block" : "none") : "color:var(--muted); font-style:italic; display:" + (entries.length === 0 ? "block" : "none")}>{T.empty}</p>
+    <div data-post-list style={"display:" + (entries.length === 0 ? "none" : "block")}>
       <div class="post-index">
         <div class="year">2026</div>
         <div>
@@ -114,15 +113,29 @@ const enriched = entries.map((entry) => {
           })}
         </div>
       </div>
-    )}
+    </div>
   </section>
 
   <script is:inline>
     (function () {
       const today = new Date().toISOString().slice(0, 10);
+      let visible = 0;
       document.querySelectorAll(".post-row[data-post-date]").forEach((el) => {
-        if (el.dataset.postDate > today) el.style.display = "none";
+        if (el.dataset.postDate > today) {
+          el.style.display = "none";
+        } else {
+          visible += 1;
+        }
       });
+      document.querySelectorAll("[data-visible-count]").forEach((el) => {
+        el.textContent = String(visible);
+      });
+      const emptyMsg = document.querySelector("[data-empty-message]");
+      const postList = document.querySelector("[data-post-list]");
+      if (visible === 0 && postList && emptyMsg) {
+        postList.style.display = "none";
+        emptyMsg.style.display = "block";
+      }
     })();
   </script>
 </Base>

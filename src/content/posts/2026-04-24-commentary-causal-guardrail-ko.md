@@ -1,11 +1,11 @@
 ---
 title: "[Commentary] 예측마다 신뢰도를 묻는다 — Causal Guardrail 과 Mahalanobis 거리"
-date: 2026-04-25 12:00:00 +0900
+date: 2026-04-24 12:00:00 +0900
 categories: [Commentary]
 tags: [commentary, causal, guardrail, mrm, paper-3, financial-ai]
 lang: ko
 excerpt: "MRM Ep 3 의 감사 로그가 *기록의 무결성* 을 보증한다면, 각각의 개별 예측이 *신뢰할 만한가* 는 누가 판정하는가. Causal Expert 의 latent space 위에서 Mahalanobis 거리로 OOD 신호를 잡아내는 예측-단위 guardrail, 그리고 이것이 CEH attribution 과 쌍을 이뤄 감사 추적에 편입되는 방식."
-alt_lang: /2026/04/25/commentary-causal-guardrail-en/
+alt_lang: /2026/04/24/commentary-causal-guardrail-en/
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 v2 § CEH / Paper 3 Findings 10-11"
 ---

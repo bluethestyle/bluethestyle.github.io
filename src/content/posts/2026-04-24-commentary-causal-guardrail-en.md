@@ -1,11 +1,11 @@
 ---
 title: "[Commentary] A reliability flag on every prediction — Causal Guardrail and Mahalanobis distance"
-date: 2026-04-25 12:00:00 +0900
+date: 2026-04-24 12:00:00 +0900
 categories: [Commentary]
 tags: [commentary, causal, guardrail, mrm, paper-3, financial-ai]
 lang: en
 excerpt: "If MRM Ep 3's audit log guarantees *record integrity*, who judges whether *each individual prediction* is trustworthy? A prediction-level guardrail that detects OOD signals via Mahalanobis distance on the Causal Expert's latent space, and how it pairs with CEH attribution to fold into the audit trail."
-alt_lang: /2026/04/25/commentary-causal-guardrail-ko/
+alt_lang: /2026/04/24/commentary-causal-guardrail-ko/
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 v2 § CEH / Paper 3 Findings 10-11"
 ---
