@@ -82,19 +82,30 @@ const cs = `var(--c${cat.color}s)`;
   <script is:inline>
     (function () {
       const today = new Date().toISOString().slice(0, 10);
-      let visible = 0;
-      document.querySelectorAll(".post-row[data-post-date]").forEach((el) => {
-        if (el.dataset.postDate > today) {
-          el.style.display = "none";
-        } else {
+      const rows = document.querySelectorAll(".post-row[data-post-date]");
+      rows.forEach((el) => {
+        if (el.dataset.postDate > today) el.style.display = "none";
+      });
+      const recount = () => {
+        const pref = document.documentElement.getAttribute("data-lang-pref");
+        let visible = 0;
+        rows.forEach((el) => {
+          if (el.dataset.postDate > today) return;
+          const postLang = el.getAttribute("data-lang-post") || "";
+          if (pref && postLang && pref !== postLang) return;
           visible += 1;
-        }
-      });
-      document.querySelectorAll("[data-visible-count]").forEach((el) => {
-        el.textContent = String(visible);
-      });
-      document.querySelectorAll("[data-post-word]").forEach((el) => {
-        el.textContent = visible === 1 ? "post" : "posts";
+        });
+        document.querySelectorAll("[data-visible-count]").forEach((el) => {
+          el.textContent = String(visible);
+        });
+        document.querySelectorAll("[data-post-word]").forEach((el) => {
+          el.textContent = visible === 1 ? "post" : "posts";
+        });
+      };
+      recount();
+      new MutationObserver(recount).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-lang-pref"],
       });
     })();
   </script>
