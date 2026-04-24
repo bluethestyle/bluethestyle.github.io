@@ -227,7 +227,7 @@ export const CATEGORIES = [
   { slug: "finai-build",  name: "FinAI Build",   ko: "3개월 개발기",  count: 2,  desc: "Building a financial AI in three months — engineering notes.",                                                descKo: "3개월간의 금융 AI 개발 기록 — 엔지니어링 노트.",                                                            color: "1" },
   { slug: "mrm-thread",   name: "MRM Thread",    ko: "MRM 스레드",    count: 2,  desc: "Model risk management for AI recommendation systems.",                                                         descKo: "AI 추천 시스템의 모델 리스크 관리.",                                                                       color: "2" },
   { slug: "study-thread", name: "Study Thread",  ko: "스터디 스레드", count: 20, desc: "Papers, math foundations, and reference reading behind the PLE architecture — studied and summarized.",      descKo: "PLE 아키텍처의 배경이 되는 논문·수학 기초·참고 문헌을 학습하며 정리한 노트.",                               color: "3" },
-  { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 0,  desc: "Readings of regulatory drafts and papers. (empty)",                                                           descKo: "규제 초안과 논문에 대한 읽기 · 아직 글 없음.",                                                             color: "4" },
+  { slug: "commentary",   name: "Commentary",    ko: "논평",          count: 2,  desc: "Readings of regulatory drafts, architecture patterns, and paper findings adjacent to the main threads.",       descKo: "규제 초안·아키텍처 패턴·논문 발견을 메인 스레드 옆에서 짚는 글.",                                              color: "4" },
 ];
 
 // RECENT is now derived from loadRecent() in src/lib/posts.js — pages
