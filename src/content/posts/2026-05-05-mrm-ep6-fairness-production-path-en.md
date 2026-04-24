@@ -85,10 +85,11 @@ reads "DI 0.85, 0.88, 0.91 — all passing" can hide a specific
 intersectional cohort that is being consistently discriminated
 against in the serving path.
 
-AI Basic Act §34 (explainability and fairness obligations)
-includes detecting exactly this kind of compound discrimination.
-Covering single attributes isn't enough to claim "we monitored
-protected groups adequately".
+Given AI Basic Act §34's requirements on high-impact AI providers
+around explainability and user-protection, covering only
+single-attribute metrics without looking at the intersectional
+layer makes it hard to credibly claim "we monitored protected
+groups adequately".
 
 In our implementation this layer lives in
 `core/agent/audit/intersectional_fairness.py`. It auto-scans

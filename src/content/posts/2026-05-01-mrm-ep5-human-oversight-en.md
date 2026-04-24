@@ -93,18 +93,27 @@ annual income under 30M KRW — are locked such that not even an
 operator config can switch them off. Only candidates that survive
 this filter make it to ranking and the Reason Generator.
 
-**Customer-side rejection — opt-out and the right to object to
-profiling.** AI Basic Act Article 31 grants the customer the
-right to reject automated decisions. PIPA Article 37-2 separately
-grants the right to object to profiling. Both rights must take
-effect *immediately when exercised*. In our implementation, each
-customer's opt-out status and profiling-consent status are stored
-as a single **DynamoDB row**, and the serving Lambda reads them
-first on every request (single-digit milliseconds). The moment a
-customer toggles "don't use AI recommendations" in the mobile
-app, a write lands in DynamoDB, and from the next request onward
-that customer doesn't enter the AI recommendation path at all —
-they divert automatically to the rule-based Layer-3 fallback. The
+**Customer-side rejection — the right to refuse automated
+decisions and the right to demand explanation.** The primary
+legal basis here is PIPA Article 37-2. Effective March 2024,
+this article grants data subjects the right to **refuse** an
+automated decision that has *significant effect* on their rights
+or obligations and the right to **demand explanation** for such
+decisions. Given financial product recommendation's influence
+over customers' financial choices, this article applies directly
+to the recommender. AI Basic Act Article 34 (high-impact AI
+provider's user-protection obligations) supports the same
+direction as a secondary basis.
+
+Both grounds require rights exercise to *take effect
+immediately*. In our implementation, each customer's refusal
+state and profiling preferences are stored as a single
+**DynamoDB row**, and the serving Lambda reads it first on every
+request (single-digit milliseconds). The moment a customer
+toggles "don't use AI recommendations" in the mobile app, a
+write lands in DynamoDB, and from the next request onward that
+customer doesn't enter the AI recommendation path at all — they
+divert automatically to the rule-based Layer-3 fallback. The
 "paper request → processed over days → manual flag set" latency
 that the legacy structure carries is eliminated.
 

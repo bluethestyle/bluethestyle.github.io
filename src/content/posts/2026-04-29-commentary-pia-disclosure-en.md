@@ -24,15 +24,25 @@ If FRIA (Ep 4) is the *§35 · Art. 9 · Art. 11* triad of impact-
 assessment artefacts, two other regulatory artefacts live next to
 them, separate obligations on their own.
 
-- **PIA (Privacy Impact Assessment)** — mandated by Personal
-  Information Protection Act (PIPA) Article 33 and GDPR Article
-  35. Any institution using personal data in AI training or
-  inference owes one.
-- **Public Disclosure Report** — the Financial Services
-  Commission (FSC, 금융위원회)'s quarterly public-disclosure
-  obligation. AI system transparency, model performance, fairness
-  indicators, incident summary, and customer-impact assessment
-  have to be published periodically.
+- **PIA (Privacy Impact Assessment)** — Personal Information
+  Protection Act (PIPA) Article 33 governs it. For *public-sector*
+  institutions §33(1) makes it a legal requirement; for
+  *private-sector* financial institutions it sits at a
+  recommended / internal-policy level. Where the data flow
+  involves EU data subjects, GDPR Article 35 (DPIA) creates a
+  separate, binding obligation. We conservatively stand up a
+  DPIA-equivalent structure in advance, so the same artefact
+  answers requests from the public-sector, private-sector, or EU
+  path.
+- **Public Disclosure Report** — an internally institutionalized
+  quarterly disclosure aligned with the Financial Services
+  Commission (FSC, 금융위원회)'s AI-in-financial-services
+  guideline direction. It periodically aggregates AI system
+  transparency, model performance, fairness indicators, incident
+  summary, and customer-impact assessment. At present this is
+  closer to *anticipatory conformance to supervisor expectations*
+  than to a hard legal mandate, and the five-section structure
+  is kept modular so it can extend as regulations crystallize.
 
 Both were traditionally *quarterly documents, hand-written by the
 owner*. In our implementation both live under `core/monitoring/`
@@ -81,10 +91,11 @@ assessment is *reproducible* — if a supervisor asks a year later
 to "rerun last quarter's PIA", the same code returns the same
 answer.
 
-## Public Disclosure Generator — the FSC quarterly report
+## Public Disclosure Generator — the quarterly 5-section report
 
-The FSC disclosure is a different artefact. Five sections have to
-be published periodically:
+A separate artefact from PIA. In line with the FSC's
+AI-in-financial-services guideline direction, we institutionalize
+the following five-section aggregation and publish it periodically:
 
 1. **AI system transparency** — summary of the recommender's
    purpose, data used, decision flow
@@ -105,9 +116,10 @@ two formats — **JSON** (machine-readable, for the supervisor's
 automated intake path) and **Markdown** (human-readable, for the
 disclosure web page and PDF conversion). Versioned storage in S3.
 
-When the FSC requests the end-of-quarter disclosure, a human
-verifies the JSON generated correctly and presses submit. The
-step of typing the numbers is structurally removed.
+When a supervisor or external stakeholder requests the end-of-
+quarter disclosure, a human verifies the JSON generated correctly
+and presses submit. The step of typing the numbers is
+structurally removed.
 
 ## Why "byproduct of the audit log"
 
