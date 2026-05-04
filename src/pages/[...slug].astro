@@ -178,7 +178,7 @@ const T = isKo
         {seriesEntry && (
           <div class="foot-row">
             <span class="k">{T.series_label}</span>
-            <a href={isKo ? seriesEntry.ko : seriesEntry.en}>
+            <a href={seriesEntry.en} data-lang-href-ko={seriesEntry.ko}>
               [{seriesEntry.tag}] {T.ep_of(post.data.part ?? seriesEntry.ep, seriesEntry.total)}
               <span class="arr">↗</span>
             </a>

@@ -54,6 +54,21 @@ const enriched = entries.map((entry) => {
 });
 ---
 <Base title={`${series.tag} — ${series.title}`} tab="" altLang={altLangUrl} currentLang={lang}>
+  <script is:inline define:vars={{ pageLang: lang, altUrl: altLangUrl }}>
+    // Series pages are language-specific (separate URLs per lang). If the
+    // saved lang-pref doesn't match the URL the user landed on, replace()
+    // to the alt-lang variant so the article list matches their selection.
+    // Only runs on series list pages — individual post pages keep their
+    // explicit lang (the user picked that version on purpose).
+    (function () {
+      try {
+        const pref = localStorage.getItem("lang-pref");
+        if ((pref === "en" || pref === "ko") && pref !== pageLang && altUrl) {
+          window.location.replace(altUrl);
+        }
+      } catch (_) { /* localStorage unavailable — keep current page */ }
+    })();
+  </script>
   <section class="hero" style="padding-bottom:32px; margin-bottom:32px">
     <div class="label">
       <span class="pulse"></span>
