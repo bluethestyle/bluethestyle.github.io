@@ -41,4 +41,17 @@ export default defineConfig({
     remarkPlugins: [remarkMath, remarkMermaid],
     rehypePlugins: [rehypeKatex],
   },
+  // MRM Thread Ep 4-6 overhaul (2026-05-04): old slugs → new slugs.
+  // Old eps were regulation walkthroughs (FRIA / Human Oversight / Fairness);
+  // new eps are philosophy-led (XAI foundation / RAG audit / Modular adaptability).
+  // Activate redirect entries as each new ep file is created — leaving Ep 5/6
+  // commented until the new files exist avoids broken-link state.
+  redirects: {
+    "/2026/04/28/mrm-ep4-fria/": "/2026/04/28/mrm-ep4-xai-foundation/",
+    "/2026/04/28/mrm-ep4-fria-ko/": "/2026/04/28/mrm-ep4-xai-foundation-ko/",
+    "/2026/05/01/mrm-ep5-human-oversight/": "/2026/05/01/mrm-ep5-rag-lancedb/",
+    "/2026/05/01/mrm-ep5-human-oversight-ko/": "/2026/05/01/mrm-ep5-rag-lancedb-ko/",
+    "/2026/05/05/mrm-ep6-fairness-production-path/": "/2026/05/05/mrm-ep6-modular-adaptability/",
+    "/2026/05/05/mrm-ep6-fairness-production-path-ko/": "/2026/05/05/mrm-ep6-modular-adaptability-ko/",
+  },
 });

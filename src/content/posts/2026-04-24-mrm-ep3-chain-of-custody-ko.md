@@ -8,8 +8,8 @@ excerpt: "7개 감사 테이블과 HMAC 해시 체인이 '기록의 연속성'�
 series: mrm-thread
 part: 3
 alt_lang: /2026/04/24/mrm-ep3-chain-of-custody-en/
-next_title: "에피소드 4 — FRIA · AI 기본법 제35조가 코드 위에서 숨 쉬다"
-next_desc: "한국 AI 기본법 §35의 7-차원 영향평가 · 5년 보존 의무 · EU AI Act Art 9 FRIAEvaluator 와 별도 관리되는 이유."
+next_title: "에피소드 4 — 설명이 아키텍처가 될 때: Inherent XAI 와 FD-TVS 스코어링"
+next_desc: "사후적 XAI(SHAP·LIME)는 운영에서 불안정하고 모델과 분리되어 있다. 게이트 가중치·CEH 귀속·마할라노비스 OOD 는 추론 경로의 부산물로 떨어지고, FD-TVS 가 그 위에 운영 스코어링 철학을 얹는다."
 next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"

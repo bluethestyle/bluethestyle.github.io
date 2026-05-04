@@ -8,8 +8,8 @@ excerpt: "Seven audit tables and an HMAC hash chain give you 'continuity of reco
 series: mrm-thread
 part: 3
 alt_lang: /2026/04/24/mrm-ep3-chain-of-custody-ko/
-next_title: "Ep 4 — FRIA: How the Korean AI Basic Act §35 Lives in Code"
-next_desc: "Korea AI Basic Act §35 seven-dimension impact assessment, five-year retention, and why it's kept separate from the EU AI Act Article 9 FRIAEvaluator."
+next_title: "Ep 4 — When Explanation Is Architecture: Inherent XAI and FD-TVS Scoring"
+next_desc: "Post-hoc XAI (SHAP, LIME) is unstable at production scale. Architectural XAI — gate weights, CEH attribution, Mahalanobis OOD — makes explanation a byproduct of the prediction path itself. FD-TVS is the operational scoring philosophy on top."
 next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
