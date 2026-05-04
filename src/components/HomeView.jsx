@@ -205,7 +205,7 @@ function HomeView({ lang, posts = [] }) {
             const ep = currentEp(s.slug, s.ep);
             const total = s.total || s.ep || ep;
             return (
-            <div key={s.slug} className="series">
+            <a key={s.slug} className="series" href={s.en} data-lang-href-ko={s.ko}>
               <div className="top">
                 <span className="cat" data-lang-ui="en">[{s.tag}]</span>
                 <span className="cat" data-lang-ui="ko">[{s.tagKo || s.tag}]</span>
@@ -216,12 +216,10 @@ function HomeView({ lang, posts = [] }) {
               <p data-lang-ui="en">{s.desc}</p>
               <p className="kr" data-lang-ui="ko">{s.descKo || s.desc}</p>
               <div className="bar"><span style={{width: (ep/(total||ep||1)*100) + "%"}}></span></div>
-              <div className="lang">
-                <a href={s.en} data-i18n-ko="한국어로 읽기 ↗">read · english ↗</a>
-                <span className="sep">·</span>
-                <a href={s.ko} data-i18n-ko="영어로 읽기 ↗">한국어로 읽기 ↗</a>
+              <div className="open">
+                <span data-i18n-ko="시리즈 열기 →">open series →</span>
               </div>
-            </div>
+            </a>
             );
           })}
         </div>
@@ -272,9 +270,9 @@ function HomeView({ lang, posts = [] }) {
         <div className="contact-bar">
           <span><span className="k" data-i18n-ko="연락처">contact</span> &nbsp; <a href={`mailto:${SITE.contact}`}>{SITE.contact}</a></span>
           <span className="sep">·</span>
-          <span><span className="k">orcid</span> &nbsp; <a>{SITE.orcid} ↗</a></span>
+          <span><span className="k">orcid</span> &nbsp; <a href={`https://orcid.org/${SITE.orcid}`} rel="me">{SITE.orcid} ↗</a></span>
           <span className="sep">·</span>
-          <span><span className="k">github</span> &nbsp; <a>@{SITE.github} ↗</a></span>
+          <span><span className="k">github</span> &nbsp; <a href={`https://github.com/${SITE.github}`} rel="me">@{SITE.github} ↗</a></span>
           <span style={{marginLeft:"auto"}}><span className="k" data-i18n-ko="라이선스">license</span> &nbsp; <span className="v" data-i18n-ko="본문 CC BY-NC 4.0 · 코드 MIT">content CC BY-NC 4.0 · code MIT</span></span>
         </div>
       </section>

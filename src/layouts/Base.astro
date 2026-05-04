@@ -187,7 +187,7 @@ const allDates = published.map((p) => p.date);
           {SERIES.map((s) => {
             const n = seriesCurrent[s.slug] ?? s.ep;
             return (
-              <a href={s.en} class="series-row">
+              <a href={s.en} class="series-row" data-lang-href-ko={s.ko}>
                 <span class="cat">[{s.tag}]</span>
                 <span class="prog" data-series-slug={s.slug} data-series-total={s.total ?? ""}>ep {n}{s.total ? `/${s.total}` : ""}</span>
               </a>
@@ -368,6 +368,17 @@ const allDates = published.map((p) => p.date);
             const target = el.getAttribute("data-set-lang") || "";
             const currentKey = pref || "";
             el.classList.toggle("on", target === currentKey);
+          });
+          // Lang-aware anchors: anchors with data-lang-href-ko default
+          // to their static href (EN target). When pref=ko, swap href
+          // to the KO variant so series cards / sidebar entries land
+          // on the right-language page. Cache the EN href first.
+          document.querySelectorAll("[data-lang-href-ko]").forEach((el) => {
+            if (el.dataset.langHrefEn === undefined) {
+              el.dataset.langHrefEn = el.getAttribute("href") || "";
+            }
+            const ko = el.getAttribute("data-lang-href-ko") || "";
+            el.setAttribute("href", pref === "ko" && ko ? ko : el.dataset.langHrefEn);
           });
           applyI18n(pref);
         };
