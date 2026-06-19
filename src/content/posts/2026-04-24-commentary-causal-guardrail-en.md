@@ -77,7 +77,7 @@ The separation came out nearly clean. At a 5% FPR threshold
 get misflagged), TPR was 100% (True Positive Rate — the rate at
 which actual OOD samples were caught). Whether these numbers
 hold on real production distributions is something to verify as
-traffic accumulates after 2026-04-30, but on the narrow task of
+real production traffic accumulates, but on the narrow task of
 *geometric separation of the training distribution* the
 Mahalanobis-based detector has strong synthetic-level evidence.
 
@@ -119,8 +119,13 @@ When a supervisor asks for the reliability history of a specific
 prediction 15 months later, a one-line SQL query against
 `log_guardrail` filtered by prediction ID pulls the guardrail
 result and the CEH attribution together. No separate "reliability
-reporting system" is built — every prediction auto-deposits both
+reporting system" is built — every prediction can auto-deposit both
 entries, and those entries accumulate.
+
+> Scope note: this per-prediction CG + CEH audit currently runs on the
+> PLE *teacher*, not on the per-task LightGBM students that serve
+> production traffic. Wiring it into the live serving path is future
+> work, not a delivered capability.
 
 ## Limits and the next question
 
@@ -167,6 +172,6 @@ chain.
 
 Source:
 [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052) v2 § CEH,
-Paper 3 Findings 10-11 (WIP);
+Paper 3 Findings 10-11 (manuscript; Zenodo DOI pending);
 implementation lives in the
 [open-source repo](https://github.com/bluethestyle/aws_ple_for_financial).

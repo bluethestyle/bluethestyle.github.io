@@ -12,7 +12,7 @@ source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
 
-*"MRM 스레드" 6편이자 시리즈의 마지막 에피소드다. 에피소드 1부터 5까지는 이 시스템의 기반을 탄탄하게 쌓아 올리는 과정이었다. 아키텍처에 내재화된 MRM(에피소드 1), 챔피언-챌린저 관문(에피소드 2), 감사 로그 계층(에피소드 3), 설명 컬럼으로서의 내재적 XAI(에피소드 4), 검색 계층으로서의 RAG와 LanceDB(에피소드 5)가 그것이다. 이 탄탄한 기반 위에 자리 잡은 5개의 규제 산출물 생성기 — `KoreanFRIAAssessor`, `FRIAEvaluator`, `AnnexIVMapper`, `PIAEvaluator`, `PublicDisclosureGenerator` — 의 세부 설계는 Paper 2에 기술되어 있다. 이번 에피소드에서는 전체 스택에 대한 장기적인 핵심 명제를 다룬다. 즉, 규제는 끊임없이 변할 것이며, 아키텍처의 핵심은 그 변화에 대응하는 비용을 극적으로 낮추는 데 있다. 변화에 대응하는 비용이 높다면, 앞선 다섯 에피소드의 치열한 노력은 모두 의미를 잃고 만다.*
+*"MRM 스레드" 6편이자 시리즈의 마지막 에피소드다. 에피소드 1부터 5까지는 이 시스템의 기반을 탄탄하게 쌓아 올리는 과정이었다. 아키텍처에 내재화된 MRM(에피소드 1), 챔피언-챌린저 관문(에피소드 2), 감사 로그 계층(에피소드 3), 설명 컬럼으로서의 내재적 XAI(에피소드 4), 검색 계층으로서의 RAG와 LanceDB(에피소드 5)가 그것이다. 이 탄탄한 기반 위에 자리 잡은 5개의 규제 산출물 생성기 — `KoreanFRIAAssessor`, `FRIAEvaluator`, `AnnexIVMapper`, `PIAEvaluator`, `PublicDisclosureGenerator` — 의 세부 설계는 Paper 2에 기술되어 있다. MRM 은 늘 보고를 요구해왔다 — responsible AI 시대에 달라지는 것은 그 보고 자체가 *모듈화* 되어야 한다는 점이다. 한 번 만들어 두고, 규제 요구가 증식할 때마다 모듈을 갈아끼우는 형태. 이번 에피소드에서는 전체 스택에 대한 장기적인 핵심 명제를 다룬다. 즉, 규제는 끊임없이 변할 것이며, 아키텍처의 핵심은 그 변화에 대응하는 비용을 극적으로 낮추는 데 있다. 변화에 대응하는 비용이 높다면, 앞선 다섯 에피소드의 치열한 노력은 모두 의미를 잃고 만다.*
 
 ## 12개월 후의 어느 시나리오
 
@@ -41,7 +41,7 @@ source_label: "Paper 2 (Zenodo DOI)"
 - `FRIAEvaluator` — EU AI Act Art. 9, 5차원 위험 관리 프로세스 기록
 - `AnnexIVMapper` — EU AI Act Art. 11 + Annex IV, 12개 섹션 기술문서 증거 매핑
 - `PIAEvaluator` — 한국 개인정보보호법(PIPA) + GDPR Art. 35, 6-도메인 개인정보 영향평가
-- `PublicDisclosureGenerator` — 금융위 AI 가이드라인, 5개 섹션 분기 공시
+- `PublicDisclosureGenerator` — 금융위 AI 가이드라인, 8개 섹션 분기 공시
 
 각 모듈은 자신만의 평가 차원, 보존 규칙, 출력 포맷, 업데이트 주기를 독자적으로 소유하고 관리한다. 이들이 유일하게 공유하는 것은 그 아래의 기반뿐이다. 즉, 동일한 감사 로그, 동일한 XAI 설명 컬럼, 동일한 RAG 검색 인터페이스만을 공유한다.
 

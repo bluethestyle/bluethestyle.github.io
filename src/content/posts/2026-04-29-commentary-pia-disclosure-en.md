@@ -41,7 +41,7 @@ them, separate obligations on their own.
   transparency, model performance, fairness indicators, incident
   summary, and customer-impact assessment. At present this is
   closer to *anticipatory conformance to supervisor expectations*
-  than to a hard legal mandate, and the five-section structure
+  than to a hard legal mandate, and the eight-section structure
   is kept modular so it can extend as regulations crystallize.
 
 Both were traditionally *quarterly documents, hand-written by the
@@ -91,11 +91,11 @@ assessment is *reproducible* — if a supervisor asks a year later
 to "rerun last quarter's PIA", the same code returns the same
 answer.
 
-## Public Disclosure Generator — the quarterly 5-section report
+## Public Disclosure Generator — the quarterly 8-section report
 
 A separate artefact from PIA. In line with the FSC's
 AI-in-financial-services guideline direction, we institutionalize
-the following five-section aggregation and publish it periodically:
+the following eight-section aggregation and publish it periodically:
 
 1. **AI system transparency** — summary of the recommender's
    purpose, data used, decision flow
@@ -107,9 +107,15 @@ the following five-section aggregation and publish it periodically:
 5. **Customer-impact assessment** — HumanReviewQueue tier 2/3
    handling counts, opt-out exercise counts, rights-related
    inquiries
+6. **Data governance** — data sources, retention windows, and the
+   legal basis for processing
+7. **Compliance status** — current regulatory-mapping status across
+   the frameworks (EU AI Act, GDPR, PIPA, AI Basic Act)
+8. **AI disclosure statement** — the formal notice that an AI system
+   is used in the recommendation, and how customers can respond
 
 `PublicDisclosureGenerator` runs an aggregation query for each of
-these five sections on the quarterly cycle. Inputs are Ep 3's
+these eight sections on the quarterly cycle. Inputs are Ep 3's
 `log_operation`, `log_model_inference`, `log_attribution`,
 `log_guardrail`, plus Ep 6's fairness archive. Output lands in
 two formats — **JSON** (machine-readable, for the supervisor's
@@ -158,7 +164,7 @@ they sharpen it. The review target gets clearer.
   appropriate? For example, does "unused-feature detection via
   attribution distribution" in *data minimization* hold for every
   model type?
-- Does the disclosure report's five-section structure still match
+- Does the disclosure report's eight-section structure still match
   the supervisor's current expectations? New items (e.g., carbon
   footprint, supply-chain risk) require the report structure to
   extend.
@@ -185,7 +191,7 @@ Including FRIA, the regulatory artefacts our system produces as
 - `PIAEvaluator` — PIPA + GDPR Art. 35 privacy impact assessment
   (6 domains)
 - `PublicDisclosureGenerator` — FSC quarterly disclosure
-  (5 sections)
+  (8 sections)
 
 Five generators running on the same audit log, each changing
 *what the MRM committee reviews* in the same way. The essential

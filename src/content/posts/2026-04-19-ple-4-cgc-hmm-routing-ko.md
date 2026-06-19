@@ -237,6 +237,8 @@ dim-normalize 는 기하적 보정이지만, "어느 Expert 가 어느 태스크
   </g>
 </svg>
 
+*(예시: 이 도식은 온프렘 기술참조서의 일반 로스터를 쓴다. 운영 벤치마크는 13개 태스크다.)*
+
 > **도메인 prior 매트릭스.** 학습 초기 bias 는 각 태스크의 "자연스러운
 > Expert 선호도" — 예: 시계열성 강한 churn/retention → PersLay+Temporal,
 > 가맹점 계층 의존 brand_prediction → Unified HGCN 단독. weight 는 모두
@@ -340,6 +342,8 @@ flowchart TB
   style bt fill:#FFFFFF,stroke:#1C8C5A
 ```
 
+*(예시: 이 도식은 온프렘 기술참조서의 일반 로스터를 쓴다. 운영 벤치마크는 13개 태스크다.)*
+
 > **세 시간 스케일, 세 태스크 그룹.** 같은 16D HMM 상태 벡터가 세 개의
 > 독립 프로젝터를 거쳐 일별(Journey) / 월별(Lifecycle) / 월별
 > 행동(Behavior) 세 모드로 나뉘고, 각 모드가 그 시간 스케일이 잘 맞는
@@ -389,5 +393,5 @@ PLE-4 는 Shared Expert pool 위의 두 가지 라우팅 문제를 정리했다.
 를 만드는 GroupTaskExpertBasket, 태스크 타워 사이에서 정보를 명시적으로
 흘려주는 Logit Transfer, 그리고 마지막 Task Tower 구조 — 를 다룬다.
 거기서 또 세 가지 새로운 결정이 나온다: 파라미터 88% 줄이는 Group 공유
-방법, 순차적 태스크 의존성을 명시적으로 전달하는 방법, 그리고 16개
+방법, 순차적 태스크 의존성을 명시적으로 전달하는 방법, 그리고 13개
 태스크 가중치를 자동 균형하는 Uncertainty Weighting.

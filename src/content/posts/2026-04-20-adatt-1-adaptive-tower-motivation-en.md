@@ -26,15 +26,16 @@ adaptive tower?" — and walks through its analogy with Transformer
 Attention and its position in the Conditional Computation /
 Hypernetwork lineage.*
 
-> **Provisional status — no measurable benefit on synthetic data.**
-> Stated plainly: on the synthetic-data benchmarks so far, PLE with
-> adaTT shows no clear performance gap against PLE without adaTT. If
-> the real-data evaluation confirms the same, *removing adaTT* is the
-> reasonable move. The four posts that follow are not written under
-> an assumption of removal — they are a record of "why we chose this
-> design." Even if the component turns out to be unused, the
-> mathematical and engineering reasoning behind the choice is worth
-> preserving.
+> **Status — no measurable benefit at 13-task scale; adaTT was removed.**
+> Stated plainly: on the synthetic-data benchmarks, PLE with adaTT
+> showed no clear performance gap against PLE without adaTT, and the
+> loss-level effect on aggregate AUC came out null-to-slightly-negative
+> (Δ ≈ −0.001 to −0.003). The final production config disables adaTT
+> (and GradSurgery, also rejected for its VRAM cost). The four posts
+> that follow are not written under an assumption of removal — they are
+> a record of "why we chose this design." Even though the component
+> ended up unused, the mathematical and engineering reasoning behind
+> the choice is worth preserving.
 
 ## What PLE Did Not Fix — Gradient Conflict
 
@@ -210,7 +211,7 @@ adaTT's end-to-end behaviour fits in three words: *Measure*, *Select*,
    transfer strength and timing: observe only early, transfer
    dynamically mid-training, freeze late for stability. (Also ADATT-3.)
 
-With these three steps combined, *sixteen tasks grow complementarily
+With these three steps combined, *thirteen tasks grow complementarily
 instead of obstructing each other's learning*. Where a fixed tower
 accepts "the shared backbone shakes, so be it," adaTT replaces it with
 "measure in real time who helps whom, cut the harmful interference,

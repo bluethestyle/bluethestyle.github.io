@@ -44,7 +44,7 @@ next_status: published
   가중치와 결합하고 softmax 정규화.
 
 adaTT 는 (c) 를 택한다. (b) PCGrad 는 매 step gradient 를 사영해 rewrite
-해야 하는데, 16 태스크 환경에서 사영 계산 비용이 무겁고 원본 gradient 의
+해야 하는데, 13 태스크 환경에서 사영 계산 비용이 무겁고 원본 gradient 의
 자기 정보도 잃는다. (a) 는 단순하지만 가중치 학습 여지가 없다. (c) 는
 표준 backprop 을 그대로 쓰고, 친화도 관측값 $\mathbf{A}$ 와 학습 가능한
 $\mathbf{W}$ 를 동시에 태워 "관측 + 학습" 을 합친다.
@@ -111,6 +111,8 @@ life_stage, ltv 는 생애주기 계열로 묶인다. 같은 그룹 내는 `intr
 | lifecycle | churn, retention, life_stage, ltv | 0.7 | 생애주기 |
 | value | balance_util, channel, timing | 0.6 | 가치 / 행동 패턴 |
 | consumption | nba, spending_category, consumption_cycle, spending_bucket, merchant_affinity, brand_prediction | 0.7 | 소비 패턴 |
+
+(예시: 이 표는 온프렘 기술참조서의 일반 로스터를 쓴다. 운영 벤치마크는 13개 태스크다.)
 
 ### Prior Blend Annealing
 
@@ -244,7 +246,7 @@ Transfer Loss, Group Prior, 3-Phase Schedule, Negative Transfer 차단
 손실을 덮지 않게 비율 상한을 건다.
 
 하지만 이 구조는 혼자 돌지 않는다. 실제 학습 루프에는 2-Phase Training
-(Shared Pretrain → Cluster Finetune), 16 태스크 Uncertainty Weighting,
+(Shared Pretrain → Cluster Finetune), 13 태스크 Uncertainty Weighting,
 AdamW + SequentialLR, 그리고 CGC 의 gate dynamic 이 함께 있다. adaTT 의
 3-Phase 친화도 스케줄이 Trainer 의 2-Phase 학습 루프와 어떻게 맞물리는지,
 CGC gate freeze 와 왜 동기화해야 하는지 — 이 엔지니어링 설계가

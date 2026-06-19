@@ -18,7 +18,10 @@ source_label: "Paper 2 (Zenodo DOI)"
 *Part 2 of "The MRM Thread". Ep 1 framed MRM as structural
 invariants; this episode walks one Challenger through the flow —
 from training completion to production, where rejection halts it,
-how emergencies intrude, and how the post-deployment loop closes.*
+how emergencies intrude, and how the post-deployment loop closes.
+Champion-Challenger is one of MRM's oldest patterns; its evolution
+into a synchronous AI gate is one of the more visible places where
+the tradition adapts to the new model class.*
 
 ## 3 a.m., Monday
 
@@ -140,7 +143,7 @@ checked *before* competition, so the rejection is sealed here.
 Step 4 never runs.
 
 Audit entry — `decision=reject`, reason = "2 fidelity failures:
-task\_churn, task\_next\_best (KL above threshold)". The Challenger
+churn\_signal, nba\_primary (KL above threshold)". The Challenger
 is stored in the registry with `promoted=False`, but it never
 enters production.
 

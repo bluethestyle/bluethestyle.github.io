@@ -12,10 +12,10 @@ next_title: "에피소드 5 — RAG + LanceDB · 감사 인프라가 결국 검�
 next_desc: "감사 로그는 단순히 쓰기 전용 데이터가 아니다. 질의 가능한 지식 베이스다. 운영 및 감사 검색을 RAG와 LanceDB로 구성한 이유, 그리고 그 결과로 인적 감독과 운영 파이프라인 위에서 공정성 모니터링 및 분기별 집계가 어떻게 해결되는지 살펴본다."
 next_status: published
 source_url: https://doi.org/10.5281/zenodo.19621884
-source_label: "Paper 1 + Paper 3 (Zenodo DOIs)"
+source_label: "Paper 1 (Zenodo DOI); Paper 3 발행 예정"
 ---
 
-*"MRM 스레드" 4편. 에피소드 3까지는 7개의 테이블, HMAC 체인, 다중 에이전트 합의 등 감사 로그 계층의 이야기를 다뤘다. 그렇다면 그 로그에 '무엇'을 기록할지는 누가 정하는가. 매 예측에 대한 설명, 기여도, 신뢰도 플래그는 어디서 오는 것일까. 이번 편에서는 그보다 한 계층 아래로 내려가 본다. 추론이 끝난 뒤 사후적으로 덧붙이는 모듈이 아니라, 아키텍처 설계 단계에서의 XAI 선택이 그에 대한 해답이라는 이야기를 전한다.*
+*"MRM 스레드" 4편. 에피소드 3까지는 7개의 테이블, HMAC 체인, 다중 에이전트 합의 등 감사 로그 계층의 이야기를 다뤘다. 그렇다면 그 로그에 '무엇'을 기록할지는 누가 정하는가. 매 예측에 대한 설명, 기여도, 신뢰도 플래그는 어디서 오는 것일까. 이번 편에서는 그보다 한 계층 아래로 내려가 본다. 추론이 끝난 뒤 사후적으로 덧붙이는 모듈이 아니라, 아키텍처 설계 단계에서의 XAI 선택이 그에 대한 해답이라는 이야기를 전한다. 해석 가능성은 늘 MRM 의 관심사였다 — 수리통계 모델 시대에는 그것이 *conceptual soundness* 의 형태로 표현되었고, 딥러닝 시대에는 같은 요구가 XAI 로 다시 등장한다. 이번 편의 아키텍처 선택은 그 요구를 운영 가능하게 만드는 방식이다.*
 
 ## SHAP 도입안이 흔들린 이유
 
@@ -106,4 +106,4 @@ FD-TVS(Financial DNA Targeted Value Scoring)는 이러한 스코어링 계층을
 
 에피소드 5에서는 한 계층 더 위로 올라가, 매 예측의 설명 로그를 질의 가능한 시스템으로 만드는 '검색 계층'을 살펴본다. 운영 및 감사 인프라의 핵심 엔진으로 RAG와 LanceDB를 선택한 이유, 컬럼 기반 검색과 버전 인식 검색이 공정성 모니터링·인적 감독 에스컬레이션·분기별 집계에 어떤 혁신을 가져다주는지, 그리고 왜 감사 로그가 단순한 쓰기 전용 데이터가 아닌지에 대해 심도 있게 다뤄볼 예정이다.
 
-소스: [Paper 1 (Zenodo)](https://doi.org/10.5281/zenodo.19621884)의 Heterogeneous Expert 아키텍처 및 게이트 가중치 설명 가능성, [Paper 3 (Zenodo)](https://doi.org/10.5281/zenodo.19622052)의 CEH 및 Causal Guardrail (마할라노비스 OOD). FD-TVS 스코어링 설정은 [`configs/pipeline.yaml`](https://github.com/bluethestyle/aws_ple_for_financial)의 `scoring.segment_task_weights` 및 `scoring.dynamic_weight_rules` 경로에서 확인할 수 있다.
+소스: [Paper 1 (Zenodo)](https://doi.org/10.5281/zenodo.19621884)의 Heterogeneous Expert 아키텍처 및 게이트 가중치 설명 가능성, 그리고 Paper 3(발행 예정)의 CEH 및 Causal Guardrail (마할라노비스 OOD). FD-TVS 스코어링 설정은 [`configs/pipeline.yaml`](https://github.com/bluethestyle/aws_ple_for_financial)의 `scoring.segment_task_weights` 및 `scoring.dynamic_weight_rules` 경로에서 확인할 수 있다.

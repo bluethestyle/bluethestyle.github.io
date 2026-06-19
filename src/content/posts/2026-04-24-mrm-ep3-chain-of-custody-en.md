@@ -20,7 +20,9 @@ decisions. This episode goes one layer down at a time — into *what*
 the record contains (seven audit tables, an HMAC chain), *who*
 verifies it (Ops and Audit agents), and *how those verifiers keep
 each other honest* (three-way parallel voting on AWS, 2-round
-deliberation on-prem).*
+deliberation on-prem). Documentation and audit have always been
+MRM's load-bearing wall; what changes for ML/DL systems is that
+the audit log must become queryable substrate, not periodic record.*
 
 ## The question in June 2027
 
@@ -272,6 +274,11 @@ weak models wobble independently and consensus itself becomes
 unstable. Pure sequential deliberation (the Delphi method) goes
 the other way — *later sessions drift toward earlier ones*, and
 minority opinions disappear into conformity bias.
+
+> Update: at the time of writing, the on-prem stack ran this 14B Q4
+> model. It was later replaced by Exaone 3.5 2.4B (consensus) + Qwen
+> 2.5 7B (tool use) after an internal four-scenario benchmark; the
+> session timings below describe the 14B Q4 setup as it stood then.
 
 In operations/audit work, **"missing something" is much worse
 than "raising a false alarm"**. A false alarm can be cleared by

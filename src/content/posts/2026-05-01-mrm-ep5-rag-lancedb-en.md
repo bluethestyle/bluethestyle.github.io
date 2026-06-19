@@ -23,7 +23,10 @@ It was whether the log was usable. The first design we tried
 treated the audit log as a write-only archive. That design
 broke the first time it met a real oversight workflow, and the
 second design — RAG over LanceDB — is the architecture that
-came out of that break.*
+came out of that break. MRM's inventory and documentation
+tradition assumed a manageable number of statistical models;
+modern fleets of ML models force the same tradition to evolve
+into searchable knowledge bases.*
 
 ## A scenario that broke the original design
 
@@ -84,7 +87,7 @@ within a week.
 The second was fairness monitoring. Disparate Impact, Statistical
 Parity Difference, and Equal Opportunity Difference across the
 five protected attributes (gender, age band, region, income tier,
-disability) aren't computed once a quarter on a curated
+life stage) aren't computed once a quarter on a curated
 validation sample. In a system that takes fairness seriously,
 they're computed continuously on the actual production
 prediction stream, sliced by protected attribute. That stream

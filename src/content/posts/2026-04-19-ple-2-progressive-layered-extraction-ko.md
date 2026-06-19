@@ -9,7 +9,7 @@ series: study-thread
 part: 2
 alt_lang: /2026/04/19/ple-2-progressive-layered-extraction-en/
 next_title: "PLE-3 — 입력 구조와 이종 Shared Expert Pool (512D)"
-next_desc: "PLEClusterInput 의 전체 필드 사양과 734D features 텐서 인덱스 매핑, HMM 모드 라우팅. 그리고 본 프로젝트의 7개 이종 Shared Expert (EconomicsExpert·TemporalExpert·HMMExpert·TDAExpert·GMMExpert·GCNExpert·PersLayExpert·UnifiedHGCN) 가 각자 어떤 수학적 관점으로 고객을 해석하는지까지."
+next_desc: "PLEClusterInput 의 전체 필드 사양과 734D features 텐서 인덱스 매핑, HMM 모드 라우팅. 그리고 본 프로젝트의 7개 이종 Shared Expert (DeepFM, Temporal Ensemble, LightGCN, Unified HGCN, PersLay, Causal, Optimal Transport) 가 각자 어떤 수학적 관점으로 고객을 해석하는지까지."
 next_status: published
 ---
 

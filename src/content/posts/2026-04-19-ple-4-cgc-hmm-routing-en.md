@@ -251,6 +251,8 @@ domain knowledge before a single gradient step.
   </g>
 </svg>
 
+*(Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)*
+
 > **Domain prior matrix.** The initial bias encodes each task's
 > "natural expert preference" — e.g. time-series-heavy churn/retention
 > → PersLay + Temporal, merchant-hierarchy-dependent brand_prediction
@@ -360,6 +362,8 @@ flowchart TB
   style bt fill:#FFFFFF,stroke:#1C8C5A
 ```
 
+*(Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)*
+
 > **Three time-scales, three task groups.** The same 16D HMM state
 > vector passes through three independent projectors and splits into
 > Journey (daily) / Lifecycle (monthly) / Behavior (monthly) modes —
@@ -418,5 +422,5 @@ cross-task information flow through the three modes of Logit
 Transfer, and the Task Tower that turns all of this into final
 predictions. Three new decisions fall out there: how to cut parameters
 by 88% through group sharing, how to pass sequential task dependencies
-explicitly, and how to auto-balance 16 task weights with Uncertainty
+explicitly, and how to auto-balance the 13 task weights with Uncertainty
 Weighting.

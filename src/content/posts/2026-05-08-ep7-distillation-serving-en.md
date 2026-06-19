@@ -9,7 +9,7 @@ series: three-months
 part: 7
 alt_lang: /2026/05/08/ep7-distillation-serving-ko/
 next_title: "Ep 8 — Honest Negative Results and What Comes Next"
-next_desc: "The adaTT null effect, GradSurgery rejection, Paper 3 WIP, and the real-data metrics pending after 2026-04-30 — a record of *what did not work* across four months."
+next_desc: "The adaTT null effect, GradSurgery rejection, Paper 3 still in progress at the time of writing, and the real-data metrics pending after 2026-04-30 — a record of *what did not work* across four months."
 next_status: published
 source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
@@ -24,7 +24,7 @@ financial recommendations on AWS Lambda.*
 ## Teacher is PLE, student is LightGBM
 
 The training-time model is PLE with seven heterogeneous experts,
-CGC gating, and thirteen task towers. Under 2M parameters (Ep 4),
+CGC gating, and thirteen task towers. About 2.7M parameters (Ep 4),
 so it's light — but not right for serving directly. Three problems.
 
 **Problem 1 — PyTorch inference runtime.** Cold-starting torch on
@@ -52,10 +52,12 @@ sits to the teacher. This is the fidelity floor Ep 2 referenced in
 the champion-challenger gate ("reject before competition if fidelity
 floor fails").
 
-Measured as per-task student-teacher KL divergence. Threshold set
-in config (`distillation.fidelity_floor`, default 0.20). If any of
-the 13 tasks exceeds this threshold, the entire challenger is
-rejected.
+Measured per task as a set of fidelity metrics (teacher-student
+agreement, JSD, and metric gap). Thresholds are set in config under
+the `distillation.fidelity` block, per task type — for binary tasks,
+max AUC gap 0.05, min agreement 0.85, max JSD 0.10. If any of the
+13 tasks fails its type thresholds (`fidelity_summary.failed > 0`),
+the entire challenger is rejected.
 
 Why the threshold matters — *even a student with strong training
 metrics, if it learned a different function from the teacher, is a
@@ -193,7 +195,7 @@ as one Claude Code conversation ending in a PR.
 
 The three-layer fallback was not designed upfront. Layer 1 was
 all we had for the first two weeks. Layer 2 came after a
-distillation failure on `task_churn` (fidelity floor violation,
+distillation failure on `churn_signal` (fidelity floor violation,
 Ep 2's rejection path) — we needed a route to still serve that
 task without the distilled model. Layer 3 came after a broader
 incident where a Phase 0 schema change propagated incorrectly and

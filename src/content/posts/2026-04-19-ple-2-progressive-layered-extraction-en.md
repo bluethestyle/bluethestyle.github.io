@@ -9,7 +9,7 @@ series: study-thread
 part: 2
 alt_lang: /2026/04/19/ple-2-progressive-layered-extraction-ko/
 next_title: "PLE-3 — Input Structure and Heterogeneous Shared Expert Pool (512D)"
-next_desc: "The full PLEClusterInput field spec, 734D feature-tensor index mapping, and HMM mode routing. Plus the seven heterogeneous Shared Experts this project actually runs (Economics, Temporal, HMM, TDA, GMM, GCN, PersLay, UnifiedHGCN) — each interpreting the customer through a structurally different mathematical lens."
+next_desc: "The full PLEClusterInput field spec, 734D feature-tensor index mapping, and HMM mode routing. Plus the seven heterogeneous Shared Experts this project actually runs (DeepFM, Temporal Ensemble, LightGCN, Unified HGCN, PersLay, Causal, Optimal Transport) — each interpreting the customer through a structurally different mathematical lens."
 next_status: published
 ---
 

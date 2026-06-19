@@ -32,7 +32,7 @@ The design is done. Affinity measurement, transfer-weight computation,
 3-Phase scheduling, negative blocking — all self-contained inside the
 `adaTT` module. But this module does not train alone. The project's
 Trainer runs its own 2-Phase training (Shared Pretrain → Cluster
-Finetune), applies Uncertainty Weighting over 16 tasks, manages
+Finetune), applies Uncertainty Weighting over 13 tasks, manages
 learning rates via AdamW + SequentialLR, and trains CGC's gate
 weights. How does adaTT coexist with these? That is the central
 question of this post.
@@ -81,9 +81,9 @@ adaTT, preserving checkpoint / inference compatibility even under
 exceptions. (3) Warmup shrinks from Phase 1's 5 epochs to Phase 2's 2
 epochs. Phase 2 is short; a long warmup would be pointless.
 
-## Decision 2 — How to Balance 16 Task Losses
+## Decision 2 — How to Balance 13 Task Losses
 
-The 16 tasks have wildly different loss scales. CTR / CVR focal losses
+The 13 tasks have wildly different loss scales. CTR / CVR focal losses
 live in one range, LTV's huber in another, brand_prediction's InfoNCE
 in yet another. Manually tuning per-task weights is a combinatorial
 explosion. Kendall et al. (CVPR 2018)'s Uncertainty Weighting
@@ -181,23 +181,23 @@ checkpoint save / restore.
 ## Decision 5 — Memory and Performance, Three Key Moves
 
 adaTT's gradient extraction is expensive. Per-task gradients against
-the Shared Expert parameters across 16 tasks drop training speed
+the Shared Expert parameters across 13 tasks drop training speed
 sharply without optimisation. Three decisions make it manageable.
 
 *`retain_graph=True`'s cost.* Calling `autograd.grad` sequentially for
-16 tasks while keeping the graph pushes peak memory to about 2× the
+13 tasks while keeping the graph pushes peak memory to about 2× the
 forward pass. Architecturally unremovable — the Trainer's
-`loss.backward()` must reuse the same graph. On an RTX 4070 12GB, 16
+`loss.backward()` must reuse the same graph. On an RTX 4070 12GB, 13
 tasks × batch_size 16384 is the ceiling.
 
-*`adatt_grad_interval = 10`.* Every-step extraction means 16 ×
+*`adatt_grad_interval = 10`.* Every-step extraction means 13 ×
 `autograd.grad` calls per step. Since affinity is EMA-smoothed,
 measuring every 10 steps is still stable. This setting alone reduces
 gradient-extraction overhead to $1/10$. The value was added after
 every-step extraction during warmup caused hangs.
 
 *TF32 + cuDNN benchmark (not torch.compile).* `torch.compile` is
-disabled project-wide. The combination of 15-task MTL + `retain_graph`
+disabled project-wide. The combination of 13-task MTL + `retain_graph`
 + dynamic shapes produces hundreds of kernel compilations and makes
 the first epoch take 30+ minutes. Instead we get 10–15% speedup via
 TF32 + cuDNN benchmark.
@@ -272,15 +272,16 @@ task conflicts in the *feature path*; adaTT measured the remaining
 conflicts in the *gradient path* and turned them back into cooperation
 — two sub-threads taking on two faces of the same MTL problem.
 
-> **Open experimental result — adaTT removal under consideration.**
+> **Experimental result — adaTT removed at 13-task scale.**
 > As flagged in ADATT-1: on the synthetic-data benchmark, PLE+adaTT
-> shows no clear performance gap over PLE-only. The same comparison
-> is now running on real data (card transaction logs). If the
-> result reproduces, *removing adaTT* from the stack is the plan.
-> These four posts stay in either case — a record of "why we tried
-> this design, and the basis on which we pulled it" is, for the next
-> person, a map marked 'already tried here, move on'. (Update: the
-> real-data results will be shared in a separate post.)
+> showed no clear performance gap over PLE-only, and the loss-level
+> effect on aggregate AUC was null-to-slightly-negative (Δ ≈ −0.001
+> to −0.003). The final production config disables adaTT (and
+> GradSurgery, also rejected for its VRAM cost); the module stays in
+> the codebase as an architectural reference. These four posts stay
+> either way — a record of "why we tried this design, and the basis on
+> which we pulled it" is, for the next person, a map marked 'already
+> tried here, move on'.
 
 From here, we move on to the mathematical foundations of each of the
 seven heterogeneous Shared Experts. Sub-threads will open for CausalOT

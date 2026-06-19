@@ -162,7 +162,7 @@ Before normalisation, we apply `clamp(min=1e-8)` to the L2 norm to
 prevent division by zero if some task's gradient happens to be
 exactly 0. A double for-loop would scatter the $O(n^2 d)$ work across
 $n^2$ Python calls; `torch.mm` instead runs it on GPU CUDA cores for a
-speedup of hundreds of times. For 16 tasks, all $16 \times 16 = 256$
+speedup of hundreds of times. For 13 tasks, all $13 \times 13 = 169$
 similarities are done by a single GEMM kernel.
 
 ## The EMA Update and the Clamp
@@ -229,7 +229,7 @@ That flat vector becomes a row of the $\mathbf{G}$ we saw above.
 because the Trainer's `loss.backward()` reuses the same graph. Removing
 it halts training immediately with "Trying to backward through the
 graph a second time." The memory cost — peak memory roughly 2× the
-forward pass at 16 tasks — is addressed in ADATT-4.
+forward pass at 13 tasks — is addressed in ADATT-4.
 
 ## Where We Stop
 

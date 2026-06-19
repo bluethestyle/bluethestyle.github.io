@@ -164,7 +164,8 @@ transition from "heterogeneous experts is a paper idea" to
 ## Why this structure fits the Korean financial-AI constraint
 
 Each of the seven experts is lightweight (20k–200k parameters).
-Seven combined is under 2M. That's how the whole ensemble fits
+Seven combined are 2.70M at the build-time 349-feature schema
+(measured). That's how the whole ensemble fits
 into 12GB of VRAM on an RTX 4070. Stacking seven Transformer
 experts would not have fit two of them, let alone seven.
 

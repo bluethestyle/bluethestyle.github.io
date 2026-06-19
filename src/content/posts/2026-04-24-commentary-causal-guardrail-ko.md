@@ -55,7 +55,9 @@ CEH 만 있고 guardrail 이 없다면 — 설명은 있지만 그 설명이 *�
 
 구현 관점에서 guardrail 결과는 별도 테이블이 아니라 Ep 3 의 `log_guardrail` 에 쓴다. 엔트리 스키마는 이미 Safety Gate 의 규제 키워드 검사 결과를 위해 정의되어 있고, guardrail 출력(거리 값, 임계치 통과/미달, 관련 latent 통계 요약) 은 추가 필드로 들어간다. HMAC 서명은 다른 `log_*` 엔트리와 동일한 체인에 연결된다.
 
-15개월 뒤 감독 당국이 특정 예측에 대한 신뢰도 판정 이력을 요청하면, `log_guardrail` 에서 해당 예측 ID 로 필터링해 guardrail 결과와 CEH attribution 을 함께 끌어오는 SQL 한 줄이 답이 된다. 별도의 "신뢰도 리포트 시스템" 을 만들지 않아도, 매 예측마다 두 층이 자동으로 남기는 엔트리가 누적된다.
+15개월 뒤 감독 당국이 특정 예측에 대한 신뢰도 판정 이력을 요청하면, `log_guardrail` 에서 해당 예측 ID 로 필터링해 guardrail 결과와 CEH attribution 을 함께 끌어오는 SQL 한 줄이 답이 된다. 별도의 "신뢰도 리포트 시스템" 을 만들지 않아도, 매 예측마다 두 층이 남길 수 있는 엔트리가 누적된다.
+
+> 참고: 이 예측별 CG + CEH 감사는 현재 PLE 교사 모델 위에서 돌고, 프로덕션 트래픽을 처리하는 태스크별 LightGBM 학생 모델 경로에는 아직 들어가 있지 않다. 실 서빙 경로에 배선하는 것은 향후 과제이며, 현재 제공되는 기능은 아니다.
 
 ## 한계와 다음 질문
 
@@ -75,5 +77,5 @@ Guardrail 이 도입되면서 분기 심사표에 한 줄이 더 붙는다 — *
 
 원문 자료:
 [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052) v2 § CEH,
-Paper 3 Findings 10-11 (WIP),
+Paper 3 Findings 10-11 (원고; Zenodo DOI 발행 예정),
 구현은 [오픈소스 레포](https://github.com/bluethestyle/aws_ple_for_financial).

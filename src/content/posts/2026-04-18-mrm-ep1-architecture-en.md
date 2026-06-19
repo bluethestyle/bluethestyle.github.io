@@ -15,9 +15,13 @@ source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
 
-*Part 1 of "The MRM Thread" — a short parallel series on regulatory
-compliance and model risk management for AI recommendation systems,
-written from a GARP FRM practitioner perspective.*
+*Part 1 of "The MRM Thread" — six episodes tracing a single bet:
+that the lifecycle-integration principle codified in SR 11-7 was
+right, but its implementation must evolve. Built for an era when
+"model" meant statistical and mathematical methods, MRM now meets a
+class of models that does not yield to the same kind of inspection.
+Architecture-first responsible AI is the form this evolution takes.
+Written from a GARP FRM practitioner perspective.*
 
 ## The standard picture
 

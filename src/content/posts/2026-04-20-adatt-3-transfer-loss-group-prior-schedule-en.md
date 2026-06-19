@@ -49,7 +49,7 @@ us compare three.
   affinity with a learnable weight and apply softmax normalisation.
 
 adaTT picks (c). (b) PCGrad rewrites gradients via projection every
-step, which is expensive at 16 tasks and also discards each gradient's
+step, which is expensive at 13 tasks and also discards each gradient's
 own information. (a) is simple but leaves no room for learnable
 weights. (c) keeps standard backprop, and rides the observed affinity
 $\mathbf{A}$ together with a learnable $\mathbf{W}$, mixing
@@ -120,6 +120,8 @@ keeps transfer intensity consistent regardless of task count.
 | lifecycle | churn, retention, life_stage, ltv | 0.7 | Customer lifecycle |
 | value | balance_util, channel, timing | 0.6 | Value / behaviour patterns |
 | consumption | nba, spending_category, consumption_cycle, spending_bucket, merchant_affinity, brand_prediction | 0.7 | Consumption patterns |
+
+*(Illustrative: this table uses the generic on-prem reference roster; the production benchmark is 13 tasks.)*
 
 ### Prior Blend Annealing
 
@@ -262,7 +264,7 @@ dips into the negative regime. The G-01 FIX Clamp caps the whole thing
 so the transfer term never overwhelms the original loss.
 
 But this structure does not run alone. The actual training loop
-includes 2-Phase Training (Shared Pretrain → Cluster Finetune), 16-task
+includes 2-Phase Training (Shared Pretrain → Cluster Finetune), 13-task
 Uncertainty Weighting, AdamW + SequentialLR, and CGC's gate dynamics.
 How adaTT's 3-Phase affinity schedule interlocks with the Trainer's
 2-Phase training loop, and why it must synchronise with CGC's gate

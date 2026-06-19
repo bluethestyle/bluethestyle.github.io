@@ -9,7 +9,7 @@ series: study-thread
 part: 5
 alt_lang: /2026/04/19/ple-5-basket-logit-tower-en/
 next_title: "PLE-6 — 해석성·불확실성·전체 사양 (+ 기술 참조서 PDF)"
-next_desc: "Sparse Autoencoder(SAE)를 통한 Expert 해석성, Evidential Deep Learning의 불확실성 정량화, 18개 태스크 전체 사양, 논문 vs 구현 비교, 디버깅 가이드, 그리고 PLE 시리즈 마무리 — 전체 PLE 기술 참조서 PDF 다운로드 포함."
+next_desc: "Sparse Autoencoder(SAE)를 통한 Expert 해석성, Evidential Deep Learning의 불확실성 정량화, 18개 태스크 초안 사양(이후 13개로 축소), 논문 vs 구현 비교, 디버깅 가이드, 그리고 PLE 시리즈 마무리 — 전체 PLE 기술 참조서 PDF 다운로드 포함."
 next_status: published
 ---
 
@@ -28,7 +28,7 @@ HMM 이 시간 스케일별로 신호를 올바른 태스크 그룹에 주입한
 남아있다.
 
 **첫째, 메모리.** 레거시 구현은 태스크 × 클러스터마다 독립 MLP 를 두었다
-— 16개 태스크 × 20개 클러스터 × 작은 MLP 각각 = 약 3M 파라미터. 대부분의
+— 13개 태스크 × 20개 클러스터 × 작은 MLP 각각 = 약 3M 파라미터. 대부분의
 capacity 가 클러스터별로 중복되어 있었다. 클러스터 차이는 *입력 분포*
 에서는 크지만 *결정 함수* 에서는 작다는 관찰에서 이 낭비의 원인이 드러난다.
 
@@ -38,9 +38,9 @@ capacity 가 클러스터별로 중복되어 있었다. 클러스터 차이는 *
 네트워크가 "CTR 점수가 높은 고객은 CVR 점수도 높다" 는 관계를 스스로
 발견하길 기다리는 것은 데이터 효율이 낮다.
 
-**셋째, 16개 태스크의 손실 스케일 균형.** Focal Loss 의 CTR 과 MSE 의
+**셋째, 13개 태스크의 손실 스케일 균형.** Focal Loss 의 CTR 과 MSE 의
 Engagement 와 InfoNCE 의 Brand 가 동시에 역전파된다. 스케일 차이가
-100 배 이상이다. 수작업으로 태스크별 가중치를 튜닝하는 것은 16차원
+100 배 이상이다. 수작업으로 태스크별 가중치를 튜닝하는 것은 13차원
 조합 폭발이고, 한 번 맞춰도 데이터 분포가 바뀌면 재튜닝이 필요하다.
 
 PLE-5 는 이 세 결정을 순서대로 푼다.
@@ -164,6 +164,8 @@ flowchart TB
 > 사이클 자동 감지) 이 위상 정렬로 실행 순서를 자동 도출한다 — CTR → CVR
 > → LTV, Churn → Retention, NBA → Spending_category → Brand_prediction.
 > 새 전이를 `task_relationships` config 에 등록하면 순서가 자동 갱신된다.
+
+> (예시: 이 도식은 온프렘 기술참조서의 일반 로스터를 쓴다. 운영 벤치마크는 13개 태스크다.)
 
 ### 전이 메커니즘
 
@@ -302,9 +304,11 @@ activation=None, Binary 는 sigmoid, Multiclass 는 softmax.
   </g>
 </svg>
 
-> **태스크 16 개, 4 개 손실 유형으로 분화.** 가중치(`Nw`) 가 명시된
+> **손실 유형 4 개로 분화한 태스크 로스터.** 가중치(`Nw`) 가 명시된
 > 항목은 uncertainty weighting (아래) 이 추가로 자동 조정한다. 명시 없는
 > 항목은 1.0 이 기본.
+>
+> (예시: 이 도식은 온프렘 기술참조서의 일반 로스터를 쓴다. 운영 벤치마크는 13개 태스크다.)
 
 > **Huber Loss.** $\mathcal{L}_{\text{Huber}} = \frac{1}{2}(y - \hat{y})^2$
 > ($|y - \hat{y}| \le \delta$), 그 밖은 $\delta(|y - \hat{y}| - \delta/2)$.
@@ -341,12 +345,12 @@ $\gamma = 2.0$ 은 focusing parameter (쉬운 예제 감쇠 강도), $\alpha$ �
 > - Churn (양성 5–15%, FN 비용 매우 높음): $\alpha = 0.60$ (이탈 놓침 방지, recall 극대화)
 > - Retention (양성 85–95%, FN 비용 중간): $\alpha = 0.20$ (소수 이탈 전조 탐지)
 
-## 결정 3' — Uncertainty Weighting: 16개 가중치를 자동으로
+## 결정 3' — Uncertainty Weighting: 13개 가중치를 자동으로
 
 태스크마다 손실 유형도 스케일도 다르다. CTR 의 Focal Loss 는 0.01 ~ 0.5
 범위에서 움직이고, LTV 의 Huber Loss 는 고객 가치 단위에 따라 1 ~ 100
 범위다. 이걸 단순 합산하면 스케일 큰 태스크가 gradient 를 독점한다.
-수작업으로 16개 가중치를 튜닝해도 데이터가 조금만 바뀌면 재튜닝이 필요하다.
+수작업으로 13개 가중치를 튜닝해도 데이터가 조금만 바뀌면 재튜닝이 필요하다.
 
 ### 결정 — 학습 가능한 log-variance 로 스스로 균형을 찾게 한다
 
@@ -367,7 +371,7 @@ $+s_k$ 의 역할이 핵심이다. 이게 없으면 모델이 모든 태스크�
 
 > **수식 직관.** 태스크가 본질적으로 어렵면 그 손실이 전체 학습을
 > 지배하지 않도록 자동으로 가중치를 낮춘다. $+s_k$ 항이 "모든 태스크를
-> 불확실하다고 선언해 손실을 0 으로" 만드는 편법을 막는다. 16 개 태스크
+> 불확실하다고 선언해 손실을 0 으로" 만드는 편법을 막는다. 13 개 태스크
 > 가중치를 수동 튜닝하지 않고 모델이 균형을 찾는다.
 
 > **이론적 기반.** Kendall, Gal & Cipolla (CVPR 2018) — 태스크별
@@ -397,7 +401,7 @@ $+s_k$ 의 역할이 핵심이다. 이게 없으면 모델이 모든 태스크�
    projection 으로 유용하지 않으면 가중치가 0 으로 수렴하는 safe default.
    네트워크가 처음부터 다시 발견하기를 기다리지 않고, 우리가 이미 아는
    의존성을 직접 전달하는 쇼트컷.
-3. **Uncertainty Weighting** — 16개 태스크 가중치를 학습 가능한
+3. **Uncertainty Weighting** — 13개 태스크 가중치를 학습 가능한
    log-variance 로 자동 균형. Kendall et al. (2018) 의 Gaussian
    likelihood MLE 에서 유도되는 $\exp(-s_k) \cdot \mathcal{L}_k + s_k$
    형태. $+s_k$ 정규화가 "모든 태스크를 불확실하다고 선언하는" 편법을
@@ -405,5 +409,5 @@ $+s_k$ 의 역할이 핵심이다. 이게 없으면 모델이 모든 태스크�
 
 다음 편인 **PLE-6** 에서는 시스템이 돌아간 후의 두 가지 남은 질문 —
 "Expert 가 실제로 무엇을 학습했는지 볼 수 있는가 (SAE)", "예측 신뢰도를
-정량화할 수 있는가 (Evidential Deep Learning)" — 그리고 전체 18개 태스크
+정량화할 수 있는가 (Evidential Deep Learning)" — 그리고 18개 태스크 초안(이후 13개로 축소)
 사양 reference 로 시리즈를 마무리한다. 기술 참조서 PDF 다운로드 포함.

@@ -4,7 +4,7 @@ date: 2026-04-19 17:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, sae, uncertainty, evidential, specs]
 lang: en
-excerpt: "The PLE study sub-thread closes — Sparse Autoencoder for expert interpretability, Evidential Deep Learning for per-prediction uncertainty, the full 18-task spec and paper-vs-implementation comparison. With the full 56-page PLE tech reference PDF attached."
+excerpt: "The PLE study sub-thread closes — Sparse Autoencoder for expert interpretability, Evidential Deep Learning for per-prediction uncertainty, the 18-task draft spec (later reduced to 13 production tasks) and paper-vs-implementation comparison. With the full 56-page PLE tech reference PDF attached."
 series: study-thread
 part: 6
 alt_lang: /2026/04/19/ple-6-interpretability-uncertainty-specs-ko/
@@ -30,7 +30,7 @@ out the series.*
 The architecture is complete. CGC picks experts stably.
 GroupTaskExpertBasket handles cluster-level specialization. Logit
 Transfer passes sequential dependencies. Uncertainty Weighting
-auto-balances 16 loss scales. The model runs, produces predictions,
+auto-balances 13 loss scales. The model runs, produces predictions,
 and can be served.
 
 Yet two questions still nag.
@@ -279,10 +279,12 @@ decisions from the previous five posts:
 5. *Logit Transfer chain* (PLE-5): execution order derived automatically from topological sort
 6. *Evidential + SAE* (PLE-6): uncertainty quantification plus expert-representation interpretability
 
-The detailed specs — full 18-task config, parameter-count estimates,
+The detailed specs — the 18-task draft config (later reduced to 13), parameter-count estimates,
 training hyperparameters, debugging guide, code-file map, config
 section layout — all live in the PDF below. The blog stops here; the
 operational bookkeeping belongs in a reference doc.
+
+> Note: the on-prem reference these study posts summarize uses a generic recommender roster (CTR/CVR/LTV and similar). The production benchmark in this project is 13 tasks (7 binary, 3 multiclass, 3 regression), reduced from an 18-task draft by removing deterministic-leakage targets.
 
 ## Download the full PLE Tech Reference
 

@@ -12,7 +12,7 @@ next_title: "Ep 5 — RAG + LanceDB: Why Audit Infrastructure Is a Retrieval Pro
 next_desc: "Audit logs aren't write-only. They are queryable knowledge bases. Why we built ops/audit retrieval as RAG over LanceDB, and what that unlocks for human oversight, fairness monitoring, and quarterly aggregation."
 next_status: published
 source_url: https://doi.org/10.5281/zenodo.19621884
-source_label: "Paper 1 + Paper 3 (Zenodo DOIs)"
+source_label: "Paper 1 (Zenodo DOI); Paper 3 forthcoming"
 ---
 
 *Part 4 of "The MRM Thread". Eps 1–3 covered the audit log layer
@@ -24,7 +24,10 @@ reliability flag come from? They don't come from a sidecar
 explainer bolted onto the inference path. They come from
 architectural choices made during model design — and this
 episode is about how we got to those choices, not just what
-they look like.*
+they look like. Interpretability has always been an MRM concern;
+on statistical models it took the form of conceptual soundness.
+On deep learning, that requirement reappears as XAI, and the
+architectural choice in this episode is what makes it tractable.*
 
 ## Why we walked away from SHAP
 
@@ -325,7 +328,7 @@ aggregation, and why the audit log isn't write-only.
 
 Source: [Paper 1 (Zenodo)](https://doi.org/10.5281/zenodo.19621884)
 on the heterogeneous expert architecture and gate-weight
-explainability, [Paper 3 (Zenodo)](https://doi.org/10.5281/zenodo.19622052)
+explainability, and Paper 3 (forthcoming on Zenodo)
 on CEH and Causal Guardrail (Mahalanobis OOD); FD-TVS scoring
 config lives in
 [`configs/pipeline.yaml`](https://github.com/bluethestyle/aws_ple_for_financial)

@@ -4,7 +4,7 @@ date: 2026-04-19 17:00:00 +0900
 categories: [Study Thread]
 tags: [study-thread, ple, sae, uncertainty, evidential, specs]
 lang: ko
-excerpt: "PLE 서브스레드 마지막 — 전문가 해석성을 위한 Sparse Autoencoder, 예측별 불확실성을 정량화하는 Evidential Deep Learning, 18개 태스크 전체 사양과 논문 대 구현 비교. 56쪽 PLE 기술 참조서 PDF 첨부."
+excerpt: "PLE 서브스레드 마지막 — 전문가 해석성을 위한 Sparse Autoencoder, 예측별 불확실성을 정량화하는 Evidential Deep Learning, 18개 태스크 초안 사양(이후 13개로 축소)과 논문 대 구현 비교. 56쪽 PLE 기술 참조서 PDF 첨부."
 series: study-thread
 part: 6
 alt_lang: /2026/04/19/ple-6-interpretability-uncertainty-specs-en/
@@ -27,7 +27,7 @@ PLE-1 → PLE-6 에 걸쳐 본 프로젝트의 PLE 아키텍처 뒤에 있는 �
 
 구조는 끝났다. CGC 가 Expert 를 안정적으로 고른다. GroupTaskExpertBasket
 이 클러스터별 특성화를 다룬다. Logit Transfer 가 순차 의존성을 전달한다.
-Uncertainty Weighting 이 16개 손실 스케일을 자동 균형한다. 모델이 돌고,
+Uncertainty Weighting 이 13개 손실 스케일을 자동 균형한다. 모델이 돌고,
 예측이 나오고, 서빙에 올릴 수 있다.
 
 그런데 여기서 두 가지가 찜찜하게 남는다.
@@ -249,10 +249,12 @@ $$\mathcal{L}_{evi} = \mathcal{L}_{task} + \lambda_{KL} \cdot \min(1, \text{epoc
 5. *Logit Transfer 체인* (PLE-5): 위상 정렬 기반 자동 실행 순서 도출
 6. *Evidential + SAE* (PLE-6): 예측 불확실성 정량화 + Expert 표현 해석성
 
-상세 스펙 (18-태스크 전체 config, 파라미터 카운트, 학습 하이퍼파라미터,
+상세 스펙 (18-태스크 초안 config(이후 13개로 축소), 파라미터 카운트, 학습 하이퍼파라미터,
 디버깅 가이드, 코드 파일 매핑, Config 섹션 맵 등) 은 아래 PDF 에 모두
 담았다. 블로그는 여기서 멈추고, 실제 운용에 필요한 세부 내용은 PDF 에서
 확인하는 것이 깔끔하다.
+
+> 참고: 이 스터디 글들이 요약하는 온프렘 기술참조서는 일반적인 추천 로스터(CTR, CVR, LTV 등)를 예시로 쓴다. 이 프로젝트의 운영 벤치마크는 13개 태스크(이진 7, 다중분류 3, 회귀 3)이며, 18개 태스크 초안에서 결정론적 누출 위험이 있는 태스크를 제거해 줄인 것이다.
 
 ## 전체 PLE 기술 참조서 다운로드
 

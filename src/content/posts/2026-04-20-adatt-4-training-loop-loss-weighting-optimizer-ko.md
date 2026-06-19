@@ -29,7 +29,7 @@ Schedule · Negative Transfer 차단 — 이 서로 어떻게 맞물리는지 �
 설계는 끝났다. 친화도 측정, 전이 가중치 계산, 3-Phase 스케줄, 음수 차단
 — 모두 `adaTT` 모듈 안에서 자기 완결적으로 돈다. 하지만 이 모듈은 혼자
 학습하지 않는다. 본 프로젝트의 Trainer 는 자체의 2-Phase 학습 (Shared
-Pretrain → Cluster Finetune) 을 돌리고, 16 태스크에 Uncertainty Weighting
+Pretrain → Cluster Finetune) 을 돌리고, 13 태스크에 Uncertainty Weighting
 을 적용하며, AdamW + SequentialLR 로 학습률을 관리하고, CGC 가 gate
 가중치를 학습한다. adaTT 가 이들과 어떻게 공존하는가 — 이것이 이번 편의 핵심 질문이다.
 
@@ -77,9 +77,9 @@ Phase 2 로 넘어갈 때 다음을 모두 리셋한다.
 보장된다. (3) 학습률 warmup 은 Phase 1 의 5 epoch 에서 Phase 2 의 2
 epoch 로 단축된다. Phase 2 는 짧기 때문이다 — 긴 warmup 은 의미 없다.
 
-## 결정 2 — 16 Task 의 Loss 를 어떻게 균형 잡는가
+## 결정 2 — 13 Task 의 Loss 를 어떻게 균형 잡는가
 
-16 태스크의 loss 스케일이 제각각이다. CTR / CVR 의 focal loss 와 LTV 의
+13 태스크의 loss 스케일이 제각각이다. CTR / CVR 의 focal loss 와 LTV 의
 huber loss 는 범위가 다르고, brand_prediction 의 InfoNCE 는 또 다르다.
 수동으로 태스크별 가중치를 튜닝하는 건 조합 폭발이다. Kendall et al.
 (CVPR 2018) 의 Uncertainty Weighting 이 이 문제를 자동화한다.
@@ -168,24 +168,24 @@ positive transfer" 라고 측정해 고정해둔 가중치는 이제 잘못된
 
 ## 결정 5 — 메모리와 성능, 세 가지 핵심
 
-adaTT 의 gradient 추출은 비싸다. 16 태스크 각각에 대해 Shared Expert
+adaTT 의 gradient 추출은 비싸다. 13 태스크 각각에 대해 Shared Expert
 파라미터의 gradient 를 계산하므로, 최적화 없이는 학습 속도가 크게
 떨어진다. 세 가지 결정으로 이 비용을 감당 가능한 수준으로 낮춘다.
 
-*`retain_graph=True` 의 비용.* 16 태스크에 대해 순차적으로 `autograd.grad`
+*`retain_graph=True` 의 비용.* 13 태스크에 대해 순차적으로 `autograd.grad`
 를 호출하면서 graph 를 유지하므로 peak memory 가 forward pass 대비
 약 2 배로 증가한다. 아키텍처 특성상 제거할 수 없다 — Trainer 의
-`loss.backward()` 가 같은 graph 를 재사용해야 하기 때문이다. 16 태스크 ×
+`loss.backward()` 가 같은 graph 를 재사용해야 하기 때문이다. 13 태스크 ×
 RTX 4070 12GB 기준 batch_size 16384 가 한계다.
 
-*`adatt_grad_interval = 10`.* 매 step gradient 를 추출하면 16 ×
+*`adatt_grad_interval = 10`.* 매 step gradient 를 추출하면 13 ×
 `autograd.grad` 호출이 매 step 발생한다. 친화도는 EMA 로 평활화되므로
 10 step 간격 측정으로도 충분히 안정적이다. 이 설정만으로 gradient 계산
 오버헤드가 $1/10$ 로 감소한다. 과거에 warmup 중 매 step 추출하다 hang 이
 발생해 추가된 설정이다.
 
 *TF32 + cuDNN benchmark (not torch.compile).* `torch.compile` 은 이
-프로젝트에서 비활성이다. 15 태스크 MTL + `retain_graph` + dynamic shape
+프로젝트에서 비활성이다. 13 태스크 MTL + `retain_graph` + dynamic shape
 조합으로 커널 컴파일 수가 수백 개에 달해 첫 epoch 에 30 분 이상 소요된다.
 대신 TF32 + cuDNN benchmark 로 10–15% 속도를 확보한다.
 
@@ -250,14 +250,14 @@ PLE 6 편과 adaTT 4 편, 총 10 편의 Study Thread 로 본 프로젝트의 MTL
 분리하고, adaTT 는 *gradient 경로* 에서 남은 충돌을 측정해 협력으로
 돌렸다 — 두 서브스레드가 같은 MTL 문제의 두 얼굴을 맡은 셈이다.
 
-> **열린 실험 결과 — adaTT 제거를 검토 중.** ADATT-1 에서 미리 밝힌
+> **실험 결과 — 13개 태스크 규모에서 adaTT 제거.** ADATT-1 에서 미리 밝힌
 > 대로, 합성 데이터 벤치마크에서 PLE+adaTT 와 PLE-only 사이에 뚜렷한
-> 성능 차이가 관찰되지 않았다. 현재 실 데이터(카드 거래 로그) 에서 같은
-> 비교를 진행 중이며, 결과가 재현되면 adaTT 를 스택에서 *제거* 할 생각이다.
-> 그렇게 되더라도 이 4 편은 그대로 남겨둔다 — "왜 이 설계를 시도했고,
-> 어떤 근거로 뺐는가" 의 기록이 다음 사람에게는 "다시 해보지 말 것" 의
-> 안내가 된다. (업데이트: 실 데이터 실험 결과는 별도 포스트에서 공유
-> 예정.)
+> 성능 차이가 관찰되지 않았고, 종합 AUC 에 대한 손실 수준 효과는 무의미하거나
+> 약간 음(−0.001 ~ −0.003)으로 나왔다. 최종 운영 구성은 adaTT 를
+> 비활성화하며(VRAM 부담으로 함께 기각된 GradSurgery 도 마찬가지다), 모듈
+> 자체는 아키텍처 참고용으로 코드베이스에 남겨둔다. 이 4편은 어느 쪽이든
+> 그대로 남긴다 — "왜 이 설계를 시도했고, 어떤 근거로 뺐는가" 의 기록이 다음
+> 사람에게는 "다시 해보지 말 것" 의 안내가 된다.
 
 다음부터는 7 개 이종 Shared Expert 각자의 수학적 기초로 넘어간다. 우선
 CausalOT (인과 추론 + 최적 수송), TDA (위상 데이터 분석 / PersLay),

@@ -15,7 +15,7 @@ source_url: https://doi.org/10.5281/zenodo.19622052
 source_label: "Paper 2 (Zenodo DOI)"
 ---
 
-*시리즈 "MRM 스레드" 1편. AI 추천 시스템의 규제 준수와 모델 리스크 관리를 실무적 관점에서 다룬다.*
+*"MRM 스레드" 1편. 시리즈는 하나의 베팅을 따라간다 — SR 11-7 이 codify 한 lifecycle 통합 원칙은 옳았지만 그 구현은 진화해야 한다는 것. 수리통계적 모델 시대에 만들어진 MRM 이 이제 같은 방식의 검증을 허용하지 않는 모델 부류와 만난다. Architecture-first responsible AI 가 그 진화의 형태다. GARP FRM 실무자 관점에서 쓴다.*
 
 ## 표준적인 모델 리스크 관리의 한계
 

@@ -20,11 +20,14 @@ RAG + LanceDB as the retrieval layer (Ep 5). On top of that
 substrate sit the five regulatory generators
 (`KoreanFRIAAssessor`, `FRIAEvaluator`, `AnnexIVMapper`,
 `PIAEvaluator`, `PublicDisclosureGenerator`) described in
-Paper 2. The whole stack only earns back its upfront cost if
-this last episode's claim holds: regulations are going to keep
-changing, and the architecture has to make that change cheap.
-If the change isn't cheap, the previous five episodes were
-wasted work.*
+Paper 2. MRM has always required reporting; what changes for
+the responsible-AI era is that the reports themselves must be
+modular — built once, swappable as regulatory requirements
+proliferate. The whole stack only earns back its upfront cost
+if this last episode's claim holds: regulations are going to
+keep changing, and the architecture has to make that change
+cheap. If the change isn't cheap, the previous five episodes
+were wasted work.*
 
 ## A scenario twelve months out
 
@@ -102,7 +105,7 @@ The five generators are deliberately five separate classes:
 - `PIAEvaluator` — Korean PIPA + GDPR Article 35, six-domain
   privacy impact assessment.
 - `PublicDisclosureGenerator` — Korean FSC AI guideline,
-  five-section quarterly public disclosure.
+  eight-section quarterly public disclosure.
 
 Each module owns its dimensions, retention rules, output
 format, and update cadence. They share only the substrate

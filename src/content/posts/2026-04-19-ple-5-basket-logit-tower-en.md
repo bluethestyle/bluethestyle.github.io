@@ -9,7 +9,7 @@ series: study-thread
 part: 5
 alt_lang: /2026/04/19/ple-5-basket-logit-tower-ko/
 next_title: "PLE-6 — Interpretability, Uncertainty, Full Specs (+ Tech Reference PDF)"
-next_desc: "Expert interpretability via Sparse Autoencoder (SAE), uncertainty quantification via Evidential Deep Learning, the full 18-task spec, paper-vs-implementation comparison, debugging guide — and a downloadable PDF of the full PLE tech reference to close out the series."
+next_desc: "Expert interpretability via Sparse Autoencoder (SAE), uncertainty quantification via Evidential Deep Learning, the 18-task draft spec (later reduced to 13 production tasks), paper-vs-implementation comparison, debugging guide — and a downloadable PDF of the full PLE tech reference to close out the series."
 next_status: published
 ---
 
@@ -29,7 +29,7 @@ That much is done. But when the pipeline crosses over into the
 *task-private* side, three decisions are still on the table.
 
 **Memory.** The legacy implementation kept an independent MLP for
-every task × cluster pair — 16 tasks × 20 clusters × a small MLP each,
+every task × cluster pair — 13 tasks × 20 clusters × a small MLP each,
 around 3M parameters. Most of that capacity was duplicated across
 clusters. The observation behind the waste: cluster-level signal
 mostly affects the *input distribution*, not the *decision function*.
@@ -40,9 +40,9 @@ the CGC gate only handles "how to mix experts." Waiting for the
 network to discover "customers with high CTR score also have high
 CVR score" on its own is wasteful — we already know it.
 
-**Loss scale balance across 16 tasks.** CTR's Focal Loss, Engagement's
+**Loss scale balance across 13 tasks.** CTR's Focal Loss, Engagement's
 MSE, and Brand_prediction's InfoNCE are all backpropagated at once,
-with scales that differ by more than 100×. Hand-tuning 16 weights is
+with scales that differ by more than 100×. Hand-tuning 13 weights is
 a combinatorial headache, and even one good tune breaks when the data
 shifts.
 
@@ -178,6 +178,8 @@ flowchart TB
 > automatically: CTR → CVR → LTV, Churn → Retention, NBA →
 > Spending_category → Brand_prediction. Adding a new transfer to
 > `task_relationships` config picks up the order automatically.
+
+> (Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)
 
 ### Transfer mechanism
 
@@ -322,9 +324,11 @@ use activation=None, binary uses sigmoid, multiclass uses softmax.
   </g>
 </svg>
 
-> **16 tasks split across 4 loss types.** Items with an explicit weight
+> **Four loss types across the task roster.** Items with an explicit weight
 > (`Nw`) are further auto-balanced by uncertainty weighting (below).
 > Anything without an explicit weight defaults to 1.0.
+>
+> (Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)
 
 > **Huber Loss.** $\mathcal{L}_{\text{Huber}} = \frac{1}{2}(y - \hat{y})^2$
 > when $|y - \hat{y}| \le \delta$, otherwise $\delta(|y - \hat{y}| - \delta/2)$.
@@ -367,12 +371,12 @@ weight.
 > - Churn (positive 5–15%, very high FN cost): $\alpha = 0.60$ (avoid missing churners, maximize recall)
 > - Retention (positive 85–95%, moderate FN cost): $\alpha = 0.20$ (detect the minority early-churn signal)
 
-## Decision 3' — Uncertainty Weighting: 16 weights, automatically
+## Decision 3' — Uncertainty Weighting: 13 weights, automatically
 
 Tasks differ in loss type *and* scale. CTR's Focal Loss sits in
 0.01–0.5; LTV's Huber Loss sits in 1–100 depending on customer value
 units. Simply summing them lets the largest-scale task dominate
-gradients. Hand-tuning 16 weights is a pain, and even a good tune
+gradients. Hand-tuning 13 weights is a pain, and even a good tune
 breaks when the data shifts.
 
 ### Decision — let the model learn the balance via log-variance
@@ -396,7 +400,7 @@ zeroing out every loss. $+s_k$ is the cost that prevents that exit.
 > **Intuition.** A task that is intrinsically hard to predict gets its
 > weight automatically lowered so its loss does not dominate training.
 > The $+s_k$ term prevents the model from "declaring every task
-> uncertain" to drive the loss to 0. Instead of hand-tuning 16 task
+> uncertain" to drive the loss to 0. Instead of hand-tuning 13 task
 > weights, the model finds the balance on its own.
 
 > **Theoretical basis.** Kendall, Gal & Cipolla (CVPR 2018) — assuming
@@ -428,7 +432,7 @@ Three decisions define PLE-5.
    useless, the projection weights go to zero. A shortcut for
    dependencies we already know, rather than making the network
    rediscover them.
-3. **Uncertainty Weighting** — auto-balance the 16 task weights
+3. **Uncertainty Weighting** — auto-balance the 13 task weights
    through trainable log-variances. The form
    $\exp(-s_k) \cdot \mathcal{L}_k + s_k$ falls out of the MLE of a
    Gaussian likelihood with homoscedastic uncertainty (Kendall et al.,
@@ -439,5 +443,5 @@ The next post, **PLE-6**, closes out the series with the two
 remaining questions once the system is running — "can we see what
 each expert actually learned? (SAE)", "can we quantify prediction
 confidence? (Evidential Deep Learning)" — and presents the 18-task
-full spec as a reference appendix, plus a downloadable PDF of the
+draft (later reduced to 13) as a reference appendix, plus a downloadable PDF of the
 complete tech reference.

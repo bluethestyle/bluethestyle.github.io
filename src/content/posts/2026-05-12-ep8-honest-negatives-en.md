@@ -4,7 +4,7 @@ date: 2026-05-12 12:00:00 +0900
 categories: [FinAI Build]
 tags: [finai-build, adatt, gradsurgery, negative-results, financial-ai]
 lang: en
-excerpt: "Record from four months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 WIP status, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did."
+excerpt: "Record from four months — how adaTT converged to a null effect at 13-task scale, why GradSurgery was rejected on VRAM overhead, Paper 3 still in progress at the time of writing, and real-data metrics pending after 2026-04-30. Why what did not work matters as much as what did."
 series: three-months
 part: 8
 alt_lang: /2026/05/12/ep8-honest-negatives-ko/
@@ -73,10 +73,12 @@ The general principle: *if implementation complexity or hardware
 cost offsets the performance gain, reject*. GradSurgery isn't a
 bad algorithm — the ROI was simply negative under our constraints.
 
-## Paper 3 (Loss Dynamics) — WIP
+## Paper 3 (Loss Dynamics) — written, publication deferred
 
 Ep 6 noted "Paper 3 (Loss Dynamics) was seeded here". That Paper 3
-is currently in WIP.
+has since been written out in full — fourteen findings, restructured
+around what *silently* fails when MTL is pushed past the
+homogeneous-task regime.
 
 The core question — *can the dynamics of loss functions themselves
 determine architectural conclusions*. Ep 6's sigmoid-softmax
@@ -86,9 +88,11 @@ phenomenon systematically — a matrix of loss weighting schemes
 sigmoid, mixture-of-experts), tracking how architectural
 conclusions shift.
 
-Still at abstract-draft stage. Experimental design complete,
-execution in progress, Zenodo upload targeted at Q3 2026. When
-results are in, Study Thread will cover them in detail.
+The experimental design and write-up are complete. The Zenodo
+publication is intentionally deferred until operational data
+arrives — Paper 1, 2, and 3 are re-published together at that
+point, so there is no separate DOI to link yet. When those
+operational numbers land, Study Thread will cover them in detail.
 
 ## From synthetic to production data — the validation window isn't open yet
 

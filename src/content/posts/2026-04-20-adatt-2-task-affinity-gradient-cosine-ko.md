@@ -149,7 +149,7 @@ $n$ 개 태스크의 gradient 를 행으로 쌓으면 $\mathbf{G} \in \mathbb{R}
 gradient 가 정확히 0 이면 0-division 이 나기 때문이다. 이중 for 루프로
 쌍마다 계산하면 $O(n^2 d)$ 연산이 $n^2$ 번의 Python 호출로 흩어져
 느려지지만, `torch.mm` 은 GPU 의 CUDA core 병렬성을 써서 수백 배 빠르다.
-16 태스크 기준 $16 \times 16 = 256$ 개 유사도가 단일 GEMM 커널로 끝난다.
+13 태스크 기준 $13 \times 13 = 169$ 개 유사도가 단일 GEMM 커널로 끝난다.
 
 ## EMA 업데이트와 clamp
 
@@ -208,7 +208,7 @@ zero 로 패딩한 뒤 `torch.cat` 으로 flatten 한다. 이 flattened 벡터�
 `retain_graph=True` 는 앞에서 설명한 대로 Trainer 의 `loss.backward()`
 가 같은 graph 를 재사용해야 하므로 *아키텍처상 필수* 다. 이걸 빼면
 "Trying to backward through the graph a second time" 에러로 학습이 즉시
-멈춘다. 메모리 비용 — 16 태스크에서 peak memory 가 forward pass 대비
+멈춘다. 메모리 비용 — 13 태스크에서 peak memory 가 forward pass 대비
 약 2 배 — 은 ADATT-4 에서 다룬다.
 
 
