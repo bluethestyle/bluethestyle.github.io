@@ -106,4 +106,4 @@ FD-TVS(Financial DNA Targeted Value Scoring)는 이러한 스코어링 계층을
 
 에피소드 5에서는 한 계층 더 위로 올라가, 매 예측의 설명 로그를 질의 가능한 시스템으로 만드는 '검색 계층'을 살펴본다. 운영 및 감사 인프라의 핵심 엔진으로 RAG와 LanceDB를 선택한 이유, 컬럼 기반 검색과 버전 인식 검색이 공정성 모니터링·인적 감독 에스컬레이션·분기별 집계에 어떤 혁신을 가져다주는지, 그리고 왜 감사 로그가 단순한 쓰기 전용 데이터가 아닌지에 대해 심도 있게 다뤄볼 예정이다.
 
-소스: [Paper 1 (Zenodo)](https://doi.org/10.5281/zenodo.19621884)의 Heterogeneous Expert 아키텍처 및 게이트 가중치 설명 가능성, 그리고 Paper 3(발행 예정)의 CEH 및 Causal Guardrail (마할라노비스 OOD). FD-TVS 스코어링 설정은 [`configs/pipeline.yaml`](https://github.com/bluethestyle/aws_ple_for_financial)의 `scoring.segment_task_weights` 및 `scoring.dynamic_weight_rules` 경로에서 확인할 수 있다.
+소스: [Paper 1 (Zenodo)](https://doi.org/10.5281/zenodo.19621884)의 Heterogeneous Expert 아키텍처 및 게이트 가중치 설명 가능성, 그리고 Paper 3(발행 예정)의 CEH 및 Causal Guardrail (마할라노비스 OOD). FD-TVS 스코어링 설정은 [오픈소스 저장소](https://github.com/bluethestyle/aws_ple_for_financial)의 `configs/datasets/santander.yaml` 안 `scoring.segment_task_weights` 및 `scoring.dynamic_weight_rules` 키에서 확인할 수 있다(병합본은 `configs/merged_config.json`). 설계 원칙은 저장소 루트의 `AGENTS.md` · `CLAUDE.md` 에 명시돼 있다.

@@ -62,10 +62,12 @@ The on-premises production system was not a toy. It had:
 - 18 simultaneous tasks
 - 62 data table ingestion jobs
 
-The public AWS benchmark version is somewhat smaller (13 tasks
-after removing 5 deterministic-leakage / redundant ones; 349
-features instead of 734) but the architecture and the engineering
-patterns are the same.
+The public AWS benchmark version is somewhat smaller (**12 tasks**
+after removing deterministic-leakage / redundant ones; 349 input
+features — 403D after Phase 0 — instead of 734) but the architecture
+and the engineering patterns are the same. It was 13 originally; the
+AWS repo reconciled 13→12 against per-run task-composition
+provenance.
 
 Building and replacing a system at that scale, with three people
 and a desktop GPU, is the sort of thing you would dismiss on paper.

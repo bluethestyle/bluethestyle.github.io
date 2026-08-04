@@ -259,7 +259,7 @@ domain knowledge before a single gradient step.
   </g>
 </svg>
 
-*(Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)*
+*(Illustrative: this figure uses the generic on-prem reference roster; the public benchmark is **12 tasks** — the AWS repo reconciled 13→12 against per-run task-composition provenance.)*
 
 > **Domain prior matrix.** The initial bias encodes each task's
 > "natural expert preference" — e.g. time-series-heavy churn/retention
@@ -370,7 +370,7 @@ flowchart TB
   style bt fill:#FFFFFF,stroke:#1C8C5A
 ```
 
-*(Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)*
+*(Illustrative: this figure uses the generic on-prem reference roster; the public benchmark is **12 tasks** — the AWS repo reconciled 13→12 against per-run task-composition provenance.)*
 
 > **Three time-scales, three task groups.** The same 16D HMM state
 > vector passes through three independent projectors and splits into

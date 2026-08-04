@@ -243,7 +243,27 @@ PLE-2 · PLE-3 · PLE-4 · PLE-5 · PLE-6 · ADATT-1~4 · TDA-1 · TDA-2 · DEEP
 HGCN-1 · CAUSALOT-1 · TEMPORAL-1 · ECON-1 · TDAFEAT-1 · HMM-1 · GMM-1 ·
 TSFEAT-1 · MULTI-1 · GROUND-1 · QWEN-1
 
-**⚠️ MRM 스레드 6편 · Commentary 2편 — gotothemoon 으로는 검증 불가.**
+**AWS 저장소 — `C:\workspace\aws_ple_for_financial` (검증 완료).**
+MRM 스레드 · Commentary · 4개월 개발기가 근거로 삼는 공개 저장소
+(`github.com/bluethestyle/aws_ple_for_financial`). `core/…` 경로 표기가 이쪽이다.
+식별자 316개를 두 저장소에 대조한 결과 **AWS 에만 존재 13건, 어디에도 없음 3건**이었고,
+3건 중 2건(`ComplianceReporter` · `USComplianceGenerator`)은 각각 *기각한 안티패턴* 과
+*가상의 미래 모듈* 이라 부재가 정상이다. 실제 오류는 `core/retrieval/` 1건이었다.
+
+**AWS 저장소 대조로 확인된 사실:**
+- 공개 벤치마크는 **12개 태스크** (README `12-task`). 초기 13에서 정합됨
+  (`docs(paper1~3): 13→12 태스크 정합` 커밋 4건). 블로그의 "13개" 는 노후 → 수정 완료.
+- 피처 차원 **~349D input / 403D after Phase 0** — MRM-3 의 "349D → 403D" 서술과 일치.
+- 온프렘 로스터는 `docs/design/onprem_experiment_design.md` 가 **"734D (16 tasks)"** 로
+  적는다. CAUSALOT-1 의 "16개 task tower" 는 여기 근거가 있다(미확인 아님).
+- `min_improvement: 0.005` / `max_degradation: 0.02` (`configs/pipeline.yaml`) — MRM-2 일치.
+- `segment_task_weights` 1.0~1.5 클리핑, `dynamic_weight_rules` — `AGENTS.md`/`CLAUDE.md`
+  설계 원칙과 일치. 단 **파일 경로가 틀렸다**(→ `configs/datasets/santander.yaml`). 수정 완료.
+- `core/monitoring/pia_evaluator.py` · `public_disclosure_generator.py` 실재 — Commentary 일치.
+- `tenure_stage` · `spend_level` 실재하며 `santander.yaml:93` 이
+  *"REMOVED: tenure_stage — reconstructable"* 라 적어 4개월 개발기 Ep5 서사와 부합.
+
+**⚠️ (구) MRM 스레드 6편 · Commentary 2편 — gotothemoon 으로는 검증 불가.**
 이 글들은 **다른 저장소**를 근거로 한다:
 `https://github.com/bluethestyle/aws_ple_for_financial` (MRM-5 가 명시적으로 인용).
 `core/audit/` · `core/retrieval/` · `core/monitoring/` 같은 `core/…` 경로 표기가

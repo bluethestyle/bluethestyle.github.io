@@ -382,5 +382,10 @@ log substrate, not a re-architecture of the system.
 Source: [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052)
 on the operational architecture; LanceDB choice and retrieval
 templates live in the
-[open-source repo](https://github.com/bluethestyle/aws_ple_for_financial)
-under `core/audit/` and `core/retrieval/`.
+[open-source repo](https://github.com/bluethestyle/aws_ple_for_financial):
+audit logging in `core/monitoring/audit_logger.py` with the store in
+`core/compliance/audit_store.py`, and the LanceDB-backed retrieval in
+`core/agent/case_store.py`, `core/agent/temporal_fact_store.py`, and
+`core/recommendation/reason/context_store.py`. (The `core/audit/` and
+`core/retrieval/` paths appear only in the design documents under
+`docs/design/`; they were never created as packages.)

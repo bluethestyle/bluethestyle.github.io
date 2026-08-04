@@ -104,6 +104,9 @@ those through seven identical MLPs gives the gate very little
 structural information to discriminate on. "MLP-3 helped CTR, MLP-5
 helped Churn" is a signal hard to separate from noise.
 
+> **A note on the task count.** The "13" here borrows the public AWS benchmark figure into an on-prem context. The on-prem roster is **16 tasks** per the design document (`onprem_experiment_design.md`), while the code (`active_tasks.py`) defines 17 of which `uplift` and `category_uplift` are `enabled: False`, leaving **15 active**. The AWS benchmark itself has since been reconciled to **12**. The three numbers refer to three different things.
+
+
 So we went a step further: **make the Shared Expert pool
 heterogeneous.** The seven experts are each chosen to represent a
 structurally distinct mathematical perspective.

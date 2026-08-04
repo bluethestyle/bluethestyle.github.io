@@ -120,4 +120,4 @@ EU AI Act 제14조가 요구하는 '인적 감독' 의무는 우리 시스템에
 
 에피소드 6이 이 시리즈의 마무리를 장식한다. 우리의 장기적인 핵심 명제는 분명하다. "규제는 반드시 변한다." 한국 AI 기본법의 구체적인 시행령이 등장할 것이고, EU AI Act는 지속적으로 개정될 것이며, 미국의 새로운 규제 프레임워크가 통과되면 또 다른 형태의 전용 산출물 생성기를 요구할 것이다. 우리가 Paper 2에서 구축한 5개의 규제 산출물 생성기(한국 FRIA, EU FRIA, Annex IV, PIA, 공시 생성기)는 정적인 문서가 아니라 유연한 *모듈*이다. 아키텍처 전체를 뒤엎지 않고도, 변함없이 탄탄한 감사 로그 인프라 위에서 새로운 규제를 새 모듈 플러그인 형태로 부드럽게 수용하도록 설계된 모듈식 적응성에 대해 이야기한다.
 
-소스: [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052)의 운영 아키텍처. LanceDB의 세부적인 선택 기준과 검색 템플릿 구현체는 [오픈소스 저장소](https://github.com/bluethestyle/aws_ple_for_financial)의 `core/audit/` 및 `core/retrieval/` 디렉터리에서 확인할 수 있다.
+소스: [Paper 2 (Zenodo)](https://doi.org/10.5281/zenodo.19622052)의 운영 아키텍처. LanceDB의 세부적인 선택 기준과 검색 템플릿 구현체는 [오픈소스 저장소](https://github.com/bluethestyle/aws_ple_for_financial)에서 확인할 수 있다 — 감사 로깅은 `core/monitoring/audit_logger.py` 와 저장소 계층 `core/compliance/audit_store.py`, LanceDB 기반 검색은 `core/agent/case_store.py`, `core/agent/temporal_fact_store.py`, `core/recommendation/reason/context_store.py` 다. (`core/audit/` 와 `core/retrieval/` 는 `docs/design/` 아래 설계 문서에만 등장하는 경로이고 실제 패키지로는 만들어지지 않았다.)

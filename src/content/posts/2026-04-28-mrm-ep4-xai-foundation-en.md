@@ -331,6 +331,8 @@ on the heterogeneous expert architecture and gate-weight
 explainability, and Paper 3 (forthcoming on Zenodo)
 on CEH and Causal Guardrail (Mahalanobis OOD); FD-TVS scoring
 config lives in
-[`configs/pipeline.yaml`](https://github.com/bluethestyle/aws_ple_for_financial)
-under `scoring.segment_task_weights` and
-`scoring.dynamic_weight_rules`.
+the [open-source repo](https://github.com/bluethestyle/aws_ple_for_financial)
+in `configs/datasets/santander.yaml`, under the
+`scoring.segment_task_weights` and `scoring.dynamic_weight_rules`
+keys (the merged form is `configs/merged_config.json`). The design
+rule itself is stated in the repo's root `AGENTS.md` and `CLAUDE.md`.

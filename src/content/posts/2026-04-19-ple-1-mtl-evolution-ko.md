@@ -204,7 +204,14 @@ $$\mathbf{h}_k = \sum_{i=1}^N g_{k,i} \cdot f_i^{expert}(\mathbf{x}), \quad \mat
 
 ## 여기서 멈추는 이유
 
-본 프로젝트의 13개 태스크 설정에서 두 단계 모두 그대로는 쓸 수 없다.
+본 프로젝트의 태스크 설정에서 두 단계 모두 그대로는 쓸 수 없다.
+
+> **태스크 개수에 대한 주석.** 온프렘 로스터는 설계 문서
+> (`onprem_experiment_design.md`) 기준 **16개 태스크** 이고, 코드
+> (`active_tasks.py`)는 17개를 정의하되 `uplift` · `category_uplift` 가
+> `enabled: False` 라 **활성 15개** 다. 공개 AWS 벤치마크는 현재 **12개**
+> 로 정합됐다(초기 13개). 세 숫자가 각기 다른 대상을 가리킨다.
+
 Shared-Bottom은 태스크 다양성에 무너진다 — churn, 순위, 회귀 타깃이
 공유 trunk을 서로 다른 방향으로 잡아당긴다. MMoE는 이론상 태스크들이
 서로를 우회할 수 있지만, 대칭적인 expert pool과 제약 없는 gate의
