@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>기술블로그 정확성 감사 보고서</title>
-<meta name="description" content="블로그 43편을 온프렘·AWS 두 저장소의 실제 코드에 대조해 사실 오류 8건과 노후 5건을 잡아낸 정확성 감사 보고서.">
 <style>
   :root{
     --paper:#F6F7F9; --panel:#FFFFFF; --ink:#14181F; --ink-2:#39424F;
@@ -196,14 +195,10 @@
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
 
-  /* standalone-only: theme toggle */
-  .theme-toggle{
-    position:fixed; top:1rem; right:1rem; z-index:10;
+  .theme-toggle{position:fixed; top:1rem; right:1rem; z-index:10;
     font-family:var(--mono); font-size:.68rem; letter-spacing:.09em;
-    text-transform:uppercase; color:var(--soft);
-    background:var(--panel); border:1px solid var(--rule);
-    padding:.42rem .7rem; cursor:pointer; line-height:1;
-  }
+    text-transform:uppercase; color:var(--soft); background:var(--panel);
+    border:1px solid var(--rule); padding:.42rem .7rem; cursor:pointer; line-height:1;}
   .theme-toggle:hover{color:var(--ink); border-color:var(--soft);}
   .theme-toggle:focus-visible{outline:2px solid var(--madder); outline-offset:2px;}
   @media print{ .theme-toggle{display:none;} body{background:#fff;} }
@@ -225,16 +220,19 @@
   <div class="meta">
     <span>대상 <b>bluethestyle.github.io</b></span>
     <span>브랜치 <b>fix/tech-accuracy-code-audit</b></span>
-    <span>커밋 <b>3</b></span>
+    <span>커밋 <b>5</b></span>
     <span>빌드 <b>100 페이지 통과</b></span>
+    <span>study-thread <b>27 / 27</b></span>
   </div>
 
   <div class="metrics">
     <div class="metric"><span class="n">2,110</span><span class="l">추출 주장</span></div>
+    <div class="metric"><span class="n">2,072</span><span class="l">KaTeX 수식</span></div>
     <div class="metric"><span class="n">316</span><span class="l">대조 식별자</span></div>
-    <div class="metric"><span class="n">40</span><span class="l">수정 파일</span></div>
-    <div class="metric"><span class="n">+712<small> / −89</small></span><span class="l">라인 변경</span></div>
-    <div class="metric"><span class="n" style="color:var(--madder)">8</span><span class="l">사실 오류</span></div>
+    <div class="metric"><span class="n">41</span><span class="l">학술 인용</span></div>
+    <div class="metric"><span class="n">42</span><span class="l">수정 포스트</span></div>
+    <div class="metric"><span class="n">+1,393<small> / −95</small></span><span class="l">라인 변경</span></div>
+    <div class="metric"><span class="n" style="color:var(--madder)">10</span><span class="l">사실 오류</span></div>
     <div class="metric"><span class="n" style="color:var(--stale)">5</span><span class="l">노후</span></div>
   </div>
 
@@ -410,6 +408,94 @@
         <code>AGENTS.md</code> 가 토씨까지 같은 말을 쓴다. 경로만 틀렸다.
       </p>
     </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 09</span>
+        <span class="ftitle">LightGCN 이 한 일을 NGCF 가 한 것처럼 — 주어 역전</span>
+        <span class="fwhere">PLE-3 · <strong>KO 만</strong></span>
+      </div>
+      <dl class="cmp">
+        <dt>KO</dt><dd class="was">NGCF 가 GCN 추천을 극단적으로 단순화하면서도 성능이 더 좋았다</dd>
+        <dt>EN</dt><dd class="now">by removing almost everything NGCF had added, <em>it</em> performed better</dd>
+      </dl>
+      <p class="fbody">
+        단순화한 쪽은 <strong>LightGCN</strong> 이고 NGCF 는 단순화당한 쪽이다. 같은 글
+        앞부분(L66)은 바르게 서술하고 있어 콜아웃에서만 뒤집혔다.
+        <strong>숫자가 아니라 의미 드리프트라 정합성 검사로는 원리적으로 잡히지 않는다</strong> —
+        학술 인용을 전수 추출하다 걸렸다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 10</span>
+        <span class="ftitle">NGCF 저자 표기</span>
+        <span class="fwhere">PLE-3 · ko/en</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">NGCF (He 2019)</dd>
+        <dt>실제</dt><dd class="now">Wang et al., SIGIR 2019</dd>
+      </dl>
+      <p class="fbody">He Xiangnan 은 공저자다. 1저자는 Xiang Wang.</p>
+    </div>
+  </section>
+
+  <!-- ================= 언어·수식·인용 ================= -->
+  <section>
+    <h2><span class="num">§2b</span>ko/en · 수식 · 인용</h2>
+
+    <h3>ko/en 정합성 — 검사기가 틀렸다</h3>
+    <p class="lede">
+      1차 검사가 보고한 <strong>"19쌍 불일치"는 전부 허위</strong>였다. 아라비아 숫자
+      패턴 개수만 비교해서, 두 언어의 수사 표기 관습 차이가 그대로 불일치로 잡혔다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>한국어</th><th>영어</th><th>1차 검사 판정</th></tr></thead>
+      <tbody>
+        <tr><td class="id">성분 5개</td><td class="id">5 components</td><td class="num" style="color:var(--madder)">ko=0 / en=1</td></tr>
+        <tr><td class="id">27차원</td><td class="id">27D</td><td class="num" style="color:var(--madder)">ko=0 / en=1</td></tr>
+        <tr><td class="id">7개 Expert</td><td class="id">seven experts</td><td class="num" style="color:var(--madder)">ko=1 / en=0</td></tr>
+      </tbody>
+    </table></div>
+    <p class="fbody" style="margin-top:.9rem">
+      한국어는 수사가 뒤에 오고(<code>성분 5개</code>), 단위가 다르며(<code>차원</code> vs
+      <code>D</code>), 영어는 작은 수를 풀어 쓴다(<code>seven</code>). 정규화 후 재검사한
+      실제 내용 드리프트는 <strong>1건</strong> — 위 오류 09 다.
+    </p>
+
+    <h3>KaTeX — 2,072개, 구문 문제 0건</h3>
+    <p class="lede" style="margin-bottom:1rem">
+      display 298 · inline 1,774. <code>$$</code> 짝, 중괄호,
+      <code>\left</code>/<code>\right</code> 균형, 미지원 매크로 전부 통과. 산술도 검산했다.
+    </p>
+    <div class="proof">dim-normalize   mean = (128 + 64×6)/7 = <b>73.14</b>
+                √(73.14/128) = <b>0.756</b>   √(73.14/64) = <b>1.069</b>
+코사인 예시     8 / √80 = <b>0.89</b>
+비율            24/734 = <b>3.3%</b>   24/4035 = <b>0.6%</b>   68/734 = <b>9.3%</b>
+FM 쌍           28×27/2 = <b>378</b>   31×30/2 = <b>465</b>
+임베딩 파라미터  771 × 16 = <b>12,336</b>       SAE  448 × 4 = <b>1792</b></div>
+    <p class="fbody" style="margin-top:.9rem">
+      중간에 4건이 잡혔으나 <code>\rightarrow</code> 를 <code>\right</code> 로 센
+      <strong>검사기 버그</strong>였다.
+    </p>
+
+    <h3>학술 인용 41건 — 전부 정확</h3>
+    <p class="lede" style="margin-bottom:.8rem">
+      Tang RecSys 2020 · Ma KDD 2018 · Jacobs 1991 · Rendle ICDM 2010 ·
+      Kipf&amp;Welling 2017 · Carrière AISTATS 2020 · Zheng NeurIPS 2018 ·
+      Cuturi NeurIPS 2013 · Shannon 1948 · Baum&amp;Petrie 1966 · Kendall CVPR 2018 ·
+      Gal&amp;Ghahramani 2016 · MacKay 1992 · Neal 1996 · Neyman 1923 · Rubin 1974 ·
+      Pearl 2000 · Kantorovich 1942 · Stigler 1961 · Nickel&amp;Kiela NeurIPS 2017 ·
+      Cohen&amp;Felson 1979 · Barabási Nature 2005 · Platt 1999 ·
+      Hinton/Vinyals/Dean 2015 · Hamilton 1989 · Kermack&amp;McKendrick 1927 —
+      연도·학회 모두 확인됐다.
+    </p>
+    <div class="note">
+      의심했던 <code>Bucilua, Caruana &amp; Niculescu-Mizil (KDD 2006)</code> 은
+      <strong>정확</strong>했다. "Model Compression" 이 실제로 KDD 2006 이다 —
+      같은 저자들의 calibration 논문(ICML 2005)과 혼동한 것은 검토자 쪽이었다.
+    </div>
   </section>
 
   <!-- ================= 노후 ================= -->
@@ -532,8 +618,19 @@ V2_APPEND        1440 + 1440 + 360 + 30 + 31         = <b>3301</b>
         <tr><td>MRM 에피소드 3</td><td class="num">349D → 403D</td><td class="id">~349D input / 403D after Phase 0</td></tr>
         <tr><td>MRM 에피소드 2</td><td class="num">0.005 / 0.02</td><td class="id">min_improvement · max_degradation</td></tr>
         <tr><td>QWEN-1</td><td class="id">Qwen3-8B-AWQ</td><td class="id">저장소 최다 사용 식별자와 일치</td></tr>
+        <tr><td>DISTILL-1</td><td class="num">α 0.3 · T 5.0 · 200D · 10 스테이지</td><td class="id">distillation_loss.py · ig_top_k=200 · CLI choices 정확히 10개</td></tr>
+        <tr><td>SCORING-1</td><td class="num">timing 28 클래스</td><td class="id">ProbabilityCalibrator · fit_from_scores · transform 경로까지 일치</td></tr>
+        <tr><td>REASON-1</td><td class="id">exaone3.5:2.4b → qwen3:14b</td><td class="id">dual-route primary/escalation 정확</td></tr>
+        <tr><td>4개월 Ep6 · Ep8</td><td class="num">−0.019 → −0.001</td><td class="id">AWS README:221 의 13-task adaTT 실험값과 일치</td></tr>
       </tbody>
     </table></div>
+
+    <div class="note">
+      <strong>4개월 개발기의 "13개 태스크" 는 고치지 않았다.</strong> 개발 당시의 실험
+      조건이고 AWS README 도 <em>"−0.019 in the 13-task heterogeneous setting"</em> 으로
+      그 시점을 보존한다. 13→12 정합은 그 이후다 — <em>현재 상태</em> 를 주장하는 문장만
+      12 로 고쳤다.
+    </div>
 
     <div class="note">
       <strong>부재가 정상이었던 식별자.</strong> MRM 에피소드 6 의
@@ -587,50 +684,63 @@ V2_APPEND        1440 + 1440 + 360 + 30 + 31         = <b>3301</b>
     <div class="tw"><table>
       <thead><tr><th>범위</th><th>상태</th><th>비고</th></tr></thead>
       <tbody>
-        <tr><td>study-thread 27편</td><td class="num" style="color:var(--fixed)">21편 검증</td><td>PLE 6 · ADATT 4 · TDA 3 · 피처군 6 · 기타 2</td></tr>
+        <tr><td>study-thread 27편</td><td class="num" style="color:var(--fixed)">27 / 27 완료</td><td>PLE 6 · ADATT 4 · TDA 3 · 피처군 6 · 서빙군 3 · 기타 5</td></tr>
         <tr><td>MRM 스레드 6편 · Commentary 2편</td><td class="num" style="color:var(--fixed)">AWS 대조 완료</td><td>식별자 316개 양방 검증</td></tr>
-        <tr><td>4개월 개발기 8편</td><td class="num" style="color:var(--stale)">본문 미착수</td><td>주장 밀도 최저 (합 13건)</td></tr>
-        <tr><td>ko/en 정합성</td><td class="num" style="color:var(--stale)">19쌍 미해소</td><td>검출만 하고 조사하지 않음</td></tr>
-        <tr><td>KaTeX 수식</td><td class="num" style="color:var(--stale)">미검증</td><td>수학적 정확성 확인 안 함</td></tr>
-        <tr><td>학술 인용</td><td class="num" style="color:var(--stale)">미검증</td><td>Tang 2020 · Cuturi 2013 · Zheng 2018 등 연도·학회 미확인</td></tr>
-        <tr><td>기술참조서 18종</td><td class="num" style="color:var(--stale)">부분 참조</td><td>필요 부분만 grep · 통독한 문서 없음</td></tr>
+        <tr><td>4개월 개발기 8편</td><td class="num" style="color:var(--fixed)">정량 주장 완료</td><td>RTX 4070 12GB · 5-agent Bedrock · 941K/17-month · −0.019 → −0.001</td></tr>
+        <tr><td>ko/en 정합성</td><td class="num" style="color:var(--fixed)">완료</td><td>19쌍은 허위 · 실제 드리프트 1건 수정</td></tr>
+        <tr><td>KaTeX 수식</td><td class="num" style="color:var(--fixed)">2,072개 통과</td><td>구문 0건 · 산술 검산 완료</td></tr>
+        <tr><td>학술 인용</td><td class="num" style="color:var(--fixed)">41건 확인</td><td>전부 정확 · 저자 표기 1건 정정</td></tr>
+        <tr><td>기술참조서 18종</td><td class="num" style="color:var(--open)">통독 안 함</td><td>의도적 — 아래 참조</td></tr>
+        <tr><td>산문형 의미 주장</td><td class="num" style="color:var(--stale)">체계적 검사 없음</td><td>오류 09 는 우연히 발견 — 아래 참조</td></tr>
       </tbody>
     </table></div>
 
+    <h3>기술참조서를 통독하지 않은 이유</h3>
+    <p class="fbody">
+      토큰 비용이 아니라 <strong>근거 우선순위</strong> 때문이다. 참조서는 3순위라
+      "블로그가 무엇을 보고 썼는지"는 알려줘도 "무엇이 참인지"는 알려주지 못한다. 실제로
+      734D · DeepFM 28필드 · HMM 6+4+6 이 전부 <em>참조서가 낡았던</em> 경우였다. 코드를
+      1순위로 본 이상 통독의 검증 가치는 낮다. 다만 참조서에만 있는 것이 하나 있었고
+      (<strong>학술 인용</strong>) 그건 전수 추출로 처리했다.
+    </p>
+
+    <h3>남은 진짜 구멍</h3>
     <div class="note">
-      <strong>검사 스크립트 결함을 바로잡았다.</strong> 초기 식별자 검사는
-      언더스코어 없는 CamelCase 를 필터로 배제했고, <code>rg</code> 서브프로세스 실패를
-      예외로 삼켜 결과가 공백이었다. "223개 전부 존재"라는 초기 결론은 <strong>무효</strong>였다.
-      현행 스크립트는 두 저장소를 직접 읽어 316개를 대조한다.
+      <strong>산문으로 서술된 의미 주장은 기계적으로 검사되지 않는다.</strong>
+      이 감사의 추출기는 숫자와 코드 식별자를 노린다. 오류 09(LightGCN/NGCF 주어 역전)는
+      숫자가 하나도 틀리지 않았고 식별자도 전부 실재했다 — 학술 인용을 뽑다가 우연히
+      걸렸다. 같은 종류의 오류가 더 있을 수 있으며, 그것을 찾는 유일한 방법은 통독이다.
+    </div>
+
+    <div class="note">
+      <strong>검사 스크립트 결함 두 건을 바로잡았다.</strong> ① 초기 식별자 검사는
+      언더스코어 없는 CamelCase 를 필터로 배제했고 <code>rg</code> 서브프로세스 실패를
+      예외로 삼켜 결과가 공백이었다 — "223개 전부 존재"라는 초기 결론은 <strong>무효</strong>였다.
+      ② 초기 ko/en 검사는 두 언어의 수사 표기 차이를 보정하지 않아 19쌍을 허위 보고했다.
+      두 결함 모두 <em>검증했다고 착각하게 만드는</em> 방향으로 틀렸다는 점이 공통된다.
     </div>
   </section>
 
   <footer>
+    <div class="row"><span class="sha">d6b84c6</span><span>ko/en 정합성 · KaTeX · 학술 인용 · 4개월 개발기 검증</span></div>
+    <div class="row"><span class="sha">164d8b8</span><span>정확성 감사 보고서 HTML — 단독 실행본</span></div>
     <div class="row"><span class="sha">db7127b</span><span>AWS 저장소 대조 검증 — MRM/Commentary/4개월 계열 정정</span></div>
-    <div class="row"><span class="sha">fee9ed3</span><span>study-thread 전 27편 코드 대조 검증 — 2차 패스</span></div>
+    <div class="row"><span class="sha">fee9ed3</span><span>study-thread 코드 대조 검증 — 2차 패스</span></div>
     <div class="row"><span class="sha">8a5ea74</span><span>온프렘 코드 대조 검증 — 사실 오류 수정 + V2 계약 층 가산</span></div>
     <div class="row" style="margin-top:1rem; color:var(--faint)">
-      근거 지도 · 교차 재정 · 배치 절차는 저장소 루트 CLAUDE.md 에 기록됨
+      근거 지도 · 교차 재정 · 배치 절차 · 커버리지 현황은 저장소 루트 CLAUDE.md 에 기록됨
     </div>
   </footer>
 
 </div>
 <script>
-(function(){
-  var root=document.documentElement, btn=document.getElementById('tt');
-  var saved=null;
-  try{ saved=localStorage.getItem('audit-theme'); }catch(e){}
-  if(saved){ root.setAttribute('data-theme',saved); }
-  btn.addEventListener('click',function(){
-    var cur=root.getAttribute('data-theme');
-    if(!cur){
-      cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-    }
-    var next=cur==='dark'?'light':'dark';
-    root.setAttribute('data-theme',next);
-    try{ localStorage.setItem('audit-theme',next); }catch(e){}
-  });
-})();
+(function(){var r=document.documentElement,b=document.getElementById('tt'),s=null;
+try{s=localStorage.getItem('audit-theme');}catch(e){}
+if(s){r.setAttribute('data-theme',s);}
+b.addEventListener('click',function(){var c=r.getAttribute('data-theme');
+if(!c){c=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+var n=c==='dark'?'light':'dark';r.setAttribute('data-theme',n);
+try{localStorage.setItem('audit-theme',n);}catch(e){}});})();
 </script>
 </body>
 </html>
