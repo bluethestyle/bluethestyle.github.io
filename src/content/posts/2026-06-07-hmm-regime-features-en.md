@@ -355,6 +355,12 @@ The full picture, from the reference's `feature_schema.yaml`:
   + LNN 18D), so every task can reference the high-level behavioral
   signal globally, complementing rather than duplicating the 48D.
 
+> **The contract has since moved.** The 734D above is the V1 feature
+> contract. On 2026-07-02 the project switched to the V2 strict contract
+> and the operational input width is **4035D** — 734D was not discarded;
+> it remains V2's _shared base of eight groups_, with the
+> lag/rolling/product families (3301D) appended on top.
+
 This is an *offline* module by design. The HMM is fit and decoded in
 the Airflow batch — fully independent of the GMM and Economics modules,
 so it parallelizes in the DAG — and the resulting features are written

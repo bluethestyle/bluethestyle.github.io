@@ -225,20 +225,30 @@ premise of the heterogeneous pool.
 
 | Expert | Input | Learning target | Why it can't be replaced by another Expert | Output dim |
 |---|---|---|---|---|
-| DeepFM | Normalized 644D | Symmetric feature-pair interactions | Explicitly captures FM's $O(nk)$ 2nd-order crosses | 64D |
+| DeepFM | Full 734D tensor | Symmetric feature-pair interactions | Explicitly captures FM's $O(nk)$ 2nd-order crosses | 64D |
 | LightGCN | Pre-computed 64D | Customer–merchant collaborative signal | "Similar customer" patterns via the bipartite graph | 64D |
 | Unified HGCN | Pre-computed 47D | Merchant hierarchical structure (merchant nodes only) | MCC tree in hyperbolic space + co-visit correction | 128D |
-| Temporal | Sequence $[B,180,16]$ + $[B,90,8]$ | Temporal pattern shifts | Mamba + LNN + Transformer ensemble | 64D |
+| Temporal | Sequence $[B,180,16]$ + $[B,90,4]$ | Temporal pattern shifts | Mamba + LNN + Transformer ensemble | 64D |
 | PersLay | Persistence Diagram | Topological structure | Loops / clusters / branches in consumption patterns | 64D |
-| Causal | Normalized 644D | Directional causal structure between features (DAG) | Confounder removal, asymmetric causal structure | 64D |
-| OT | Normalized 644D | Customer–prototype distribution distance | Encodes distributional geometry via the Wasserstein distance | 64D |
+| Causal | Full 734D tensor | Directional causal structure between features (DAG) | Confounder removal, asymmetric causal structure | 64D |
+| OT | Full 734D tensor | Customer–prototype distribution distance | Encodes distributional geometry via the Wasserstein distance | 64D |
 
 > **Why all seven Experts are needed.** The seven each capture a
 > different facet of the same customer, and the CGC Gate learns the
 > per-task optimal combination. Three Experts (DeepFM, Causal, OT)
-> take the same normalized 644D as input, but extract fundamentally
+> take the same 734D tensor as input, but extract fundamentally
 > different mathematical structures — *symmetric / asymmetric /
 > distance* — so they are not redundant.
+
+> **Under V2 the three diverge.** The table above reflects the V1
+> contract: `model_config.yaml` sets `input_dim: 734` for all three
+> (644D is the *normalized subset* — 734 minus the 90D raw power-law —
+> not an Expert input width). Since the V2 strict switch on 2026-07-02,
+> Experts are routed by feature group and their widths differ: DeepFM
+> takes all thirteen groups at **4035D**, Causal **539D**, and OT only
+> `extended_source` + `multi_source` at **175D**. "Same input, read
+> differently" is a V1 statement; under V2 it becomes *different inputs,
+> read differently*.
 
 ### The gate as an attention distribution
 

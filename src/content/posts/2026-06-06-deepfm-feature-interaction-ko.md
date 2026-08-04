@@ -215,14 +215,23 @@ $448 \to 256 \to 128 \to 64$ 로 압축된다.
 역전파한다. 이것이 Wide & Deep 의 수작업 교차 피처 파이프라인을
 제거하고, 두 절반이 일관되게 유지되는 이유다.
 
-필드 자체가 프로젝트의 기여다. 644D 벡터는 **28개 의미 필드** 로
-슬라이싱된다 — `rfm`(34D), 4개로 분할된 category 필드
+필드 자체가 프로젝트의 기여다. 피처 벡터는 의미 필드로 슬라이싱된다 —
+`rfm`(34D), 4개로 분할된 category 필드
 (`customer_cat`/`product_cat`/`region_cat`/`channel_cat`, 각 16D),
-`transaction`(80D), `deposit`, `investment`, `mamba`(50D), `economics`,
-`merchant_hierarchy`(21D) 등 — 각각 자기 `nn.Linear(dᵢ, 16)` 으로 16D 에
-프로젝션된다. 이로써 임베딩 파라미터는
-$\sum_i d_i \times 16 = 644\times16 = 10{,}304$ 개, 28 필드는
-$28\times27/2 = 378$ 가지 쌍별 FM 상호작용을 준다.
+`transaction`(80D), `deposit`(20D), `investment`(18D), `mamba`(50D),
+`economics`(17D), `merchant_hierarchy`(27D) 등 — 각각 자기
+`nn.Linear(dᵢ, 16)` 으로 16D 에 프로젝션된다. 현재 코드의 기본 스펙
+`DEEPFM_FIELD_SPEC` 은 **31개 필드, 합 771D** 이고(`deepfm_expert.py`),
+따라서 임베딩 파라미터는 $\sum_i d_i \times 16 = 771\times16 = 12{,}336$
+개, 31 필드는 $31\times30/2 = 465$ 가지 쌍별 FM 상호작용을 준다.
+
+> **어느 숫자가 언제인가.** 771D 는 FE 산출측(v3.16) 기준의 기본 스펙이고,
+> 피처 계약(734D V1 / 4035D V2)과는 구성이 다르다 — `log_transform`(61D)
+> 과 `missing_flag`(6D) 를 포함하고 `raw_power_law` 를 55D 로 잡는 등
+> 산출측 뷰이기 때문이다. 실제 학습 경로에서는 `PLEClusterAdaTT` 가
+> 활성 계약에 맞는 `field_dims` 를 주입하므로, 운영 V2 에서 DeepFM 이
+> 받는 폭은 **4035D** 다. 아래 "역사적 배경" 의 28 필드 · 644D · 378 쌍
+> 은 v3.11 시점 수치다.
 
 > **역사적 배경.** 기존 64D `category` 블록을 4개의 16D 서브필드로 나눈
 > 것(v3.11)은 의도적이다 — FM 은 필드 *내부* 를 교차하지 않으므로, 단일
@@ -299,9 +308,10 @@ Expert 들과 함께 PLE CGC gate 에서 만나 태스크별로 혼합된다.
 | 6 | output: Linear→LN→SiLU | `[B, 64]` |
 | 7 | interpret projection | `[B, 4]` |
 
-DeepFM 옆에서 두 Expert 가 *같은* 644D 를 읽고 역시 64D 를 낸다 — Causal
-Expert(비대칭 DAG, $W_{ij}\neq W_{ji}$)와 Optimal-Transport Expert(거리,
-$W(\mu,\nu)\geq 0$). DeepFM 의 기여는 둘이 줄 수 없는 구조다 — *대칭* 내적
+DeepFM 옆에서 두 Expert 가 역시 64D 를 낸다 — Causal Expert(비대칭 DAG,
+$W_{ij}\neq W_{ji}$)와 Optimal-Transport Expert(거리,
+$W(\mu,\nu)\geq 0$). V1 에서는 셋이 같은 734D 텐서를 읽었지만, 운영 V2
+에서는 그룹 라우팅으로 갈라진다 — DeepFM 4035D, Causal 539D, OT 175D. DeepFM 의 기여는 둘이 줄 수 없는 구조다 — *대칭* 내적
 $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$. CGC gate 가 이 관점들을
 태스크별로 가중하므로, LTV 태스크는 DeepFM 의 교차 패턴에 기대고 churn
 태스크는 인과 구조에 기댈 수 있다. `domain_experts: ["deepfm"]` 로

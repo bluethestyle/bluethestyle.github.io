@@ -299,6 +299,11 @@ BIC 모니터(`validate_k_range()`, $[5, 30]$)가 최적 K 가 현재 K 와
 배치 순서는 *Economics → GMM → 734D 통합* 이 되어야 하며, DAG 에서
 `ExternalTaskSensor` 로 보장된다.
 
+> **계약은 그 뒤로 갱신됐다.** 위 734D 는 V1 피처 계약이다. 프로젝트는
+> 2026-07-02 자로 V2 strict 계약으로 전환했고, 운영 입력 폭은 **4035D** 다 —
+> 734D 는 폐기된 게 아니라 V2 의 _공유 베이스 8그룹_ 으로 남고, 여기에
+> lag/rolling/product 계열 3301D 가 덧붙어 4035D 가 된다.
+
 후속에서 20D 확률 블록은 `PLEClusterInput` 의 `cluster_probs` 필드로
 전달되어 `GroupTaskExpertBasket` 의 **소프트 라우팅** 을 구동한다. 이는
 태스크마다 20개 클러스터 서브헤드를 운용하고 소속 벡터로 혼합한다.

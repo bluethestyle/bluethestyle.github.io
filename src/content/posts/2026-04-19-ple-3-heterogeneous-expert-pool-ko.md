@@ -220,11 +220,19 @@ $$W_1(\mu, \nu) = \inf_{\gamma \in \Pi(\mu, \nu)} \int \|x - y\|_1 \, d\gamma(x,
 
 PLE-2 에서 이종 Expert Pool 을 쓰는 이유 — 파라미터 효율, 해석가능성, 자연스러운 역할 분화 — 를 정리했다. 여기서 한 줄 덧붙인다: **이 7명은 서로를 환원하지 못한다.** 그 증거가 3명의 같은 입력 실험이다.
 
-DeepFM, Causal, OT 는 **정확히 같은 644D 정규화 피처 벡터** 를 입력으로 받는다. 그런데 셋은 각자 전혀 다른 수학 구조를 뽑는다.
+DeepFM, Causal, OT 는 **정확히 같은 734D 피처 텐서** 를 입력으로 받는다 (`model_config.yaml` 의 V1 값은 셋 다 `input_dim: 734` 다 — 644D 는 raw power-law 90D 를 뺀 *normalized 소집합* 이지 Expert 입력 폭이 아니다). 그런데 셋은 각자 전혀 다른 수학 구조를 뽑는다.
 
 - DeepFM: **대칭 교차** — $\langle v_i, v_j \rangle = \langle v_j, v_i \rangle$
 - Causal: **비대칭 인과** — $X \to Y$ 는 $Y \to X$ 와 다르다
 - OT: **분포 기하** — 프로토타입들과의 Wasserstein 거리 패턴
+
+> **V2 에서는 입력이 갈라진다.** 위 "같은 입력" 논증은 V1 계약 기준이다.
+> 2026-07-02 V2 strict 전환 이후 Expert 는 피처 그룹 단위로 라우팅되어
+> DeepFM 은 13개 그룹 전부 **4035D**, Causal 은 `base`+`multi_source`+
+> `domain`+`multidisciplinary`+`model_derived` **539D**, OT 는
+> `extended_source`+`multi_source` **175D** 를 받는다. 세 구조가 교환
+> 불가능하다는 논지 자체는 그대로지만, 그 근거가 *같은 입력의 다른 독법* 에서
+> *애초에 다른 입력* 으로 바뀐 셈이다.
 
 같은 피처 집합에서 뽑는 세 구조가 수학적으로 *교환 불가능* 하다는 것 — 하나가 다른 둘을 대체할 수 없다는 것 — 이 이종 pool 의 핵심 정당화다. 나머지 4명 (LightGCN, Unified HGCN, Temporal, PersLay) 은 각자 고유한 도메인 입력 — 그래프, 쌍곡 좌표, 시퀀스, persistence diagram — 을 받아 단일 피처 벡터로는 볼 수 없는 단면들을 본다.
 

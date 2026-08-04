@@ -322,6 +322,12 @@ across the 18 tasks — letting the model tell apart "customers with the
 same average spend but different structure," exactly the case a raw mean
 collapses.
 
+> **The contract has since moved.** The 734D above is the V1 feature
+> contract. On 2026-07-02 the project switched to the V2 strict contract
+> and the operational input width is **4035D** — 734D was not discarded;
+> it remains V2's _shared base of eight groups_, with the
+> lag/rolling/product families (3301D) appended on top.
+
 The features earn their place downstream in two concrete ways. First, a
 `DebitCardIncomeConstraints` layer turns the income split into hard and
 soft rules — a premium-tier card is excluded when `permanent_income_avg`

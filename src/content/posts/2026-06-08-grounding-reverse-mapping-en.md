@@ -162,6 +162,12 @@ is the V1-compatible structure: 644 normalized features plus 90 raw
 power-law features. The 644 normalized dimensions decompose into seven
 contiguous ranges:
 
+> **The contract has since moved.** The 734D above is the V1 feature
+> contract. On 2026-07-02 the project switched to the V2 strict contract
+> and the operational input width is **4035D** — 734D was not discarded;
+> it remains V2's _shared base of eight groups_, with the
+> lag/rolling/product families (3301D) appended on top.
+
 $$ 238_{\text{profile}} + 91_{\text{multi\_source}} + 84_{\text{extended}} + 159_{\text{domain}} + 27_{\text{model\_derived}} + 24_{\text{multi\_disc}} + 21_{\text{merchant}} = 644 $$
 
 Each range is a slice of contiguous indices with a name and a

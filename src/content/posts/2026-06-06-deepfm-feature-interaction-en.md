@@ -238,14 +238,25 @@ parallel, and back-propagate into it together. That is what removes the
 hand-built cross-feature pipeline of Wide & Deep, and it is why both
 halves stay consistent.
 
-The fields themselves are the project's contribution. The 644D vector is
-sliced into **28 semantic fields** — `rfm` (34D), four split category
+The fields themselves are the project's contribution. The feature vector
+is sliced into semantic fields — `rfm` (34D), four split category
 fields (`customer_cat`/`product_cat`/`region_cat`/`channel_cat`, 16D
-each), `transaction` (80D), `deposit`, `investment`, `mamba` (50D),
-`economics`, `merchant_hierarchy` (21D), and so on — each projected to
-16D by its own `nn.Linear(dᵢ, 16)`. That gives $\sum_i d_i \times 16 = 644\times16 = 10{,}304$
-embedding parameters, with 28 fields yielding $28\times27/2 = 378$
-pairwise FM interactions.
+each), `transaction` (80D), `deposit` (20D), `investment` (18D), `mamba`
+(50D), `economics` (17D), `merchant_hierarchy` (27D), and so on — each
+projected to 16D by its own `nn.Linear(dᵢ, 16)`. The current default spec
+`DEEPFM_FIELD_SPEC` in `deepfm_expert.py` holds **31 fields summing to
+771D**, so the embedding parameters come to
+$\sum_i d_i \times 16 = 771\times16 = 12{,}336$, with 31 fields yielding
+$31\times30/2 = 465$ pairwise FM interactions.
+
+> **Which number is from when.** 771D is the producer-side (v3.16)
+> default spec, and its composition differs from the feature contract
+> (734D V1 / 4035D V2) — it carries `log_transform` (61D) and
+> `missing_flag` (6D) and counts `raw_power_law` as 55D. On the real
+> training path `PLEClusterAdaTT` injects `field_dims` matching the
+> active contract, so the width DeepFM actually receives under
+> operational V2 is **4035D**. The 28 fields / 644D / 378 pairs in
+> "Historical context" below are v3.11-era figures.
 
 > **Historical context.** Splitting the old 64D `category` block into
 > four 16D subfields (v3.11) was deliberate: FM never crosses *within* a
@@ -332,9 +343,11 @@ the PLE CGC gate, which mixes them per task.
 | 6 | output: Linear→LN→SiLU | `[B, 64]` |
 | 7 | interpret projection | `[B, 4]` |
 
-Alongside DeepFM, two other Experts read the *same* 644D and also emit
-64D — the Causal Expert (asymmetric DAG, $W_{ij}\neq W_{ji}$) and the
-Optimal-Transport Expert (a distance, $W(\mu,\nu)\geq 0$). DeepFM's
+Alongside DeepFM, two other Experts also emit 64D — the Causal Expert
+(asymmetric DAG, $W_{ij}\neq W_{ji}$) and the Optimal-Transport Expert
+(a distance, $W(\mu,\nu)\geq 0$). Under V1 all three read the same 734D
+tensor; under operational V2 group routing splits them apart — DeepFM
+4035D, Causal 539D, OT 175D. DeepFM's
 contribution is the one structure they cannot give: the *symmetric*
 inner product $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$. The CGC gate
 weights these views per task, so an LTV task can lean on DeepFM's cross

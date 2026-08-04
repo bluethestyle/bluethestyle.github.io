@@ -218,11 +218,19 @@ $$W_1(\mu, \nu) = \inf_{\gamma \in \Pi(\mu, \nu)} \int \|x - y\|_1 \, d\gamma(x,
 
 ## Why all seven — cross-fertilization, not redundancy
 
-PLE-2 already argued the *why* of a heterogeneous pool — parameter efficiency, interpretability, natural specialization across tasks. One sentence to add here: **these seven do not reduce to one another.** The cleanest evidence is the same-input experiment. Three of the seven — DeepFM, Causal, Optimal Transport — take **the exact same 644D normalized feature vector** as input, and still extract three irreducibly different structures:
+PLE-2 already argued the *why* of a heterogeneous pool — parameter efficiency, interpretability, natural specialization across tasks. One sentence to add here: **these seven do not reduce to one another.** The cleanest evidence is the same-input experiment. Three of the seven — DeepFM, Causal, Optimal Transport — take **the exact same 734D feature tensor** as input (`model_config.yaml` sets `input_dim: 734` for all three under V1; 644D is the *normalized subset* — 734 minus the 90D raw power-law — not an Expert input width), and still extract three irreducibly different structures:
 
 - DeepFM extracts **symmetric crosses** — $\langle v_i, v_j \rangle = \langle v_j, v_i \rangle$.
 - Causal extracts **asymmetric directionality** — $X \to Y$ is not $Y \to X$.
 - OT extracts **distributional geometry** — Wasserstein distance pattern against prototype distributions.
+
+> **Under V2 the inputs diverge.** The "same input" argument above holds for
+> the V1 contract. Since the V2 strict switch on 2026-07-02, Experts are routed
+> by feature group: DeepFM takes all thirteen groups at **4035D**, Causal takes
+> `base` + `multi_source` + `domain` + `multidisciplinary` + `model_derived` at
+> **539D**, and OT takes `extended_source` + `multi_source` at **175D**. The
+> non-commutability argument still stands, but its basis shifts from *the same
+> input read differently* to *different inputs entirely*.
 
 Three mathematically non-commutable structures from the same feature set — none of the three can be reduced to a function of the others. That is the core justification for the heterogeneous pool. The remaining four (LightGCN, Unified HGCN, Temporal, PersLay) each take domain-specific inputs — graph neighborhoods, hyperbolic coordinates, raw sequences, persistence diagrams — and expose yet another slice of the same customer that the feature vector alone cannot reveal.
 

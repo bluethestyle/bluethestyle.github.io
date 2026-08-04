@@ -1,0 +1,238 @@
+# CLAUDE.md — bluethestyle.github.io
+
+기술 블로그(Astro 5). 이 문서는 **포스트의 기술적 주장을 무엇에 대조해서 검증하는가** 를 고정한다.
+포스트 내용을 수정하기 전에 반드시 읽는다.
+
+## 1. 저장소 구조
+
+- 빌드: Astro 5 + MDX, `remark-math` / `rehype-katex` (수식), `astro.config.mjs` 의 `remarkMermaid` 가
+  ` ```mermaid ` 블록을 `<pre class="mermaid">` 로 변환 → `Base.astro` 가 클라이언트에서 렌더.
+- 포스트: [src/content/posts/](src/content/posts/) — **43편 × ko/en = 86 파일**.
+  파일명 규약 `YYYY-MM-DD-<slug>-<ko|en>.md`.
+- 시리즈: `study-thread`(27) · `three-months`(8) · `mrm-thread`(6) · commentary 2편(시리즈 미지정).
+- 프론트매터 키: `title, date, categories, tags, lang, excerpt, series, part,
+  alt_lang, next_title, next_desc, next_status`.
+  `alt_lang` 은 반대 언어판의 **URL 경로**(`/YYYY/MM/DD/<slug>-<lang>/`)여야 한다.
+
+## 2. 원본 프로젝트와 근거 우선순위
+
+포스트가 서술하는 시스템의 실물은 온프렘 프로젝트 `C:\workspace\gotothemoon` 이다.
+
+**충돌 시 우선순위 — 높은 쪽이 이긴다:**
+
+1. **실제 코드** — `gotothemoon/workspace/code/src/**` (단, `src/_legacy_merlin/**` 는 격리된 死코드이므로 근거로 쓰지 않는다)
+2. **설계서** — `gotothemoon/docs/설계서/*.md`
+3. **기술참조서** — `gotothemoon/docs/기술참조서/*.typ` (포스트가 명시하는 출처)
+
+### 불일치 3분류 — 처리 방식이 다르다
+
+| 유형 | 판정 | 조치 |
+|---|---|---|
+| ① 오류 | 블로그가 원본과 불일치 | 블로그 수정 |
+| ② 노후 | 작성 시점엔 맞았으나 프로젝트가 이후 변경됨 | 블로그 수정 + 변경 시점 명시 |
+| ③ 원본 미결 | 코드/문서 자체가 모순이거나 마이그레이션 중 | **수정하지 말고 보고** — 결정은 엔지니어 몫 |
+
+③ 을 ① 처럼 자동 수정하는 것이 이 저장소에서 가장 큰 위험이다.
+
+## 3. 포스트 ↔ 근거 문서 매핑
+
+`study-thread` 27편은 기술참조서 18종과 사실상 1:1 대응한다. (ko/en 쌍은 동일 근거를 공유)
+
+| # | 포스트 slug | 근거 문서 (`docs/기술참조서/`) |
+|---|---|---|
+| 1–3, 5–6 | `ple-1` ~ `ple-6` | `PLE_기술_참조서.typ` |
+| 4 | `ple-4-cgc-hmm-routing` | `PLE_기술_참조서.typ` (본문에 출처 미표기 — 추정) |
+| 7–10 | `adatt-1` ~ `adatt-4` | `adaTT_기술_참조서.typ` |
+| 11–12 | `tda-1-topology-of-spending`, `tda-2-perslay-set-function` | `PersLay_기술_참조서.typ` |
+| 13 | `deepfm-feature-interaction` | `DeepFM_기술_참조서.typ` |
+| 14 | `hgcn-hyperbolic-graph` | `GCN_기술_참조서.typ` |
+| 15 | `causal-ot-expert` | `CausalOT_기술_참조서.typ` |
+| 16 | `temporal-ensemble` | `Temporal_기술_참조서.typ` |
+| 17 | `economics-expert` | `Economics_피처_기술_참조서.typ` |
+| 18 | `tda-features-offline` | `TDA_피처_기술_참조서.typ` |
+| 19 | `hmm-regime-features` | `HMM_피처_기술_참조서.typ` |
+| 20 | `gmm-soft-clustering` | `GMM_피처_기술_참조서.typ` |
+| 21 | `timeseries-features` | `TimeSeries_피처_기술_참조서.typ` |
+| 22 | `multidisciplinary-features` | `Multidisciplinary_피처_기술_참조서.typ` |
+| 23 | `knowledge-distillation` | `지식증류_기술_참조서.typ` |
+| 24 | `inference-scoring` | `추론_스코어링_기술_참조서.typ` |
+| 25 | `reason-generation` | `추천사유생성_기술_참조서.typ` |
+| 26 | `grounding-reverse-mapping` | `그라운딩_피쳐역매핑_기술_참조서.typ` |
+| 27 | `qwen-vllm-serving` | `Qwen_vLLM_기술_참조서.typ` |
+
+`three-months` · `mrm-thread` · commentary 는 서사/회고 성격으로 단일 근거 문서가 없다.
+기술 주장이 나오면 코드와 설계서에 직접 대조한다.
+
+## 4. 핵심 코드 근거 위치
+
+| 주제 | 파일 |
+|---|---|
+| 피처 차원 계약 (V1/V2) | `workspace/code/src/features/integration/feature_contract.py` |
+| PLE + adaTT 모델 본체 | `workspace/code/src/models/ple_cluster_adatt.py` |
+| 태스크 정의 · 클래스 수 · 그룹 | `workspace/code/src/config/active_tasks.py` |
+| 차원 불일치 이력 | `gotothemoon/FEATURE_DIM_RECONCILIATION.md` (2026-05-29) |
+
+## 5. 교차 주장 재정 (확정, 2026-08-04)
+
+여러 배치를 관통하는 숫자를 **코드에 직접 대조해 확정**한 결과. Phase 2 배치는 이 판정을
+전제로 진행하며, 배치 안에서 재판정하지 않는다.
+
+근거: `feature_contract.py` 의 `V2_BASE_GROUPS` / `V2_APPEND_FEATURE_GROUPS` /
+`SEPARATE_INPUT_GROUPS` 실값, `task_feature_mapper.py`, `ple_cluster_adatt.py`.
+
+| 숫자 | 코드 근거 | 판정 |
+|---|---|---|
+| **644D** | `V2_BASE_GROUPS` 앞 7그룹 합 = 238+91+159+24+27+84+21 | ✅ 정확 |
+| **90D** | `("raw_power_law", 90)` | ✅ 정확 |
+| **734D** | 644 + 90 = 734 = **V2 공유 베이스 8그룹** | ⚠️ 구조는 정확, "메인 텐서 폭" 서술은 노후 |
+| **4035D** | 734 + `V2_APPEND`(1440+1440+360+30+31 = 3301) | 🔴 **블로그 0회 — 누락** |
+| **159D** domain | *"domain stays at the V1-frozen 159 slot"* | ✅ V2 에서도 유지 |
+| **64D** | `group_output_dim`/`output_dim` 기본 64, `_cgc_mean_dim = 64.0` | ✅ 현행 (128D 와 비대칭 병존) |
+| **22D** | `task_feature_mapper.py:110` `"gmm_cluster": 22` | ✅ 정확 |
+| **48D** HMM | `hmm_journey`/`lifecycle`/`behavior` 각 16 = 48, `PLEClusterInput.hmm_*` 별도 전달 | ✅ 정확 |
+| **5D** hmm_summary | `model_derived` 27 = hmm_summary 5 + bandit 4 + lnn 18 | ✅ 정확 |
+| **70D / 58D** TDA | 아래 참조 | ✅ **둘 다 정확** — 같은 슬롯의 두 관점 |
+
+### 70D vs 58D — 모순이 아니다
+
+`domain` 159 = **147 real + 12 pad**. real 내역은 tda_short 24 + tda_long 24 +
+phase_transition 10 + gmm_cluster 22 + mamba_temporal 50 + economics 17 = 147.
+
+- **스키마 라벨** 기준 TDA = 24 + **36** + 10 = **70**
+- **실제 산출** 기준 TDA = 24 + **24** + 10 = **58**
+- **70 − 58 = 12 = domain 그룹의 pad 와 정확히 일치**
+
+즉 12 pad 의 정체가 `tda_long` 의 라벨(36) 대비 산출(24) 부족분이다. 블로그의 70D 는
+슬롯 폭을, 코드의 58D 는 실산출을 말하는 것으로 **같은 대상의 두 관점**이다.
+
+`configs/model_config.yaml` 의 `perslay.input_dim` 주석이 이를 날짜와 함께 확증한다 —
+*"[2026-06-24: 70→58, tda_long 실측 24D 정정(2026-04-23) 반영. 구 70은 tda_long
+36D(β2/H2) 미생산분]"*. **PersLay Expert 의 입력은 58D 가 확정값**이며, 2026-06-05 자
+`tda-2` 포스트의 70D 폴백 서술은 그 변경 이전 시점이다(해당 포스트에 주석 추가 완료).
+[tda-features-offline-ko.md](src/content/posts/2026-06-07-tda-features-offline-ko.md) 는 이미
+"스키마 라벨 36 / 산출 24" 를 본문에 기록하고 있다. **수정 대상 아님.**
+(단 오프라인 도메인 블록과 PersLay Expert 입력 `[batch,58]` 은 층위가 다르니 혼동 금지.)
+
+### Expert 라우팅 — 교차 재정 (배치마다 재판정 금지)
+
+Expert 는 텐서 전체를 받지 않는다. **피처 그룹 단위로 라우팅**된다.
+SoT = `ple_cluster_adatt.py` 의 `DEFAULT_EXPERT_ROUTING_V2`
+(`configs/model_config.yaml` 의 `v2_expert_dims` 가 참조값으로 일치).
+
+| Expert | 라우팅 그룹 | 폭 |
+|---|---|---|
+| `deepfm` / `xdeepfm` / `autoint` | 13개 그룹 전부 | **4035D** |
+| `causal` | base + multi_source + domain + multidisciplinary + model_derived | **539D** |
+| `optimal_transport` (= `ot`) | extended_source + multi_source | **175D** |
+| `lightgcn` | 64 + product_top30 | **95D** |
+
+- Expert 출력은 별개다 — `output_dim` 기본 **64D**(일부 128D). 입력 폭과 혼동 금지.
+- **"DeepFM · Causal · OT 가 같은 644D 정규화 벡터를 입력받는다" 는 서술은 틀렸다.**
+  `model_config.yaml` 의 V1 값은 셋 다 `input_dim: 734` 다 (L225 · L286 · L318).
+  644D 는 *normalized 소집합*(= 734 − raw_power_law 90)이지 Expert 입력 폭이 아니다.
+
+  | Expert | V1 `input_dim` | V2 override |
+  |---|---|---|
+  | `deepfm` | 734 | **4035** |
+  | `causal` | 734 | **539** |
+  | `optimal_transport` | 734 | **175** |
+
+  즉 V1 에서는 셋이 같은 폭(734)을 받은 것이 맞지만 그 값은 644 가 아니고,
+  V2 에서는 **더 이상 같지도 않다**.
+
+### DeepFM 필드 분할 — 교차 재정
+
+`DEEPFM_FIELD_SPEC` (`src/models/experts/deepfm_expert.py:171`) 실측 = **31 필드, 합 771D**.
+파일 자신의 주석도 *"이 기본 spec의 합은 771D다"* 라고 명시한다.
+
+⚠️ `configs/model_config.yaml:220` 주석은 *"644D를 28개 서브그룹(필드)으로 분할"* 이라고
+쓰지만 **낡았다**. 같은 파일 L228 은 *"(31필드)"* 라고 바르게 적어 자기모순이다.
+우선순위(코드 > 설정 주석)에 따라 **31 필드 / 771D** 를 정답으로 한다.
+블로그가 "28개 의미 필드" 라고 쓴 것은 이 낡은 yaml 주석을 따라간 결과다.
+- 어떤 피처 블록이 어느 Expert 에 닿는지 주장할 때는 반드시 위 라우팅 표를 확인한다.
+  예: `multidisciplinary` 24D 는 **DeepFM 과 Causal 에만** 닿고 OT 에는 닿지 않는다.
+
+### 유일한 실질 결함 — V2 운영 계약 층 누락
+
+블로그의 차원 서술은 **V1 기준으로 정확하지만 V1 에서 끝나 있다.** 코드는 세 곳에서
+블로그와 동일한 프레이밍에 V2 를 덧붙여 쓴다:
+
+> `feature_reverse_mapper.py:78` · `ai_risk_classifier.py:552` · `triton_feature_preprocessor.py:93`
+> — *"SoT(feature_contract.py): V1 normalized=644(domain 159) / main 734 / **운영 strict V2 4035**"*
+
+그리고 `feature_contract.py` 는 2026-07-02 자로 V1 런타임 은퇴(`is_v2_enabled()` 항상 `True`).
+
+**따라서 수정은 치환이 아니라 가산이다** — 734D 를 4035D 로 바꾸는 게 아니라,
+734D 를 V2 의 공유 베이스로 자리매김하고 운영 계약이 4035D 임을 덧붙인다.
+대상은 734D 를 언급하는 9편(p17~p22, p24~p26)의 ko/en 쌍.
+
+## 6. 원본 프로젝트 쪽 결함 (블로그 문제 아님 — 보고용)
+
+- `ple_cluster_adatt.py:118` 주석이 *"strict V2 4057D"* 라고 쓰지만, `feature_contract.py` 는
+  4057/domain=181 확장을 2026-06-16 에 되돌리고 **4035** 로 확정했다. 주석이 노후.
+- `distillation/soft_label_generator.py:1512` 는 `life_stage: {"num_classes": 6}` 인데,
+  `config/active_tasks.py:70` 은 2026-07-08 자로 **3-class** `{student, adult, senior}`.
+- `task_feature_mapper.py:87` 주석이 *"hmm_journey/lifecycle/behavior: 각 10D"* 라고 쓰지만,
+  같은 파일 L158–160 은 각 **16D**(합 48D)이고 L124 도 *"HMM Triple-Mode 48D"* 라고 명시한다.
+  L87 주석이 노후.
+- `configs/model_config.yaml:82` 는 `expert_input_version: v1` 인데, `feature_contract.py` 의
+  `is_v2_enabled()` 는 2026-07-02 부터 항상 `True` 라 실제로는 V2 경로만 탄다. 설정값이 死값.
+
+## 6b. 미결 — 사용자 판단 필요 (자동 수정 금지)
+
+**"7개 이종 Shared Expert" 서술 vs 코드의 활성 6개.**
+`configs/model_config.yaml` 의 `shared_experts` 중 `enabled: true` 는
+**perslay · deepfm · temporal · causal · optimal_transport · unified_hgcn = 6개**다.
+**`lightgcn` 은 `enabled: false`** 이고 `hgcn` / `merchant_hgcn` / `din` / `xdeepfm` /
+`autoint` 도 전부 `false`.
+
+블로그는 여러 편에서 *"7개 이종 Expert (DeepFM · LightGCN · UHGCN · Temporal ·
+PersLay · Causal · OT)"* 로 서술한다 — p2 · p3 · p6, `three-months` ep3 · ep4.
+반면 p24 는 *"734D 6-Expert 모델"* 이라 써서 블로그 내부에서도 갈린다.
+
+판단이 갈리는 지점:
+- p3 는 *"왜 이 7명을 뽑았나"* 라는 **설계 근거** 글이라, 설계된 pool 을 7개로
+  서술하는 것이 반드시 오류는 아니다.
+- 반면 p2 의 Expert 비교표나 p6 의 사양표는 **현재 구조** 를 기술하므로
+  활성 6개와 어긋난다.
+- `lightgcn` 의 `enabled: false` 가 영구 폐기인지 일시 비활성인지는 코드만으로
+  판정되지 않는다 (참고: `hgcn` 은 *"deprecated → unified_hgcn 으로 통합"* 이라
+  주석이 명시하지만 `lightgcn` 에는 그런 주석이 없다).
+
+→ **"설계된 7 / 활성 6" 을 어떻게 표기할지는 저자 결정 사항.** 결정 전까지 수정하지 않는다.
+
+**태스크 개수 — 13 / 15 / 16 / 17 이 공존한다.**
+`src/config/active_tasks.py` 의 `TASK_METADATA` 는 **17개** 정의, 그중 `uplift` 와
+`category_uplift` 가 `"enabled": False` 라 **활성 15개**다.
+
+블로그 표기는 갈린다:
+- `ep1-premise` · `ple-1` · `ple-4` 는 **13개** 라 쓰되, *공개 AWS 벤치마크 버전* 임을
+  명시한다 (ple-4: *"이 도식은 온프렘 기술참조서의 일반 로스터를 쓴다. 운영 벤치마크는
+  13개 태스크다"*). 이 구분이 있으므로 오류로 단정할 수 없다.
+- 다만 `ple-2` 는 *"우리가 다루는 13개 태스크"* 라고 써서 온프렘 프로젝트의 태스크로 읽힌다.
+- `causal-ot-expert` 는 *"16개 task tower"* 라 쓰는데 이 숫자는 코드 어디에도 없다.
+
+→ 온프렘(15/17) 과 공개 벤치마크(13) 를 어느 글에서 어느 기준으로 쓸지는 저자 결정 사항.
+
+## 7. 검토 절차
+
+1. **Phase 0** — 주장 대장 기계 추출(차원/클래스 수/상태 수/코드 식별자). 현재 **1,911건**.
+2. **Phase 1** — 위 §3 매핑 + §2 우선순위 고정.
+3. **Phase 2** — **원본 문서 단위 배치** 검증. 배치 1개 = `.typ` 1개 + 해당 ko/en 포스트.
+   포스트 단위가 아니라 근거 단위로 묶어야 컨텍스트가 감당된다.
+
+   ⚠️ **배치 안에서도 코드가 1순위다.** 참조서 대조만으로 배치를 끝내지 말 것.
+   `.typ` 는 포스트가 무엇을 근거로 썼는지 알려줄 뿐이고, 참조서 자체가 노후일 수 있다
+   (실제로 §5 의 734D 는 참조서가 낡은 경우였다). 배치마다 최소한 다음을 코드로 확인한다:
+   - 차원·클래스 수·상태 수의 실값 (`feature_contract.py`, `task_feature_mapper.py`, `active_tasks.py`)
+   - 피처 키 이름 (`configs/feature_schema.yaml`)
+   - **어느 Expert/모듈이 그 블록을 소비하는가** (`DEFAULT_EXPERT_ROUTING_V2`)
+   
+   배치 1(p22)에서 참조서만 봤을 때는 "전부 일치" 였으나, 코드를 보고서야
+   "24D 가 세 Expert(DeepFM/Causal/OT)에 644D 슬라이스로 투입된다" 는 서술이
+   **사실 오류**임이 드러났다. 소비처 주장은 참조서로 검증되지 않는다.
+4. **Phase 3** — ko/en 정합성(숫자·구조·주장 일치) 별도 패스.
+5. **Phase 4** — 배치 단위 수정 + 배치 단위 커밋.
+
+전체를 한 번에 읽는 통짜 검토는 금지. 블로그 1.72MB + 기술참조서 1.87MB ≈ 90만 토큰으로,
+컨텍스트에 넣더라도 추론 여지가 남지 않아 검증이 아니라 훑기가 된다.

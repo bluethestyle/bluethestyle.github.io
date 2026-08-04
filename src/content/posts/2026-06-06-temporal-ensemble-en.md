@@ -335,7 +335,8 @@ $\mathbf{g}$ is its barycentric coordinate.
 
 The Expert consumes two sequences and emits one vector. Inputs:
 `txn_seq` of shape `[B, 180, 16]` (16 = card 8D + deposit 8D) and
-`session_seq` of shape `[B, 90, 8]`; each sub-model keeps separate
+`session_seq` of shape `[B, 90, 4]` (4 = `sess_duration` / `page_views` /
+`elapsed_sec` / `hour`); each sub-model keeps separate
 txn/session instances and concatenates them before the gate. Output: a
 single **64D** vector that feeds the PLE CGC gate, which mixes it with the
 other Experts per task.

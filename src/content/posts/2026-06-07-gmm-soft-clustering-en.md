@@ -335,6 +335,12 @@ come from the **Economics** module, so the batch ordering is
 *Economics → GMM → 734D integration*, enforced in the DAG via an
 `ExternalTaskSensor`.
 
+> **The contract has since moved.** The 734D above is the V1 feature
+> contract. On 2026-07-02 the project switched to the V2 strict contract
+> and the operational input width is **4035D** — 734D was not discarded;
+> it remains V2's _shared base of eight groups_, with the
+> lag/rolling/product families (3301D) appended on top.
+
 Downstream, the 20D probability block is passed as the `cluster_probs`
 field of `PLEClusterInput` and drives the **soft routing** in
 `GroupTaskExpertBasket`, which keeps 20 cluster sub-heads per task and

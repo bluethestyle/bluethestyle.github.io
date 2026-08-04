@@ -460,10 +460,19 @@ all of it. But the reference is candid about the *current* state, and
 this series quotes its sources honestly: in the live configuration the
 raw-diagram path is **switched off** (`use_raw_diagram: false`, with
 the raw-diagram Parquet not currently injected), so production
-inference runs the **pre-computed fallback** — the 70-D offline
-summary (24-D short + 36-D long + 10-D phase) through a 3-layer MLP,
-$70 \to 64 \to 64 \to 64$. If even those features are missing, the
+inference runs the **pre-computed fallback** — the offline summary
+features through a 3-layer MLP. If even those features are missing, the
 Expert degrades to a zero vector rather than crashing the batch.
+
+> **The number changed after this post.** At the time of writing the
+> fallback width was **70-D** (24-D short + schema-labelled 36-D long +
+> 10-D phase) and the MLP was $70 \to 64 \to 64 \to 64$. On 2026-06-24
+> the PersLay Expert's `input_dim` was corrected to **58-D**, because
+> `tda_long` actually produces **24-D**, not the 36-D its schema label
+> claims (the β₂/H₂ portion is never generated). So 24 + 24 + 10 =
+> **58**, and the 12-D difference survives as pad inside the Domain
+> group. Counted by schema label the offline block is 70-D; counted by
+> what is actually produced it is 58-D.
 
 The fallback trades per-point detail for robustness — aggregated
 statistics cannot see what individual $(b,d)$ points encode. The

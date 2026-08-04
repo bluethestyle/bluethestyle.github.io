@@ -299,8 +299,8 @@ softmax 가 $g_1 + g_2 + g_3 = 1$ 을 강제한다. 각 모델 출력은 먼저 
 ## Expert 가 PLE 에 꽂히는 자리
 
 Expert 는 두 시퀀스를 받아 하나의 벡터를 낸다. 입력: `[B, 180, 16]`
-형태의 `txn_seq`(16 = card 8D + deposit 8D)와 `[B, 90, 8]` 형태의
-`session_seq`. 각 서브모델은 txn/session 전용 인스턴스를 별도로 유지하고
+형태의 `txn_seq`(16 = card 8D + deposit 8D)와 `[B, 90, 4]` 형태의
+`session_seq`(4 = `sess_duration` / `page_views` / `elapsed_sec` / `hour`). 각 서브모델은 txn/session 전용 인스턴스를 별도로 유지하고
 게이트 앞에서 concat 한다. 출력: 단일 **64D** 벡터가 PLE CGC gate 로
 들어가 태스크별로 다른 Expert 와 혼합된다.
 

@@ -298,9 +298,23 @@ _낮은_ 엔트로피(규칙적, 예측 가능)를 갖고, 시점과 금액이 �
 스키마 레지스트리 `feature_schema.yaml` 이 `chemical_kinetics_001` ~
 `interference_008` 의 24개 키를 보관한다.
 
-다운스트림에서 24D 는 전체 734D 의 일부로 세 Shared Expert —
-**DeepFM**, **Causal**, **OT** — 에 자동 투입된다(모두 644D 정규화
-슬라이스). DeepFM 은 다학제 피처와 나머지 간 교차 패턴(예:
+> **계약은 그 뒤로 갱신됐다.** 위 734D 는 이 글이 근거로 삼은 V1 피처
+> 계약이다. 프로젝트는 2026-07-02 자로 V2 strict 계약으로 전환했고,
+> 운영 입력 폭은 **4035D** 다. 734D 가 폐기된 것은 아니다 — V2 의
+> _공유 베이스 8그룹_ 으로 그대로 남고, 여기에 lag/rolling/product
+> 계열 3301D 가 덧붙어 4035D 가 된다. 이 글의 24D 다학제 블록은 그
+> 베이스 안의 자리를 유지한다.
+
+다운스트림에서 24D 가 도달하는 Shared Expert 는 두 곳이다 —
+**DeepFM** 과 **Causal**. Expert 는 텐서 전체를 받지 않고 피처 그룹
+단위로 라우팅되며(`ple_cluster_adatt.py` 의 `DEFAULT_EXPERT_ROUTING_V2`),
+`multidisciplinary` 그룹을 라우팅에 포함하는 것이 이 둘뿐이기 때문이다.
+DeepFM 은 13개 그룹 전부, 즉 4035D 를 받는다. Causal 은 `base` +
+`multi_source` + `domain` + `multidisciplinary` + `model_derived` =
+539D 를 받는다. **OT** Expert 는 `extended_source` + `multi_source`
+= 175D 만 받으므로 다학제 블록이 닿지 않는다.
+
+DeepFM 은 다학제 피처와 나머지 간 교차 패턴(예:
 `spending_acceleration` × 이탈 확률)을 field interaction 으로 학습하고,
 Causal Expert 는 이들 사이의 인과 방향을 DAG 로 복원하려 한다. 참조서의
 태스크별 예상 기여도는 계측기를 태스크에 대응시킨다 — 화학 반응 속도론
@@ -308,7 +322,8 @@ Causal Expert 는 이들 사이의 인과 방향을 DAG 로 복원하려 한다.
 **cross-sell** 로, 범죄 패턴(버스트성/주기성)은 **timing** 과 소비 주기
 태스크로, 간섭(스펙트럼)은 **spending category** 와 merchant affinity 로.
 
-참조서가 거듭 강조하는 경고: 24D 는 734D 의 약 3.3%에 불과하고,
+참조서가 거듭 강조하는 경고: 24D 는 734D 의 약 3.3%(V2 4035D 기준
+0.6%)에 불과하고,
 아날로지에는 한계가 있다. 이 피처들은 패턴 포착 계측기이지 인과 설명이 아니다 —
 소비자는 분자가 아니다. 또한 다수가 데이터 품질에 의존한다(원형 분산은
 거래 시각이, SIR 비율은 MCC 매핑이 필요). 데이터가 부족하면 COALESCE

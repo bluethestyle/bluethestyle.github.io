@@ -346,9 +346,25 @@ main tensor (644D normalized + 90D raw power-law). The schema registry
 `feature_schema.yaml` holds the 24 keys, `chemical_kinetics_001` through
 `interference_008`.
 
-Downstream, the 24D rides into the model as part of the full 734D feeding
-three Shared Experts — **DeepFM**, **Causal**, and **OT** — all on the
-644D normalized slice. DeepFM learns cross patterns between the
+> **The contract has since moved.** The 734D above is the V1 feature
+> contract this post is grounded in. On 2026-07-02 the project switched
+> to the V2 strict contract, and the operational input width is now
+> **4035D**. 734D was not discarded — it remains V2's _shared base of
+> eight groups_, with the lag/rolling/product families (3301D) appended
+> on top to reach 4035D. The 24D multidisciplinary block keeps its slot
+> inside that base.
+
+Downstream, the 24D reaches exactly two Shared Experts — **DeepFM** and
+**Causal**. Experts do not receive the whole tensor; they are routed by
+feature group (`DEFAULT_EXPERT_ROUTING_V2` in `ple_cluster_adatt.py`),
+and these two are the only ones whose routing includes the
+`multidisciplinary` group. DeepFM takes all thirteen groups — the full
+4035D. Causal takes `base` + `multi_source` + `domain` +
+`multidisciplinary` + `model_derived` = 539D. The **OT** Expert takes
+only `extended_source` + `multi_source` = 175D, so the
+multidisciplinary block never reaches it.
+
+DeepFM learns cross patterns between the
 multidisciplinary features and the rest (e.g. `spending_acceleration` ×
 churn probability) as field interactions; the Causal Expert tries to
 recover causal direction among them as a DAG. The reference's expected
@@ -358,7 +374,8 @@ diffusion toward **NBA** and **cross-sell**; crime pattern (burstiness/
 periodicity) toward **timing** and consumption-cycle tasks; interference
 (spectral) toward **spending category** and merchant affinity.
 
-A warning the reference is careful to repeat: 24D is only ~3.3% of 734D,
+A warning the reference is careful to repeat: 24D is only ~3.3% of 734D
+(0.6% against V2's 4035D),
 and analogy has limits. The features are pattern-capture instruments, not
 causal explanations — a consumer is not a molecule. And many of them lean
 on data quality (circular variance needs transaction-time, SIR ratios

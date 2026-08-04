@@ -30,7 +30,7 @@ transport do.*
 > directed-acyclic causal graph over latent variables and intervenes on
 > it, and an **OT Expert** that turns each customer into a probability
 > distribution and measures its Wasserstein distance to learnable
-> prototypes. Both take the same normalized **644D** feature vector and
+> prototypes. Both take the same **734D** feature tensor and
 > both emit a **64D** representation into the CGC gate — yet they extract
 > mathematically opposite structures: one *asymmetric and acyclic*
 > (direction of causation), the other a *metric* (distributional
@@ -181,8 +181,8 @@ z$) and the causal structure simply evaporates.
 ## The Learned W and the Structural Equation
 
 Inside the Expert the pipeline is three stages: a **Compressor**
-squeezes the 644D input down to 32 causal variables
-($644\to128\to32$), the **structural causal model** intervenes, and a
+squeezes the input down to 32 causal variables
+($734\to128\to32$ under V1), the **structural causal model** intervenes, and a
 **Causal Encoder** lifts the result back to 64D ($32\to128\to64$). The
 intervention itself is a single, almost suspiciously simple equation:
 
@@ -303,7 +303,7 @@ distribution morphs into the other.
 
 In the Expert this becomes concrete:
 
-- **Customer distribution.** $\boldsymbol\mu = \operatorname{softmax}(\text{DistProjector}(\mathbf x)) \in \Delta^{32}$ — the 644D feature vector projected to a probability simplex over 32 latent categories.
+- **Customer distribution.** $\boldsymbol\mu = \operatorname{softmax}(\text{DistProjector}(\mathbf x)) \in \Delta^{32}$ — the feature vector projected to a probability simplex over 32 latent categories.
 - **Prototypes.** $\boldsymbol\nu_k = \operatorname{softmax}(\boldsymbol\ell_k) \in \Delta^{32}$, a bank of learnable reference distributions (class default 16, operational `n_ref=8`) — each a "typical customer type" the data clusters into (travel-heavy, savings-heavy, …) learned end-to-end, not hand-defined.
 - **Cost matrix.** $\mathbf C = \mathbf M^\top\mathbf M$, a learnable ground metric forced positive-semidefinite by the $\mathbf M^\top\mathbf M$ factorization — so no entry rewards transport (which would make Sinkhorn produce nonsense plans).
 
@@ -351,7 +351,7 @@ system* locating each customer by its distance to 16 reference points.
   <rect x="0" y="0" width="600" height="170" fill="#f8fafc" rx="8"/>
   <!-- x input -->
   <rect x="16" y="62" width="78" height="46" rx="6" fill="#f0fdf4" stroke="#0d9488" stroke-width="1"/>
-  <text x="55" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#0d9488">x [644]</text>
+  <text x="55" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#0d9488">x [734]</text>
   <text x="55" y="97" text-anchor="middle" font-size="9" fill="#64748b">features</text>
   <!-- softmax mu -->
   <rect x="120" y="62" width="92" height="46" rx="6" fill="#fce7f3" stroke="#e11d48" stroke-width="1"/>
@@ -394,9 +394,11 @@ main task gradient.
 
 ## Where the Experts Plug Into PLE
 
-Both Experts take the normalized **644D** feature vector (the V1
-compatibility path; under operational V2 they receive a per-group
-feature subset instead) and emit **64D**. v3.2 widened the CGC Gate
+Both Experts take the **734D** feature tensor under the V1 contract
+(`input_dim: 734` in `model_config.yaml`) and emit **64D**. Under
+operational V2 group routing splits them: Causal takes `base` +
+`multi_source` + `domain` + `multidisciplinary` + `model_derived` at
+**539D**, OT takes `extended_source` + `multi_source` at **175D**. v3.2 widened the CGC Gate
 Attention from $[B,5]$ to $[B,7]$ to admit them alongside the existing
 PersLay / DeepFM / Temporal / Unified H-GCN Experts. The gate then mixes
 all seven per task across the project's 16 task towers.
@@ -410,7 +412,7 @@ Expert? The reference gives three reasons:
 | Independent gating | the CGC gate can weight Causal high for churn, OT high for cross-sell — impossible if fused |
 | Swappability | Causal can swap NOTEARS→GES/PC, OT can swap Sinkhorn→Sliced-Wasserstein, independently |
 
-Three Experts (DeepFM, Causal, OT) read the *same* 644D yet contribute
+Three Experts (DeepFM, Causal, OT) read the *same* 734D under V1 yet contribute
 disjoint structure: DeepFM the symmetric pair interaction
 $\langle\mathbf v_i,\mathbf v_j\rangle$, Causal the asymmetric acyclic
 direction $W_{ij}^2$, OT the metric distance $W(\boldsymbol\mu,

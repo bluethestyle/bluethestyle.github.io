@@ -27,7 +27,7 @@ next_status: draft
 > Expert 를 나란히 추가했다 — 잠재 변수 위에 비순환 인과 그래프를 학습해
 > 개입하는 **Causal Expert**, 그리고 각 고객을 확률 분포로 바꿔 학습된
 > 프로토타입과의 Wasserstein 거리를 재는 **OT Expert**. 둘 다 동일한
-> 정규화 **644D** 피처 벡터를 받아 **64D** 표현을 CGC gate 로 내보낸다 —
+> **734D** 피처 텐서를 받아 **64D** 표현을 CGC gate 로 내보낸다 —
 > 그러나 추출하는 수학적 구조는 정반대다. 하나는 *비대칭이고 비순환*(인과의
 > 방향), 다른 하나는 *거리 함수*(분포적 거리). 이 글은 둘 모두를 따라간다.
 
@@ -158,8 +158,8 @@ $$ \mathcal{L}_{\text{DAG}} = \lambda_{\text{acyclic}}\cdot h(\mathbf W) + \lamb
 
 ## 학습된 W 와 구조 방정식
 
-Expert 내부 파이프라인은 세 단계다 — **Compressor** 가 644D 입력을 32개
-인과 변수로 압축($644\to128\to32$)하고, **구조적 인과 모형(SCM)** 이
+Expert 내부 파이프라인은 세 단계다 — **Compressor** 가 입력을 32개
+인과 변수로 압축(V1 기준 $734\to128\to32$)하고, **구조적 인과 모형(SCM)** 이
 개입하며, **Causal Encoder** 가 결과를 다시 64D 로 올린다($32\to128\to64$).
 개입 자체는 의심스러울 만큼 단순한 한 방정식이다.
 
@@ -265,7 +265,7 @@ $\mathbf P_{ij}$ 는 $i$ 에서 $j$ 로 옮긴 질량, $\mathbf C_{ij}$ 는 그 
 
 Expert 에서 이것은 구체화된다.
 
-- **고객 분포.** $\boldsymbol\mu = \operatorname{softmax}(\text{DistProjector}(\mathbf x)) \in \Delta^{32}$ — 644D 피처 벡터를 32개 잠재 카테고리 위의 확률 simplex 로 사영.
+- **고객 분포.** $\boldsymbol\mu = \operatorname{softmax}(\text{DistProjector}(\mathbf x)) \in \Delta^{32}$ — 피처 벡터를 32개 잠재 카테고리 위의 확률 simplex 로 사영.
 - **프로토타입.** $\boldsymbol\nu_k = \operatorname{softmax}(\boldsymbol\ell_k) \in \Delta^{32}$, 학습 가능한 기준 분포 뱅크(클래스 기본 16, 운영 `n_ref=8`) — 데이터가 군집화한 "전형적 고객 유형"(여행 중심, 저축 중심 …)을 손으로 정의하지 않고 end-to-end 로 학습.
 - **비용 행렬.** $\mathbf C = \mathbf M^\top\mathbf M$, $\mathbf M^\top\mathbf M$ 분해로 양반정치(PSD)를 강제한 학습 가능한 ground metric — 어떤 원소도 수송을 보상하지 않게(그러면 Sinkhorn 이 무의미한 계획을 낸다).
 
@@ -309,7 +309,7 @@ C\rangle_F$ 다. 16개 프로토타입 전부에 돌리면 $[B,16]$ Wasserstein 
 <svg viewBox="0 0 600 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:system-ui,sans-serif;">
   <rect x="0" y="0" width="600" height="170" fill="#f8fafc" rx="8"/>
   <rect x="16" y="62" width="78" height="46" rx="6" fill="#f0fdf4" stroke="#0d9488" stroke-width="1"/>
-  <text x="55" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#0d9488">x [644]</text>
+  <text x="55" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#0d9488">x [734]</text>
   <text x="55" y="97" text-anchor="middle" font-size="9" fill="#64748b">피처</text>
   <rect x="120" y="62" width="92" height="46" rx="6" fill="#fce7f3" stroke="#e11d48" stroke-width="1"/>
   <text x="166" y="82" text-anchor="middle" font-size="12" font-weight="700" fill="#e11d48">μ ∈ Δ³²</text>
@@ -345,8 +345,11 @@ C\rangle_F$ 다. 16개 프로토타입 전부에 돌리면 $[B,16]$ Wasserstein 
 
 ## Expert 는 PLE 어디에 꽂히는가
 
-두 Expert 모두 정규화 **644D** 피처 벡터(V1 호환 경로 — 운영 V2 에서는
-대신 group 별 feature subset 을 받는다)를 받아 **64D** 를 낸다. v3.2 는
+두 Expert 모두 V1 계약에서는 **734D** 피처 텐서를 받아 **64D** 를 낸다
+(`model_config.yaml` 의 `input_dim: 734`). 운영 V2 에서는 그룹 라우팅으로
+갈라져 Causal 은 `base`+`multi_source`+`domain`+`multidisciplinary`+
+`model_derived` **539D**, OT 는 `extended_source`+`multi_source`
+**175D** 를 받는다. v3.2 는
 CGC Gate Attention 을 $[B,5]$ 에서 $[B,7]$ 로 넓혀, 기존 PersLay / DeepFM
 / Temporal / Unified H-GCN Expert 와 나란히 받아들였다. 게이트는 그 일곱을
 프로젝트의 16개 task tower 에 걸쳐 태스크별로 혼합한다.
@@ -360,7 +363,7 @@ Causal 과 OT 를 하나로 융합하지 않고 *분리* 유지하는 이유? �
 | 독립 게이팅 | CGC 게이트가 churn 엔 Causal 을, cross-sell 엔 OT 를 높게 가중 가능 — 융합 시 불가능 |
 | 교체 용이성 | Causal 은 NOTEARS→GES/PC, OT 는 Sinkhorn→Sliced-Wasserstein 으로 독립 교체 가능 |
 
-세 Expert(DeepFM, Causal, OT)가 *같은* 644D 를 읽되 서로소인 구조를
+세 Expert(DeepFM, Causal, OT)가 V1 에서 *같은* 734D 를 읽되 서로소인 구조를
 보탠다 — DeepFM 은 대칭 쌍 상호작용 $\langle\mathbf v_i,\mathbf
 v_j\rangle$, Causal 은 비대칭 비순환 방향 $W_{ij}^2$, OT 는 거리 함수
 $W(\boldsymbol\mu, \boldsymbol\nu_k)$. 같은 입력, 환원 불가능하게 다른 세

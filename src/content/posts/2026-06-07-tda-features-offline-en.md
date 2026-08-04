@@ -242,6 +242,12 @@ every customer.
 The 70D TDA block is the single largest occupant of the 159D Domain
 feature group, and it splits into three sub-blocks:
 
+> **The contract has since moved.** The 734D above is the V1 feature
+> contract. On 2026-07-02 the project switched to the V2 strict contract
+> and the operational input width is **4035D** — 734D was not discarded;
+> it remains V2's _shared base of eight groups_, with the
+> lag/rolling/product families (3301D) appended on top.
+
 | Sub-block | Dim | Source | Homology | Scope |
 | --- | --- | --- | --- | --- |
 | `tda_short` | 24D | 90-day app logs | $H_0, H_1$ | Global + Local |
