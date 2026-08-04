@@ -284,12 +284,42 @@ gotothemoon 의 **문서(백서·리포트·DAG)** 에는 있으나 `src/` 코�
 
 **4개월 개발기 8편** — 주장 밀도 최저(합 13건), 서사 위주. 미착수.
 
-**절차상 미완:**
-- ko/en 정합성 — **19개 쌍의 수치 불일치** 검출만 하고 미해소.
-- KaTeX 수식의 수학적 정확성 미검증.
-- 학술 인용(Tang RecSys 2020 · Cuturi NeurIPS 2013 · Zheng NeurIPS 2018 ·
-  Carrière 2020 · Cohen & Felson 1979 · Barabási 2005 등) **전혀 미확인**.
-- 기술참조서 18종 중 통독한 문서 없음(필요 부분만 grep).
+**절차 — 완료됨:**
+- **ko/en 정합성** — v1 검사의 "19쌍 불일치"는 **전부 허위**였다. 아라비아 숫자 패턴
+  개수만 비교해서 한국어의 후치 수사(`성분 5개` vs `5 components`)와 단위 차이
+  (`27차원` vs `27D`), 영문 수사 표기(`seven experts`)가 불일치로 잡혔다.
+  정규화 후 재검사 결과 실제 내용 드리프트는 **1건** — PLE-3 KO 에서 LightGCN 이
+  한 단순화를 NGCF 가 한 것처럼 주어가 뒤바뀌어 있었다(EN 은 정상). 수정 완료.
+- **KaTeX** — display 298 · inline 1,774 = **총 2,072개**. 구문 문제 **0건**
+  (`$$` 짝 · 중괄호 · `\left`/`\right` 균형 · 미지원 매크로). 산술도 검산 완료 —
+  dim-normalize scale(0.756 / 1.069), 코사인 예시 0.89, 24/734=3.3%, 24/4035=0.6%,
+  68/734=9.3%, 28×27/2=378, 31×30/2=465, 771×16=12,336, ln20≈2.996, 448×4=1792.
+- **학술 인용 41건 대조** — Tang RecSys 2020 · Ma KDD 2018 · Jacobs 1991 ·
+  Rendle ICDM 2010 · Kipf&Welling 2017 · He SIGIR 2020 · Koren 2009 ·
+  Carrière AISTATS 2020 · Zheng NeurIPS 2018 · Cuturi NeurIPS 2013 · Shannon 1948 ·
+  Baum&Petrie 1966 · Kendall CVPR 2018 · Gal&Ghahramani 2016 · Sensoy NeurIPS 2018 ·
+  MacKay 1992 · Neal 1996 · Neyman 1923 · Rubin 1974 · Pearl 2000 · Kantorovich 1942 ·
+  Stigler 1961 · Nickel&Kiela NeurIPS 2017 · Cohen&Felson 1979 · Barabási Nature 2005 ·
+  Platt 1999 · Bucilua/Caruana/Niculescu-Mizil **KDD 2006**(Model Compression — 정확) ·
+  Hinton/Vinyals/Dean 2015 · Hamilton 1989 · Kermack&McKendrick 1927 등 **전부 정확**.
+  수정 1건: NGCF 의 저자 표기 `He 2019` → **`Wang et al., SIGIR 2019`**(He 는 공저자).
+
+**남은 미완:**
+- 기술참조서 18종 중 통독한 문서 없음(필요 부분만 grep). 다만 참조서는 3순위 근거이고
+  실제로 734D · DeepFM 28필드 · HMM 6+4+6 이 전부 참조서가 낡은 경우였으므로
+  검증 가치가 낮다. 참조서에만 있는 것은 학술 인용이었고 그건 위에서 처리했다.
+
+### 4개월 개발기 8편 — 검증 완료
+
+주장 밀도가 낮아(추출 13건) 후순위였으나 정량 주장은 전부 대조했다.
+`RTX 4070 · 12GB VRAM`, `5-agent Bedrock`(3 serving + 2 ops/audit), `941K users`,
+`17-month`, `containers/lambda/`, `LightGBM per-task students`, adaTT `−0.019` →
+버그 수정 후 `−0.001` — **AWS README 와 전부 일치**.
+
+⚠️ **이 시리즈의 "13개 태스크" 는 고치지 말 것.** 개발 당시의 실험 조건이고
+AWS README:221 도 *"−0.019 in the 13-task heterogeneous setting"* 으로 그 시점을
+보존한다. 13→12 정합은 그 이후다. *현재 상태* 를 주장하는 문장
+("운영 벤치마크는 13개 태스크다")만 12 로 고쳤다.
 
 > **식별자 검사 주의.** 초기 검사 스크립트는 (1) 언더스코어 없는 CamelCase 를
 > 필터로 배제했고 (2) `rg` 서브프로세스 실패를 예외로 삼켜 결과가 공백이었다.

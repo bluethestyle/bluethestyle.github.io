@@ -231,3 +231,6 @@ self-organize by gate pressure alone, and instead *bake the separation
 into the architecture itself* — a Shared Expert for cross-task signal,
 Task-specific Experts for patterns only one task cares about. That is
 PLE, and it is where **PLE-2** picks up.
+
+> **A note on the task count.** "13" is the figure from when the reference reduced 18→13. The on-prem roster is now **16** per the design document and 17 defined / **15 active** in code (`active_tasks.py`); the public AWS benchmark has been reconciled to **12**.
+

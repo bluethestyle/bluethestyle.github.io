@@ -34,6 +34,9 @@ around 3M parameters. Most of that capacity was duplicated across
 clusters. The observation behind the waste: cluster-level signal
 mostly affects the *input distribution*, not the *decision function*.
 
+> **A note on the task count.** "13" is the figure from when the reference reduced 18→13. The on-prem roster is now **16** per the design document and 17 defined / **15 active** in code (`active_tasks.py`); the public AWS benchmark has been reconciled to **12**.
+
+
 **Task dependencies are not in the architecture yet.** CTR feeds CVR,
 Churn feeds Retention — these are obvious from the business side. But
 the CGC gate only handles "how to mix experts." Waiting for the
@@ -179,7 +182,7 @@ flowchart TB
 > Spending_category → Brand_prediction. Adding a new transfer to
 > `task_relationships` config picks up the order automatically.
 
-> (Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)
+> (Illustrative: this figure uses the generic on-prem reference roster; the public benchmark is **12 tasks**.)
 
 ### Transfer mechanism
 
@@ -328,7 +331,7 @@ use activation=None, binary uses sigmoid, multiclass uses softmax.
 > (`Nw`) are further auto-balanced by uncertainty weighting (below).
 > Anything without an explicit weight defaults to 1.0.
 >
-> (Illustrative: this figure uses the generic on-prem reference roster; the production benchmark is 13 tasks.)
+> (Illustrative: this figure uses the generic on-prem reference roster; the public benchmark is **12 tasks**.)
 
 > **Huber Loss.** $\mathcal{L}_{\text{Huber}} = \frac{1}{2}(y - \hat{y})^2$
 > when $|y - \hat{y}| \le \delta$, otherwise $\delta(|y - \hat{y}| - \delta/2)$.

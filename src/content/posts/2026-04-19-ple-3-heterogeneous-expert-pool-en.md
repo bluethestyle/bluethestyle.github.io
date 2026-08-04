@@ -61,7 +61,7 @@ $$\hat{y}_{FM} = w_0 + \sum_{i=1}^{n} w_i x_i + \sum_{i=1}^{n} \sum_{j=i+1}^{n} 
 
 **Gap to fill.** A *community-level* signal that cannot be reconstructed from individual features. What merchants do customers with similar spending patterns prefer? No amount of a customer's own 644D feature vector gives this — the signal lives in the bipartite graph, not the node.
 
-**Alternatives considered.** Standard GCN (Kipf & Welling 2017) carries feature transformations and nonlinearities that tend to overfit for recommendation — which is exactly what NGCF (He et al., SIGIR 2019) ran into. GraphSAGE and GAT add neighbor sampling and attention on top, but in our bipartite collaborative setup the added complexity costs more than it buys.
+**Alternatives considered.** Standard GCN (Kipf & Welling 2017) carries feature transformations and nonlinearities that tend to overfit for recommendation — which is exactly what NGCF (Wang et al., SIGIR 2019) ran into. GraphSAGE and GAT add neighbor sampling and attention on top, but in our bipartite collaborative setup the added complexity costs more than it buys.
 
 **Why LightGCN.** He et al. (SIGIR 2020) stripped GCN of feature transformation and nonlinearity — a radical simplification — and it beat NGCF, the textbook case for "deeper is not always better." It pre-trains offline (batch-friendly), converges fast, overfits less. For the single role of "extract bipartite collaborative signal," the right tool is the minimally decorated one.
 
