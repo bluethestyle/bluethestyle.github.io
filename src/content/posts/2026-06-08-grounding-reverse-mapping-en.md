@@ -168,7 +168,20 @@ contiguous ranges:
 > it remains V2's _shared base of eight groups_, with the
 > lag/rolling/product families (3301D) appended on top.
 
-$$ 238_{\text{profile}} + 91_{\text{multi\_source}} + 84_{\text{extended}} + 159_{\text{domain}} + 27_{\text{model\_derived}} + 24_{\text{multi\_disc}} + 21_{\text{merchant}} = 644 $$
+$$ 238_{\text{profile}} + 91_{\text{multi\_source}} + 147_{\text{domain}} + 24_{\text{multi\_disc}} + 27_{\text{model\_derived}} + 84_{\text{extended}} + 21_{\text{merchant}} = 632 $$
+
+> **Why 632 and not 644.** The feature contract (`feature_contract.py`)
+> puts the normalized width at **644D** with `domain` at **159D**. The
+> reverse-mapping engine's `FEATURE_RANGES`, however, sizes `domain` at
+> **147D** and therefore runs on a **632D** layout — 12 of those 159
+> dimensions are pad, and the mapper indexes only the 147 that are
+> actually produced. The file says so itself: *"[legacy 632D structure —
+> domain 147 basis] … these offsets are un-migrated; they are the live
+> runtime values and are kept as such (reconciling the reverse mapping
+> is an engineering decision)."* So **the contract says 644 and the
+> runtime reverse mapping says 632**, and that gap is still open. The
+> ordering above also follows the mapper's offsets, where
+> `extended_source` comes sixth.
 
 Each range is a slice of contiguous indices with a name and a
 description, held in a small `FeatureRange` dataclass:

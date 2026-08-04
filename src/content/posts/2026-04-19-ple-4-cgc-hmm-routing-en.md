@@ -84,6 +84,14 @@ decision is why CGC gets split into two stages.
   and applies per-task block-level scaling. This is where
   dim-normalize lives.
 
+> **512D assumes the full seven-Expert roster.** `model_config.yaml`
+> computes this width dynamically and records the measured value in a
+> comment: *"sum of Shared Expert outputs (currently 6 enabled = 5×64 +
+> unified_hgcn 128 = **448D**; 512D once lightgcn is restored)"*. With
+> `lightgcn` at `enabled: false`, the operational concat is **448D**,
+> plus a 32D HMM projection. Read the 512D in the diagram below as the
+> full roster including lightgcn.
+
 ```mermaid
 flowchart TB
   input[(Shared Expert Pool · 7 experts · 512D concat)]

@@ -148,10 +148,20 @@ $t_k$ 는 금융 언어 텍스트다. 어려운 부분은 두 가지를 동시�
 > 734D 는 폐기된 게 아니라 V2 의 _공유 베이스 8그룹_ 으로 남고, 여기에
 > lag/rolling/product 계열 3301D 가 덧붙어 4035D 가 된다.
 
-$$ 238_{\text{profile}} + 91_{\text{multi\_source}} + 84_{\text{extended}} + 159_{\text{domain}} + 27_{\text{model\_derived}} + 24_{\text{multi\_disc}} + 21_{\text{merchant}} = 644 $$
+$$ 238_{\text{profile}} + 91_{\text{multi\_source}} + 147_{\text{domain}} + 24_{\text{multi\_disc}} + 27_{\text{model\_derived}} + 84_{\text{extended}} + 21_{\text{merchant}} = 632 $$
 
 각 범위는 이름과 설명을 가진 연속 인덱스 슬라이스이며, 작은
 `FeatureRange` 데이터클래스에 담긴다.
+
+> **왜 644 가 아니라 632 인가.** 피처 계약(`feature_contract.py`)이 말하는
+> normalized 폭은 **644D** 이고 그 안에서 `domain` 은 **159D** 다. 그런데
+> 역매핑 엔진의 `FEATURE_RANGES` 는 `domain` 을 **147D** 로 잡아 총
+> **632D** 레이아웃 위에서 돈다 — 159 중 12D 는 pad 이고, 매퍼는 실산출
+> 147 만 인덱싱하기 때문이다. 파일 자신이 이를 명시한다:
+> *"[legacy 632D 구조 — domain 147 기준] … 아래 오프셋은 미마이그레이션 —
+> 런타임 동작값이라 값 유지(역매핑 정합은 엔지니어 결정)"*.
+> 즉 **계약은 644, 런타임 역매핑은 632** 이며 이 간극은 아직 열려 있다.
+> 위 식의 순서도 매퍼 오프셋 순서(`extended_source` 가 여섯 번째)를 따른다.
 
 ```python
 @dataclass

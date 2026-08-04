@@ -76,6 +76,13 @@ Expert 가 *의미 있게 다른* 것을 학습했음을 보증하지는 않는�
 세 번째를 택했다. 512D 를 2048D overcomplete latent 로 올리고 L1
 정규화로 희소성을 유도한다.
 
+> **두 숫자 모두 7개 Expert 전원 기준이다.** `SAELayer` 는 폭을 고정값이
+> 아니라 `expansion_factor = 4` 로 잡아 `latent_dim = input_dim × 4` 를
+> 쓴다. 즉 512D 입력이면 2048D 가 맞다. 다만 `model_config.yaml` 주석은
+> 현행 활성 Expert 가 6개(5×64 + unified_hgcn 128 = **448D**)이고
+> lightgcn 복구 시 512D 라고 적는다. 지금 운영값으로는 448D → **1792D**
+> latent 다.
+
 ### SAE 구조
 
 $$\mathbf{z} = \text{ReLU}(\mathbf{W}_{enc} \cdot \mathbf{h}_{shared} + \mathbf{b}_{enc}) \in \mathbb{R}^{2048}$$

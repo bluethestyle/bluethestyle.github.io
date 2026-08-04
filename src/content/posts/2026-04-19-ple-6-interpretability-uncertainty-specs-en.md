@@ -82,6 +82,14 @@ A few alternatives:
 Option three. Lift 512D into a 2048D overcomplete latent with L1
 sparsity.
 
+> **Both numbers assume the full seven-Expert roster.** `SAELayer` does
+> not hardcode the width: it uses `expansion_factor = 4`, so
+> `latent_dim = input_dim × 4`. A 512D input does give 2048D. But
+> `model_config.yaml` notes that only six Experts are currently enabled
+> (5×64 + unified_hgcn 128 = **448D**), with 512D returning once
+> lightgcn is restored. At today's operational width that is 448D →
+> **1792D** latent.
+
 ### SAE architecture
 
 $$\mathbf{z} = \text{ReLU}(\mathbf{W}_{enc} \cdot \mathbf{h}_{shared} + \mathbf{b}_{enc}) \in \mathbb{R}^{2048}$$

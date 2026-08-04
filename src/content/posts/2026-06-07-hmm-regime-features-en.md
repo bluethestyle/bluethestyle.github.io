@@ -302,7 +302,18 @@ numeric features (string-valued `dominant_state_name` and `state_mode`
 do not count toward the dimension). For Journey/Lifecycle the formula
 gives $5 + 5 + 6 = 16$; Behavior the reference books as
 $6 + 4 + 6 = 16$ — the extra sixth state absorbed by a slimmer meta
-block, so every mode stays at 16D.
+block.
+
+> **Here the reference and the code diverge.** The dimension check in
+> `hmm_features.py` uses a single mode-agnostic expression,
+> `expected_dim = self.n_states + 5 + 6`; there is no branch that trims
+> Behavior's meta block to 4D. By that formula Behavior is
+> $6 + 5 + 6 = 17$D. The consumer-side contract
+> (`task_feature_mapper.py`), meanwhile, declares `hmm_behavior: 16`.
+> So **the producer says 17 and the contract says 16**, and the
+> reference's "$6+4+6$" reads as a post-hoc reconciliation. The 48D
+> three-mode total still holds as the contract value, but Behavior's
+> internal split is not confirmed by the code.
 
 | Group | Features | Source | Dim (J/L · B) |
 | --- | --- | --- | --- |

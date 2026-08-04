@@ -177,6 +177,14 @@ SoT = `ple_cluster_adatt.py` 의 `DEFAULT_EXPERT_ROUTING_V2`
   L87 주석이 노후.
 - `configs/model_config.yaml:82` 는 `expert_input_version: v1` 인데, `feature_contract.py` 의
   `is_v2_enabled()` 는 2026-07-02 부터 항상 `True` 라 실제로는 V2 경로만 탄다. 설정값이 死값.
+- `hmm_features.py:886` 의 차원 검증은 모드 무관 `n_states + 5 + 6` 이라 Behavior 가 **17D**
+  인데, `task_feature_mapper.py:160` 은 `hmm_behavior: 16` 을 선언한다. 산출 17 / 계약 16 불일치.
+- `feature_reverse_mapper.py:74-87` 의 `FEATURE_RANGES` 는 **632D**(domain 147) 레이아웃인데
+  계약은 644D(domain 159)다. 파일 주석이 *"미마이그레이션 … 역매핑 정합은 엔지니어 결정"*
+  이라고 스스로 밝힌다.
+- `ple_dataset.py:15` 는 LNN 18D 를 *"ODE latent 16D + stability 1D + convergence 1D"* 라
+  적지만, 실제 산출 모듈 `lnn_features.py` 는 *"분포 4D + 주파수 4D + 변화점 3D +
+  자기상관 4D + 복잡도 3D"* 인 **통계 피처**다. 두 설명이 다르다.
 
 ## 6b. 미결 — 사용자 판단 필요 (자동 수정 금지)
 
@@ -195,11 +203,25 @@ PersLay · Causal · OT)"* 로 서술한다 — p2 · p3 · p6, `three-months` e
   서술하는 것이 반드시 오류는 아니다.
 - 반면 p2 의 Expert 비교표나 p6 의 사양표는 **현재 구조** 를 기술하므로
   활성 6개와 어긋난다.
-- `lightgcn` 의 `enabled: false` 가 영구 폐기인지 일시 비활성인지는 코드만으로
-  판정되지 않는다 (참고: `hgcn` 은 *"deprecated → unified_hgcn 으로 통합"* 이라
-  주석이 명시하지만 `lightgcn` 에는 그런 주석이 없다).
+- ~~`lightgcn` 의 `enabled: false` 가 영구 폐기인지 일시 비활성인지 판정 불가~~
+  → **해소됨.** `configs/model_config.yaml:525` 주석이 명시한다:
+  *"Shared Experts 출력 합(현행 활성 6개 = 5×64 + unified_hgcn 128 = **448D**;
+  **lightgcn 복구 시 512D**)"*. "복구 시" 라는 표현이 **일시 비활성**임을 알려준다.
+  `hgcn` 의 영구 폐기(*"deprecated → unified_hgcn 으로 통합"*)와는 성격이 다르다.
 
-→ **"설계된 7 / 활성 6" 을 어떻게 표기할지는 저자 결정 사항.** 결정 전까지 수정하지 않는다.
+**이 때문에 연쇄로 어긋나는 숫자들 (수정 완료):**
+
+| 값 | 7개 전원 기준 (블로그) | 현행 활성 6개 |
+|---|---|---|
+| Shared concat 폭 | 512D | **448D** (5×64 + 128) |
+| SAE overcomplete latent | 2048D | **1792D** (`expansion_factor = 4`) |
+
+PLE-4 · PLE-6 에 위 실측을 주석으로 가산했다. HGCN-1 이 이미 448D 를 쓰고 있어
+블로그 내부에서도 512 / 448 이 갈려 있었다.
+
+→ **여전히 남는 저자 결정:** "7개 Expert" 라는 서사 표현을 그대로 둘지
+("설계된 7 / 활성 6" 병기 등). PLE-3 처럼 *설계 근거* 를 다루는 글은 7이 맞고,
+PLE-2 비교표·PLE-6 사양표처럼 *현재 구조* 를 기술하는 글은 어긋난다.
 
 **태스크 개수 — 13 / 15 / 16 / 17 이 공존한다.**
 `src/config/active_tasks.py` 의 `TASK_METADATA` 는 **17개** 정의, 그중 `uplift` 와
@@ -213,6 +235,66 @@ PersLay · Causal · OT)"* 로 서술한다 — p2 · p3 · p6, `three-months` e
 - `causal-ot-expert` 는 *"16개 task tower"* 라 쓰는데 이 숫자는 코드 어디에도 없다.
 
 → 온프렘(15/17) 과 공개 벤치마크(13) 를 어느 글에서 어느 기준으로 쓸지는 저자 결정 사항.
+
+## 6c. 검증 커버리지 (2026-08-04 기준)
+
+**코드 대조 배치를 완료한 study-thread 글 — 21편 (전 27편 중).**
+PLE-2 · PLE-3 · PLE-4 · PLE-5 · PLE-6 · ADATT-1~4 · TDA-1 · TDA-2 · DEEPFM-1 ·
+HGCN-1 · CAUSALOT-1 · TEMPORAL-1 · ECON-1 · TDAFEAT-1 · HMM-1 · GMM-1 ·
+TSFEAT-1 · MULTI-1 · GROUND-1 · QWEN-1
+
+**⚠️ MRM 스레드 6편 · Commentary 2편 — gotothemoon 으로는 검증 불가.**
+이 글들은 **다른 저장소**를 근거로 한다:
+`https://github.com/bluethestyle/aws_ple_for_financial` (MRM-5 가 명시적으로 인용).
+`core/audit/` · `core/retrieval/` · `core/monitoring/` 같은 `core/…` 경로 표기가
+그 저장소의 레이아웃이다 (gotothemoon 은 `src/…` 를 쓰고 `src/core/` 하위에는
+`agent`/`pipeline`/`recommendation` 만 있다).
+
+전수 식별자 검사에서 gotothemoon 에 없는 것으로 나온 **16건**은 전부 이 계열이며,
+**오류가 아니라 검증 범위 밖**이다:
+`KoreanFRIAAssessor`(22회) · `ComplianceReporter` · `USComplianceGenerator` ·
+`core/monitoring/pia_evaluator.py` · `core/monitoring/public_disclosure_generator.py` ·
+`core/audit/` · `core/retrieval/` · `configs/pipeline.yaml` ·
+`scoring.segment_task_weights` · `scoring.dynamic_weight_rules` ·
+`min_improvement` · `max_degradation` · `tenure_stage` · `spend_level` 등.
+`PIAEvaluator` / `FRIAEvaluator` / `AnnexIVMapper` / `PublicDisclosureGenerator` 는
+gotothemoon 의 **문서(백서·리포트·DAG)** 에는 있으나 `src/` 코드에는 없다.
+
+→ 이 8편을 검증하려면 AWS 저장소가 필요하다.
+
+**4개월 개발기 8편** — 주장 밀도 최저(합 13건), 서사 위주. 미착수.
+
+**절차상 미완:**
+- ko/en 정합성 — **19개 쌍의 수치 불일치** 검출만 하고 미해소.
+- KaTeX 수식의 수학적 정확성 미검증.
+- 학술 인용(Tang RecSys 2020 · Cuturi NeurIPS 2013 · Zheng NeurIPS 2018 ·
+  Carrière 2020 · Cohen & Felson 1979 · Barabási 2005 등) **전혀 미확인**.
+- 기술참조서 18종 중 통독한 문서 없음(필요 부분만 grep).
+
+> **식별자 검사 주의.** 초기 검사 스크립트는 (1) 언더스코어 없는 CamelCase 를
+> 필터로 배제했고 (2) `rg` 서브프로세스 실패를 예외로 삼켜 결과가 공백이었다.
+> "223개 전부 존재" 라는 초기 결론은 **무효**였다. 현재 스크립트
+> (`ident_full.py`)는 저장소를 직접 읽어 316개를 대조한다.
+
+### PersLay 서브스레드 검증 결과 (TDA-1 · TDA-2) — 전부 일치
+
+| 주장 | 코드 근거 |
+|---|---|
+| `PersLayBlock` 5개 (Short β₀/β₁ + Long β₀/β₁/β₂) | `perslay_expert.py:352-358` |
+| concat 128 + 192 + 32 + 10 = **362D** → 64D | `perslay_expert.py:315` 주석과 완전 일치 |
+| `final_mlp` 362 → 128 → 64 | `perslay_expert.py:376` |
+| Short 최대 **200**쌍 / Long **150**쌍 | `model_config.yaml:214-215` (코드 기본 500/300 을 yaml 이 override — 블로그가 운영값을 쓴 것이 옳다) |
+| `beta_idx` 채널로 블록 라우팅 | 텐서 3번째 컬럼 `[batch, max_pairs, 3]` |
+| 4D 해석용 프로젝션 | `INTERPRET_DIM = 4`, `interpret_proj` |
+| `w(b,d) = |d−b|^p`, p = 1.0 | `WeightFunction(method="persistence", power=1.0)` |
+| 패딩 (0,0) 이 weight 로 자동 무시 | `perslay_expert.py:245` 주석 동일 |
+| 프로덕션 ρ = `sum` (attention 에서 전환) | `rho_type: "sum"` + 전환 사유 주석 |
+| φ = `RationalHatPhi` | `perslay_expert.py:30` |
+| raw diagram 경로 dead | `use_raw_diagram: false` — 블로그가 이미 정직하게 기술 |
+| `domain_experts` 에 PersLay 를 둔 **7개 태스크** (ctr·cvr·churn·retention·life_stage·nba·spending_category) | 7개 전부 확인. `uplift`/`category_uplift` 도 포함하나 `enabled: False` 라 제외한 것이 옳다 |
+
+유일한 수정: TDA-2 의 70D 폴백 → PersLay `input_dim` 이 2026-06-24 자로 58D 로
+정정된 사실을 주석으로 가산 (§5 참조).
 
 ## 7. 검토 절차
 

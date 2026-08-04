@@ -73,6 +73,13 @@ attention 한 점에서 보정하는 것이 다른 부작용이 적다. 이 결�
 - **1단계 CGCLayer** (논문 원형): Shared + Task Expert 를 한 축에서 Softmax 가중합. 태스크당 고정 차원 벡터 출력.
 - **2단계 CGCAttention**: Shared concat (512D) 만 따로 보고, Expert 블록별로 태스크별 스케일링. 이 자리가 dim-normalize 를 포함한다.
 
+> **512D 는 7개 Expert 전원 기준이다.** `model_config.yaml` 은 이 값을
+> 동적 계산으로 두고 주석에 실측을 적어둔다 — *"Shared Experts 출력
+> 합(현행 활성 6개 = 5×64 + unified_hgcn 128 = **448D**; lightgcn 복구 시
+> 512D)"*. 현재 `lightgcn` 은 `enabled: false` 라 운영 concat 은 **448D**
+> 이고, 여기에 HMM projection 32D 가 더해진다. 아래 도식의 512D 는
+> lightgcn 을 포함한 전체 로스터 기준으로 읽으면 된다.
+
 ```mermaid
 flowchart TB
   input[(Shared Expert Pool · 7 experts · 512D concat)]
