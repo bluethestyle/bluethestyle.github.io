@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기술블로그 정확성 감사 보고서</title>
+<meta name="description" content="블로그 43편을 온프렘·AWS 두 저장소의 실제 코드에 대조해 사실 오류 8건과 노후 5건을 잡아낸 정확성 감사 보고서.">
+<style>
+  :root{
+    --paper:#F6F7F9; --panel:#FFFFFF; --ink:#14181F; --ink-2:#39424F;
+    --soft:#5A6472; --faint:#8A93A1; --rule:#DCE0E7; --rule-2:#EAEDF1;
+    --madder:#A82D33; --madder-bg:#FBEFEF;
+    --fixed:#26694A; --fixed-bg:#EAF3EE;
+    --stale:#8A5F06; --stale-bg:#F8F1E2;
+    --open:#3D6491;  --open-bg:#ECF1F7;
+    --mono: ui-monospace,"SFMono-Regular","Cascadia Mono",Consolas,"Liberation Mono",monospace;
+    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI","Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    --sp:1.5rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#11151B; --panel:#171C24; --ink:#E3E7ED; --ink-2:#B9C1CC;
+      --soft:#8F99A7; --faint:#6C7684; --rule:#262D36; --rule-2:#1E242C;
+      --madder:#E0666B; --madder-bg:#2A1A1C;
+      --fixed:#6FBF95; --fixed-bg:#16241D;
+      --stale:#D8A950; --stale-bg:#251F12;
+      --open:#7FA8D6;  --open-bg:#161E28;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11151B; --panel:#171C24; --ink:#E3E7ED; --ink-2:#B9C1CC;
+    --soft:#8F99A7; --faint:#6C7684; --rule:#262D36; --rule-2:#1E242C;
+    --madder:#E0666B; --madder-bg:#2A1A1C;
+    --fixed:#6FBF95; --fixed-bg:#16241D;
+    --stale:#D8A950; --stale-bg:#251F12;
+    --open:#7FA8D6;  --open-bg:#161E28;
+  }
+  :root[data-theme="light"]{
+    --paper:#F6F7F9; --panel:#FFFFFF; --ink:#14181F; --ink-2:#39424F;
+    --soft:#5A6472; --faint:#8A93A1; --rule:#DCE0E7; --rule-2:#EAEDF1;
+    --madder:#A82D33; --madder-bg:#FBEFEF;
+    --fixed:#26694A; --fixed-bg:#EAF3EE;
+    --stale:#8A5F06; --stale-bg:#F8F1E2;
+    --open:#3D6491;  --open-bg:#ECF1F7;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--paper); color:var(--ink); font-family:var(--sans);
+    font-size:16px; line-height:1.68; margin:0;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:60rem; margin:0 auto; padding:4rem 1.5rem 6rem;}
+
+  /* ---------- masthead ---------- */
+  .eyebrow{
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--madder); margin:0 0 1rem;
+  }
+  h1{
+    font-size:clamp(1.9rem,4.4vw,2.9rem); line-height:1.15; letter-spacing:-.022em;
+    font-weight:700; margin:0 0 .9rem; text-wrap:balance;
+  }
+  .standfirst{
+    font-size:1.06rem; color:var(--ink-2); max-width:44rem; margin:0 0 2rem;
+    text-wrap:pretty;
+  }
+  .meta{
+    display:flex; flex-wrap:wrap; gap:.4rem 1.6rem; font-family:var(--mono);
+    font-size:.76rem; color:var(--soft); border-top:1px solid var(--rule);
+    border-bottom:1px solid var(--rule); padding:.85rem 0; margin-bottom:3.5rem;
+  }
+  .meta b{color:var(--ink); font-weight:600;}
+
+  /* ---------- metric strip ---------- */
+  .metrics{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));
+    gap:1px; background:var(--rule); border:1px solid var(--rule);
+    margin-bottom:3.5rem;
+  }
+  .metric{background:var(--panel); padding:1.15rem 1.1rem;}
+  .metric .n{
+    font-family:var(--mono); font-variant-numeric:tabular-nums;
+    font-size:1.75rem; font-weight:600; letter-spacing:-.03em; line-height:1.1;
+    display:block; color:var(--ink);
+  }
+  .metric .n small{font-size:.82rem; font-weight:500; color:var(--soft); letter-spacing:0;}
+  .metric .l{
+    font-family:var(--mono); font-size:.68rem; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--faint); margin-top:.4rem; display:block;
+  }
+
+  /* ---------- sections ---------- */
+  section{margin-bottom:3.75rem;}
+  h2{
+    font-size:1.32rem; letter-spacing:-.014em; font-weight:680; margin:0 0 .35rem;
+    display:flex; align-items:baseline; gap:.7rem; text-wrap:balance;
+  }
+  h2 .num{
+    font-family:var(--mono); font-size:.75rem; color:var(--madder);
+    font-weight:600; letter-spacing:.06em;
+  }
+  .lede{color:var(--ink-2); margin:0 0 1.5rem; max-width:46rem; text-wrap:pretty;}
+  h3{font-size:.98rem; font-weight:660; margin:2rem 0 .7rem; letter-spacing:-.008em;}
+
+  /* ---------- precedence tiers ---------- */
+  .tiers{display:flex; flex-direction:column; gap:1px; background:var(--rule);
+         border:1px solid var(--rule);}
+  .tier{background:var(--panel); padding:.9rem 1.1rem; display:flex;
+        align-items:baseline; gap:1rem; flex-wrap:wrap;}
+  .tier .rank{font-family:var(--mono); font-size:.72rem; color:var(--madder);
+              font-weight:600; min-width:1.6rem;}
+  .tier .name{font-weight:640; min-width:8rem;}
+  .tier .path{font-family:var(--mono); font-size:.78rem; color:var(--soft);
+              word-break:break-all;}
+
+  /* ---------- finding blocks ---------- */
+  .finding{
+    border:1px solid var(--rule); background:var(--panel);
+    padding:1.25rem 1.3rem; margin-bottom:1.1rem;
+  }
+  .fhead{display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap; margin-bottom:.55rem;}
+  .chip{
+    font-family:var(--mono); font-size:.65rem; letter-spacing:.1em;
+    text-transform:uppercase; padding:.2rem .5rem; font-weight:600; white-space:nowrap;
+  }
+  .c-err{background:var(--madder-bg); color:var(--madder);}
+  .c-stale{background:var(--stale-bg); color:var(--stale);}
+  .c-open{background:var(--open-bg); color:var(--open);}
+  .c-ok{background:var(--fixed-bg); color:var(--fixed);}
+  .ftitle{font-weight:660; letter-spacing:-.008em;}
+  .fwhere{font-family:var(--mono); font-size:.73rem; color:var(--faint); margin-left:auto;}
+  .fbody{color:var(--ink-2); font-size:.94rem; margin:.5rem 0 0;}
+  .fbody p{margin:.5rem 0 0;}
+
+  /* claim vs truth */
+  .cmp{display:grid; grid-template-columns:auto 1fr; gap:.35rem .9rem;
+       margin:.9rem 0 .2rem; font-size:.88rem; align-items:baseline;}
+  .cmp dt{
+    font-family:var(--mono); font-size:.67rem; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--faint); padding-top:.15rem; white-space:nowrap;
+  }
+  .cmp dd{margin:0; font-family:var(--mono); font-variant-numeric:tabular-nums;
+          color:var(--ink); word-break:break-word;}
+  .cmp .was{color:var(--madder); text-decoration:line-through;
+            text-decoration-thickness:1px; text-decoration-color:color-mix(in srgb,var(--madder) 45%,transparent);}
+  .cmp .now{color:var(--fixed); font-weight:600;}
+
+  code{font-family:var(--mono); font-size:.86em; background:var(--rule-2);
+       padding:.1em .35em; border-radius:2px; word-break:break-word;}
+  .cmp code{background:none; padding:0;}
+
+  /* ---------- tables ---------- */
+  .tw{overflow-x:auto; border:1px solid var(--rule); background:var(--panel);}
+  table{border-collapse:collapse; width:100%; font-size:.88rem; min-width:34rem;}
+  th,td{text-align:left; padding:.6rem .85rem; border-bottom:1px solid var(--rule-2);
+        vertical-align:top;}
+  th{font-family:var(--mono); font-size:.67rem; letter-spacing:.09em;
+     text-transform:uppercase; color:var(--faint); font-weight:600;
+     border-bottom:1px solid var(--rule); white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap;}
+  td.id{font-family:var(--mono); font-size:.82rem; word-break:break-all;}
+
+  /* ---------- arithmetic proof ---------- */
+  .proof{
+    font-family:var(--mono); font-variant-numeric:tabular-nums;
+    background:var(--panel); border:1px solid var(--rule);
+    padding:1.1rem 1.2rem; font-size:.85rem; line-height:2;
+    overflow-x:auto; white-space:pre; color:var(--ink-2);
+  }
+  .proof b{color:var(--ink); font-weight:600;}
+  .proof i{color:var(--madder); font-style:normal;}
+
+  ul.plain{margin:.6rem 0 0; padding-left:1.1rem; color:var(--ink-2); font-size:.94rem;}
+  ul.plain li{margin-bottom:.4rem;}
+  ul.plain li::marker{color:var(--faint);}
+
+  .note{
+    border-left:2px solid var(--madder); padding:.15rem 0 .15rem 1rem;
+    color:var(--ink-2); font-size:.92rem; margin:1.2rem 0;
+  }
+
+  footer{
+    border-top:1px solid var(--rule); padding-top:1.5rem; margin-top:4rem;
+    font-family:var(--mono); font-size:.75rem; color:var(--soft);
+  }
+  footer .row{display:flex; gap:.85rem; padding:.28rem 0; flex-wrap:wrap;}
+  footer .sha{color:var(--madder); font-weight:600;}
+
+  @media (max-width:640px){
+    .wrap{padding:2.5rem 1.1rem 4rem;}
+    .cmp{grid-template-columns:1fr; gap:.15rem;}
+    .cmp dt{padding-top:.5rem;}
+    .fwhere{margin-left:0; width:100%;}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
+
+  /* standalone-only: theme toggle */
+  .theme-toggle{
+    position:fixed; top:1rem; right:1rem; z-index:10;
+    font-family:var(--mono); font-size:.68rem; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--soft);
+    background:var(--panel); border:1px solid var(--rule);
+    padding:.42rem .7rem; cursor:pointer; line-height:1;
+  }
+  .theme-toggle:hover{color:var(--ink); border-color:var(--soft);}
+  .theme-toggle:focus-visible{outline:2px solid var(--madder); outline-offset:2px;}
+  @media print{ .theme-toggle{display:none;} body{background:#fff;} }
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="tt" type="button" aria-label="테마 전환">Theme</button>
+<div class="wrap">
+
+  <p class="eyebrow">Technical Accuracy Audit · 2026-08-04</p>
+  <h1>기술블로그 정확성 감사 보고서</h1>
+  <p class="standfirst">
+    블로그 43편(ko/en 86파일)의 기술 주장을 온프렘 프로젝트
+    <code>gotothemoon</code> 및 공개 저장소 <code>aws_ple_for_financial</code> 의
+    <strong>실제 코드를 1순위 근거</strong>로 검증했다. 기술참조서는 최하위 근거로만
+    사용했으며, 참조서 자체가 노후한 경우가 다수 확인됐다.
+  </p>
+
+  <div class="meta">
+    <span>대상 <b>bluethestyle.github.io</b></span>
+    <span>브랜치 <b>fix/tech-accuracy-code-audit</b></span>
+    <span>커밋 <b>3</b></span>
+    <span>빌드 <b>100 페이지 통과</b></span>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><span class="n">2,110</span><span class="l">추출 주장</span></div>
+    <div class="metric"><span class="n">316</span><span class="l">대조 식별자</span></div>
+    <div class="metric"><span class="n">40</span><span class="l">수정 파일</span></div>
+    <div class="metric"><span class="n">+712<small> / −89</small></span><span class="l">라인 변경</span></div>
+    <div class="metric"><span class="n" style="color:var(--madder)">8</span><span class="l">사실 오류</span></div>
+    <div class="metric"><span class="n" style="color:var(--stale)">5</span><span class="l">노후</span></div>
+  </div>
+
+  <!-- ================= 방법 ================= -->
+  <section>
+    <h2><span class="num">§1</span>근거 우선순위</h2>
+    <p class="lede">
+      충돌 시 높은 쪽이 이긴다. 이 순서를 먼저 고정하지 않았다면 아래 오류 대부분은
+      "참조서와 일치함"으로 통과됐을 것이다.
+    </p>
+    <div class="tiers">
+      <div class="tier">
+        <span class="rank">1위</span><span class="name">실제 코드</span>
+        <span class="path">workspace/code/src/** · core/** &nbsp;(<code>_legacy_merlin</code> 제외)</span>
+      </div>
+      <div class="tier">
+        <span class="rank">2위</span><span class="name">설계서</span>
+        <span class="path">docs/설계서/*.md · docs/design/*.md</span>
+      </div>
+      <div class="tier">
+        <span class="rank">3위</span><span class="name">기술참조서</span>
+        <span class="path">docs/기술참조서/*.typ &nbsp;(포스트가 명시한 출처)</span>
+      </div>
+    </div>
+    <div class="note">
+      불일치는 세 갈래로 처리했다 — <strong>① 오류</strong>는 수정,
+      <strong>② 노후</strong>는 수정 후 변경 시점 명시,
+      <strong>③ 원본 미결</strong>은 수정하지 않고 보고. ③을 ①처럼 자동 수정하는 것이
+      가장 큰 위험이었다.
+    </div>
+  </section>
+
+  <!-- ================= 사실 오류 ================= -->
+  <section>
+    <h2><span class="num">§2</span>사실 오류 — 수정 완료</h2>
+    <p class="lede">
+      전부 코드에서만 확인 가능한 것들이다. 기술참조서는 피처가 무엇인지는 쓰지만
+      <em>어느 모듈이 그것을 소비하는지</em>는 쓰지 않는다.
+    </p>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 01</span>
+        <span class="ftitle">Expert 입력 차원</span>
+        <span class="fwhere">PLE-2 · PLE-3 · DEEPFM-1 · CAUSALOT-1 · MULTI-1</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">DeepFM · Causal · OT 가 같은 644D 정규화 벡터</dd>
+        <dt>코드 V1</dt><dd class="now">셋 다 input_dim: 734</dd>
+        <dt>코드 V2</dt><dd class="now">4035 / 539 / 175 — 더 이상 같지 않다</dd>
+      </dl>
+      <p class="fbody">
+        644D 는 raw power-law 90D 를 뺀 <em>normalized 소집합</em>이지 Expert 입력 폭이
+        아니다. <code>model_config.yaml</code> L225·L286·L318 이 V1 값을 734 로 적는다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 02</span>
+        <span class="ftitle">Expert 라우팅 — OT 는 다학제 블록을 받지 않는다</span>
+        <span class="fwhere">MULTI-1</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">24D 가 세 Expert(DeepFM · Causal · OT)에 투입</dd>
+        <dt>코드</dt><dd class="now">DeepFM · Causal 둘뿐</dd>
+      </dl>
+      <p class="fbody">
+        <code>DEFAULT_EXPERT_ROUTING_V2</code> 상 OT 의 라우팅은
+        <code>extended_source</code> + <code>multi_source</code> 뿐이라
+        <code>multidisciplinary</code> 그룹이 닿지 않는다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 03</span>
+        <span class="ftitle">DeepFM 필드 분할</span>
+        <span class="fwhere">DEEPFM-1</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">644D → 28 필드 → 378 쌍 · merchant_hierarchy 21D</dd>
+        <dt>코드</dt><dd class="now">771D → 31 필드 → 465 쌍 · merchant_hierarchy 27D</dd>
+      </dl>
+      <p class="fbody">
+        <code>DEEPFM_FIELD_SPEC</code> 실측이다. 블로그가 따라간
+        <code>model_config.yaml:220</code> 주석이 v3.11 시점이고 코드는 v3.16 —
+        같은 파일 L228 은 "31필드"라고 바르게 적어 <strong>프로젝트 자체가 자기모순</strong>이다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 04</span>
+        <span class="ftitle">Temporal 세션 시퀀스 폭</span>
+        <span class="fwhere">TEMPORAL-1 · PLE-2</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">[B, 90, 8]</dd>
+        <dt>코드</dt><dd class="now">[B, 90, 4] — session_input_dim: 4</dd>
+      </dl>
+      <p class="fbody">
+        <code>sess_duration</code> / <code>page_views</code> / <code>elapsed_sec</code> /
+        <code>hour</code> 네 개다. 거래 시퀀스 <code>[B,180,16]</code> 은 정확했다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 05</span>
+        <span class="ftitle">피처 역매핑 레이아웃 — 폭과 순서 모두</span>
+        <span class="fwhere">GROUND-1</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">238 + 91 + 84 + 159 + 27 + 24 + 21 = 644</dd>
+        <dt>코드</dt><dd class="now">238 + 91 + 147 + 24 + 27 + 84 + 21 = 632</dd>
+      </dl>
+      <p class="fbody">
+        <code>FeatureReverseMapper.FEATURE_RANGES</code> 는 <code>domain</code> 을 147D 로 잡아
+        총 632D 위에서 돈다. <strong>연속 인덱스 슬라이스라 순서도 의미를 갖는데</strong>
+        <code>extended_source</code> 가 세 번째가 아니라 여섯 번째다. 파일 주석이 스스로
+        밝힌다 — <em>"legacy 632D 구조 … 미마이그레이션 … 역매핑 정합은 엔지니어 결정"</em>.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 06</span>
+        <span class="ftitle">HMM Behavior 모드 차원 — 참조서 설명이 코드에 없다</span>
+        <span class="fwhere">HMM-1</span>
+      </div>
+      <dl class="cmp">
+        <dt>참조서</dt><dd class="was">Behavior = 6 + 4 + 6 = 16D (메타 블록을 줄여 맞춤)</dd>
+        <dt>산출측</dt><dd class="now">n_states + 5 + 6 → 6 + 5 + 6 = 17D</dd>
+        <dt>계약측</dt><dd class="now">hmm_behavior: 16</dd>
+      </dl>
+      <p class="fbody">
+        <code>hmm_features.py:886</code> 의 검증식은 모드 구분이 없다 — Behavior 메타를
+        4D 로 줄이는 분기가 존재하지 않는다. 산출 17 / 계약 16 이 어긋나 있고,
+        참조서의 "6+4+6" 은 그 어긋남을 사후 설명한 것에 가깝다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 07</span>
+        <span class="ftitle">존재하지 않는 디렉터리로 독자를 안내</span>
+        <span class="fwhere">MRM 에피소드 5</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">core/audit/ · core/retrieval/ 에서 확인 가능</dd>
+        <dt>실제</dt><dd class="now">core/monitoring/audit_logger.py · core/compliance/audit_store.py</dd>
+        <dt>LanceDB</dt><dd class="now">core/agent/case_store.py · temporal_fact_store.py · core/recommendation/reason/context_store.py</dd>
+      </dl>
+      <p class="fbody">
+        두 디렉터리 모두 실재하지 않는다. <code>docs/design/</code> 설계 문서에만 등장하는
+        경로이며 패키지로는 만들어진 적이 없다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-err">오류 08</span>
+        <span class="ftitle">FD-TVS 스코어링 설정 파일 경로</span>
+        <span class="fwhere">MRM 에피소드 4</span>
+      </div>
+      <dl class="cmp">
+        <dt>블로그</dt><dd class="was">configs/pipeline.yaml</dd>
+        <dt>실제</dt><dd class="now">configs/datasets/santander.yaml (병합본 configs/merged_config.json)</dd>
+      </dl>
+      <p class="fbody">
+        키 이름과 <strong>1.0~1.5 클리핑</strong> 설계는 정확했다 — 저장소
+        <code>AGENTS.md</code> 가 토씨까지 같은 말을 쓴다. 경로만 틀렸다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 노후 ================= -->
+  <section>
+    <h2><span class="num">§3</span>노후 — 작성 시점엔 정확했던 것</h2>
+    <p class="lede">
+      기존 문장은 지우지 않고 변경 시점과 함께 덧붙였다. 삭제가 아니라 가산이다.
+    </p>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-stale">노후 01</span>
+        <span class="ftitle">V2 strict 계약 전환 — 운영 입력 폭 4035D</span>
+        <span class="fwhere">8편 · ko/en</span>
+      </div>
+      <p class="fbody">
+        <code>feature_contract.py</code> 가 2026-07-02 자로 V1 을 런타임 은퇴시켰다
+        (<code>is_v2_enabled()</code> 는 항상 <code>True</code> 인 shim). 블로그는 734D 를
+        51회 언급하고 4035D 는 <strong>0회</strong>였다. 다만 734D 는 폐기가 아니라
+        V2 의 공유 베이스 8그룹으로 존속하므로 치환이 아닌 가산으로 처리했다.
+      </p>
+      <div class="proof">V2_BASE_GROUPS   238 + 91 + 159 + 24 + 27 + 84 + 21   = <b>644</b>  normalized
+                 + 90 raw_power_law                  = <b>734</b>  V1 계약 / V2 공유 베이스
+V2_APPEND        1440 + 1440 + 360 + 30 + 31         = <b>3301</b>
+                 734 + 3301                          = <b>4035</b>  운영 계약</div>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-stale">노후 02</span>
+        <span class="ftitle">PersLay 입력 70D → 58D</span>
+        <span class="fwhere">TDA-2</span>
+      </div>
+      <p class="fbody">
+        2026-06-24 자 정정. 글은 06-05 작성이라 그 이전 시점이다. 사유까지 코드 주석에 있다 —
+        <code>tda_long</code> 의 실측 산출이 스키마 라벨 36D 가 아니라 24D(β₂/H₂ 미생산).
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-stale">노후 03</span>
+        <span class="ftitle">Shared concat 512D → 448D, SAE latent 2048D → 1792D</span>
+        <span class="fwhere">PLE-4 · PLE-6</span>
+      </div>
+      <p class="fbody">
+        <code>lightgcn</code> 이 <code>enabled: false</code> 라 활성 Expert 는 6개다.
+        <code>model_config.yaml:525</code> 가 실측을 적어둔다 —
+        <em>"현행 활성 6개 = 5×64 + unified_hgcn 128 = 448D; lightgcn 복구 시 512D"</em>.
+        <code>SAELayer</code> 는 <code>expansion_factor = 4</code> 라 448 × 4 = 1792.
+        HGCN-1 은 이미 448D 를 쓰고 있어 <strong>블로그 내부에서도 갈려</strong> 있었다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-stale">노후 04</span>
+        <span class="ftitle">공개 벤치마크 태스크 수 13 → 12</span>
+        <span class="fwhere">EP1 전제조건 · PLE-4</span>
+      </div>
+      <p class="fbody">
+        AWS 저장소가 실행별 태스크 구성 provenance 기반으로 정합을 마쳤다
+        (<code>docs(paper1~3): 13→12 태스크 정합</code> 커밋 4건 + typst 20종 재컴파일).
+        README 도 <code>12-task</code> 다.
+      </p>
+    </div>
+
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-stale">노후 05</span>
+        <span class="ftitle">태스크 개수 3종이 뒤섞여 있었다</span>
+        <span class="fwhere">PLE-1 · PLE-2</span>
+      </div>
+      <p class="fbody">"13개"는 AWS 벤치마크 숫자를 온프렘 문맥에 쓴 것이었다. 주석으로 분리했다.</p>
+      <div class="tw"><table>
+        <thead><tr><th>대상</th><th>개수</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr><td>공개 AWS 벤치마크</td><td class="num">12</td><td class="id">README (13→12 정합 완료)</td></tr>
+          <tr><td>온프렘 설계 문서</td><td class="num">16</td><td class="id">onprem_experiment_design.md</td></tr>
+          <tr><td>온프렘 코드</td><td class="num">17 정의 / 15 활성</td><td class="id">active_tasks.py</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ================= 통과 ================= -->
+  <section>
+    <h2><span class="num">§4</span>검증 통과 — 수정하지 않은 것</h2>
+    <p class="lede">
+      대다수 주장은 정확했다. 특히 산수는 코드 실값과 한 자리도 어긋나지 않았다.
+    </p>
+
+    <h3>70D 대 58D — 모순이 아니었다</h3>
+    <p class="lede" style="margin-bottom:1rem">
+      가장 의심스러웠던 불일치가 오히려 두 서술이 모두 옳은 경우로 판명됐다.
+    </p>
+    <div class="proof">domain 그룹        <b>159</b> = 147 real + <i>12 pad</i>
+스키마 라벨 기준   24 + <i>36</i> + 10 = <b>70</b>   ← 블로그
+실제 산출 기준     24 + <i>24</i> + 10 = <b>58</b>   ← 코드
+                   70 − 58 = <i>12</i> = pad 와 정확히 일치</div>
+    <p class="fbody" style="margin-top:.9rem">
+      12 pad 의 정체가 <code>tda_long</code> 의 라벨 대비 산출 부족분이었다. 블로그는 슬롯 폭을,
+      코드는 실산출을 말한 것으로 같은 대상의 두 관점이다. 해당 포스트는 이미 이 불일치를
+      본문에 기록해두고 있었다.
+    </p>
+
+    <h3>모듈별 대조 결과</h3>
+    <div class="tw"><table>
+      <thead><tr><th>포스트</th><th>주장</th><th>코드 근거</th></tr></thead>
+      <tbody>
+        <tr><td>TDA-1 · TDA-2</td><td class="num">362D = 128+192+32+10</td><td class="id">perslay_expert.py:315 주석과 동일 · max_pairs 200/150 · INTERPRET_DIM=4</td></tr>
+        <tr><td>TDAFEAT-1</td><td class="num">phase 10D = 4 + 6</td><td class="id">_TDA_PHASE_FEATURES 10개가 정확히 분할</td></tr>
+        <tr><td>ECON-1</td><td class="num">17D = 9D + 8D</td><td class="id">financial_behavior + income_decomposition · 피처명 17개 전부</td></tr>
+        <tr><td>GMM-1</td><td class="num">K=20 · 22D</td><td class="id">OUTPUT_DIM = 20 + cluster_id + entropy · 입력 40D 분할 일치</td></tr>
+        <tr><td>TSFEAT-1</td><td class="num">68D = 50 + 18</td><td class="id">lnn_features.py 가 실제로 통계 18D (분포4·주파수4·변화점3·자기상관4·복잡도3)</td></tr>
+        <tr><td>ADATT-3</td><td class="num">0.8 / 0.7 / 0.6 / 0.7</td><td class="id">intra_strength · inter_group_strength 0.3 완전 일치</td></tr>
+        <tr><td>ADATT-4</td><td class="num">focal α 0.20 / 0.60</td><td class="id">γ=2 · nba 12-class · loss_weight 전부 일치</td></tr>
+        <tr><td>HGCN-1</td><td class="num">47D = 20 + 27</td><td class="id">base_input_dim + merchant_input_dim · output 128D</td></tr>
+        <tr><td>MULTI-1</td><td class="num">24D = 6+5+8+5</td><td class="id">task_feature_mapper.py:118-121</td></tr>
+        <tr><td>MRM 에피소드 3</td><td class="num">349D → 403D</td><td class="id">~349D input / 403D after Phase 0</td></tr>
+        <tr><td>MRM 에피소드 2</td><td class="num">0.005 / 0.02</td><td class="id">min_improvement · max_degradation</td></tr>
+        <tr><td>QWEN-1</td><td class="id">Qwen3-8B-AWQ</td><td class="id">저장소 최다 사용 식별자와 일치</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note">
+      <strong>부재가 정상이었던 식별자.</strong> MRM 에피소드 6 의
+      <code>ComplianceReporter</code> 는 본문이 <em>"가장 빠지기 쉬운 유혹"</em>이라며
+      기각한 안티패턴이고, <code>USComplianceGenerator</code> 는
+      <em>"만약 통과된다면"</em> 이라는 가상의 미래 모듈이다. 코드에 없는 것이 맞다.
+    </div>
+  </section>
+
+  <!-- ================= 원본 결함 ================= -->
+  <section>
+    <h2><span class="num">§5</span>원본 프로젝트 결함 — 보고만</h2>
+    <p class="lede">블로그 문제가 아니다. 수정하지 않고 기록했다.</p>
+    <div class="tw"><table>
+      <thead><tr><th>위치</th><th>기재</th><th>실제</th></tr></thead>
+      <tbody>
+        <tr><td class="id">ple_cluster_adatt.py:118</td><td class="num">strict V2 4057D</td><td class="num">4035 (4057 확장은 2026-06-16 철회)</td></tr>
+        <tr><td class="id">soft_label_generator.py:1512</td><td class="num">life_stage: 6</td><td class="num">3 (2026-07-08)</td></tr>
+        <tr><td class="id">task_feature_mapper.py:87</td><td class="num">각 10D</td><td class="num">16D — 같은 파일 L158-160</td></tr>
+        <tr><td class="id">model_config.yaml:82</td><td class="num">expert_input_version: v1</td><td class="num">死값 — V2 경로만 탄다</td></tr>
+        <tr><td class="id">model_config.yaml:220</td><td class="num">28 필드 / 644D</td><td class="num">31 필드 / 771D — 같은 파일 L228</td></tr>
+        <tr><td class="id">hmm_features.py:886</td><td class="num">Behavior 17D</td><td class="num">계약은 16D</td></tr>
+        <tr><td class="id">feature_reverse_mapper.py</td><td class="num">632D 레이아웃</td><td class="num">계약은 644D — 미마이그레이션</td></tr>
+        <tr><td class="id">ple_dataset.py:15</td><td class="num">LNN = ODE latent 16+1+1</td><td class="num">실제는 통계 피처 18D</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ================= 미결 ================= -->
+  <section>
+    <h2><span class="num">§6</span>저자 판단이 필요한 미결</h2>
+    <div class="finding">
+      <div class="fhead">
+        <span class="chip c-open">미결</span>
+        <span class="ftitle">"7개 이종 Expert" 라는 서사 표현</span>
+      </div>
+      <p class="fbody">
+        활성은 6개이고, <code>lightgcn</code> 은 <em>일시</em> 비활성이다
+        ("복구 시"라는 표현이 근거). 숫자가 어긋나는 곳은 §3 노후 03 으로 수정했으나,
+        서사 표현 자체는 손대지 않았다 — PLE-3 처럼 <em>왜 이 7명을 뽑았나</em> 를 다루는
+        설계 근거 글은 7이 맞고, PLE-2 비교표·PLE-6 사양표처럼 <em>현재 구조</em> 를
+        기술하는 글은 어긋난다. "설계된 7 / 활성 6" 병기 여부는 저자 결정 사항이다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 커버리지 ================= -->
+  <section>
+    <h2><span class="num">§7</span>검증 커버리지와 한계</h2>
+    <p class="lede">검증되지 않은 영역을 명시한다. 이것이 이 보고서에서 가장 중요한 절이다.</p>
+    <div class="tw"><table>
+      <thead><tr><th>범위</th><th>상태</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td>study-thread 27편</td><td class="num" style="color:var(--fixed)">21편 검증</td><td>PLE 6 · ADATT 4 · TDA 3 · 피처군 6 · 기타 2</td></tr>
+        <tr><td>MRM 스레드 6편 · Commentary 2편</td><td class="num" style="color:var(--fixed)">AWS 대조 완료</td><td>식별자 316개 양방 검증</td></tr>
+        <tr><td>4개월 개발기 8편</td><td class="num" style="color:var(--stale)">본문 미착수</td><td>주장 밀도 최저 (합 13건)</td></tr>
+        <tr><td>ko/en 정합성</td><td class="num" style="color:var(--stale)">19쌍 미해소</td><td>검출만 하고 조사하지 않음</td></tr>
+        <tr><td>KaTeX 수식</td><td class="num" style="color:var(--stale)">미검증</td><td>수학적 정확성 확인 안 함</td></tr>
+        <tr><td>학술 인용</td><td class="num" style="color:var(--stale)">미검증</td><td>Tang 2020 · Cuturi 2013 · Zheng 2018 등 연도·학회 미확인</td></tr>
+        <tr><td>기술참조서 18종</td><td class="num" style="color:var(--stale)">부분 참조</td><td>필요 부분만 grep · 통독한 문서 없음</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note">
+      <strong>검사 스크립트 결함을 바로잡았다.</strong> 초기 식별자 검사는
+      언더스코어 없는 CamelCase 를 필터로 배제했고, <code>rg</code> 서브프로세스 실패를
+      예외로 삼켜 결과가 공백이었다. "223개 전부 존재"라는 초기 결론은 <strong>무효</strong>였다.
+      현행 스크립트는 두 저장소를 직접 읽어 316개를 대조한다.
+    </div>
+  </section>
+
+  <footer>
+    <div class="row"><span class="sha">db7127b</span><span>AWS 저장소 대조 검증 — MRM/Commentary/4개월 계열 정정</span></div>
+    <div class="row"><span class="sha">fee9ed3</span><span>study-thread 전 27편 코드 대조 검증 — 2차 패스</span></div>
+    <div class="row"><span class="sha">8a5ea74</span><span>온프렘 코드 대조 검증 — 사실 오류 수정 + V2 계약 층 가산</span></div>
+    <div class="row" style="margin-top:1rem; color:var(--faint)">
+      근거 지도 · 교차 재정 · 배치 절차는 저장소 루트 CLAUDE.md 에 기록됨
+    </div>
+  </footer>
+
+</div>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('tt');
+  var saved=null;
+  try{ saved=localStorage.getItem('audit-theme'); }catch(e){}
+  if(saved){ root.setAttribute('data-theme',saved); }
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){
+      cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    }
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{ localStorage.setItem('audit-theme',next); }catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
